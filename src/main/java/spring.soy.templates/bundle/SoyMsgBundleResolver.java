@@ -1,4 +1,4 @@
-package spring.soy.templates;
+package spring.soy.templates.bundle;
 
 import com.google.template.soy.msgs.SoyMsgBundle;
 
@@ -13,6 +13,6 @@ import java.util.Locale;
  */
 public interface SoyMsgBundleResolver {
 
-    SoyMsgBundle resolve(final Locale locale) throws IOException;
+    SoyMsgBundle resolve(Locale locale) throws IOException;
 
 }

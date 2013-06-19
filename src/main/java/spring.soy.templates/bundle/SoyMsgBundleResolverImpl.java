@@ -1,4 +1,4 @@
-package spring.soy.templates;
+package spring.soy.templates.bundle;
 
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.msgs.SoyMsgBundleHandler;
@@ -16,11 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 20/06/2013
  * Time: 00:01
  */
-public class SoyMsgBundleResolverImpl {
+public class SoyMsgBundleResolverImpl implements SoyMsgBundleResolver {
 
     private static final Map<Locale, SoyMsgBundle> msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
 
-    public SoyMsgBundle resolve(Locale locale) throws IOException {
+    public SoyMsgBundle resolve(final Locale locale) throws IOException {
         SoyMsgBundle soyMsgBundle = msgBundles.get(locale);
         if (soyMsgBundle == null) {
             soyMsgBundle = createSoyMsgBundle(locale);
@@ -40,9 +40,9 @@ public class SoyMsgBundleResolverImpl {
         return soyMsgBundle;
     }
 
-    private static SoyMsgBundle createSoyMsgBundle(Locale locale) throws IOException {
-        URL msgFile = Thread.currentThread().getContextClassLoader().getResource("xliffs/messages_"+locale.toString()+".xlf");
-        if (msgFile == null){
+    private static SoyMsgBundle createSoyMsgBundle(final Locale locale) throws IOException {
+        URL msgFile = Thread.currentThread().getContextClassLoader().getResource("xliffs/messages_" + locale.toString() + ".xlf");
+        if (msgFile == null) {
             return null;
         }
 
