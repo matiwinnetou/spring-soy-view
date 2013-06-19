@@ -45,6 +45,12 @@
             <version>2.5</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.closure</groupId>
+            <artifactId>soy-with-deps</artifactId>
+            <version>20111222</version>
+        </dependency>
+
     </dependencies>
 
 </project>
