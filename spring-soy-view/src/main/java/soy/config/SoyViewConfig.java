@@ -1,5 +1,7 @@
 package soy.config;
 
+import com.google.template.soy.javasrc.SoyJavaSrcOptions;
+import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import soy.bundle.SoyMsgBundleResolver;
 import soy.compile.TofuCompiler;
 import soy.data.ToSoyDataConverter;
@@ -25,5 +27,7 @@ public interface SoyViewConfig {
     SoyMsgBundleResolver getSoyMsgBundleResolver();
 
     ToSoyDataConverter getToSoyDataConverter();
+
+    SoyJsSrcOptions getJsSrcOptions();
 
 }

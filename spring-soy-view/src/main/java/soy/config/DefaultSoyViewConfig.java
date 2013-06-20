@@ -1,5 +1,6 @@
 package soy.config;
 
+import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import org.springframework.core.io.ClassPathResource;
 import soy.bundle.EmptySoyMsgBundleResolver;
 import soy.bundle.SoyMsgBundleResolver;
@@ -32,8 +33,18 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
 
     private ToSoyDataConverter toSoyDataConverter = new CleverToSoyDataConverter();
 
+    private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();
+
     public void setDebugOn(final boolean debugOn) {
         isDebugOn = debugOn;
+    }
+
+    public SoyJsSrcOptions getJsSrcOptions() {
+        return soyJsSrcOptions;
+    }
+
+    public void setSoyJsSrcOptions(final SoyJsSrcOptions soyJsSrcOptions) {
+        this.soyJsSrcOptions = soyJsSrcOptions;
     }
 
     public ToSoyDataConverter getToSoyDataConverter() {

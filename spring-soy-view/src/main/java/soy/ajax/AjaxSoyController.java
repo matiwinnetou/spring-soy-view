@@ -1,8 +1,8 @@
 package soy.ajax;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
+import soy.compile.TofuCompiler;
 import soy.config.SoyViewConfig;
+import soy.locale.LocaleResolver;
+import soy.template.TemplateFilesResolver;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
@@ -34,9 +37,6 @@ public class AjaxSoyController {
 	
 	@Autowired
 	private SoyViewConfig config;
-	
-	//TODO: Make properties on this settable via config
-	private SoyJsSrcOptions jsSrcOptions = new SoyJsSrcOptions();
 	
 	private ConcurrentHashMap<String, String> cachedJsTemplates = new ConcurrentHashMap<String, String>();
 
@@ -68,15 +68,12 @@ public class AjaxSoyController {
 	}
 
 	private String compileTemplateAndAssertSuccess(final HttpServletRequest request, File templateFile) throws IOException {
-		final SoyFileSet soyFileSet = buildSoyFileSetFrom(templateFile);
+        final Optional<SoyMsgBundle> soyMsgBundle = getSoyBundle(request);
+        final SoyJsSrcOptions soyJavaSrcOptions = config.getJsSrcOptions();
+        final TofuCompiler tofuCompiler = config.getTofuCompiler();
 
-        final Locale locale = config.getLocaleResolver().resolveLocale(request);
-        SoyMsgBundle soyMsgBundle = null;
-        if (locale != null) {
-            soyMsgBundle = config.getSoyMsgBundleResolver().resolve(locale);
-        }
+		final List<String> compiledTemplates = tofuCompiler.compileToJsSrc(templateFile, soyJavaSrcOptions, soyMsgBundle.orNull());
 
-		final List<String> compiledTemplates = soyFileSet.compileToJsSrc(jsSrcOptions, soyMsgBundle);
 		if (compiledTemplates.size() < 1) {
 			throw notFound("No compiled templates found");
 		}
@@ -84,15 +81,20 @@ public class AjaxSoyController {
 		return compiledTemplates.get(0);
 	}
 
-	private SoyFileSet buildSoyFileSetFrom(final File templateFile) {
-        final SoyFileSet.Builder builder = new SoyFileSet.Builder();
-        builder.add(templateFile);
+    private Optional<SoyMsgBundle> getSoyBundle(HttpServletRequest request) throws IOException {
+        final LocaleResolver localeResolver = config.getLocaleResolver();
+        final Locale locale = localeResolver.resolveLocale(request);
 
-        return builder.build();
-	}
+        if (locale != null) {
+            return Optional.fromNullable(config.getSoyMsgBundleResolver().resolve(locale));
+        }
 
-	private File getTemplateFileAndAssertExistence(final String templateFileName) {
-        final Collection<File> files = config.getTemplateFilesResolver().resolve();
+        return Optional.absent();
+    }
+
+    private File getTemplateFileAndAssertExistence(final String templateFileName) {
+        final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
+        final Collection<File> files = templateFilesResolver.resolve();
 
         final File templateFile = Iterables.find(files, new Predicate<File>() {
             @Override
