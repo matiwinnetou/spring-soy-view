@@ -14,19 +14,6 @@ import java.util.Collection;
  */
 public class DefaultTofuCompiler implements TofuCompiler {
 
-//    @Override
-//    public SoyTofu compile(final URL[] urls) {
-//        final SoyFileSet.Builder sfsBuilder = new SoyFileSet.Builder();
-//
-//        for (final URL url : urls) {
-//            sfsBuilder.add(url);
-//        }
-//
-//        final SoyFileSet sfs = sfsBuilder.build();
-//
-//        return sfs.compileToTofu();
-//    }
-
     @Override
     public SoyTofu compile(final Collection<File> files) {
         final SoyFileSet.Builder sfsBuilder = new SoyFileSet.Builder();

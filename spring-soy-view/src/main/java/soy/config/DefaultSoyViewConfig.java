@@ -1,13 +1,16 @@
 package soy.config;
 
 import org.springframework.core.io.ClassPathResource;
+import soy.bundle.EmptySoyMsgBundleResolver;
 import soy.bundle.SoyMsgBundleResolver;
 import soy.bundle.SoyMsgBundleResolverImpl;
 import soy.compile.DefaultTofuCompiler;
 import soy.compile.TofuCompiler;
+import soy.data.CleverToSoyDataConverter;
 import soy.data.PojoReflectionToSoyDataConverter;
 import soy.data.ToSoyDataConverter;
 import soy.locale.AcceptHeaderLocaleResolver;
+import soy.locale.EmptyLocaleResolver;
 import soy.locale.LocaleResolver;
 import soy.template.DefaultTemplateFilesResolver;
 import soy.template.TemplateFilesResolver;
@@ -22,15 +25,15 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
 
     private boolean isDebugOn;
 
-    private LocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
+    private LocaleResolver localeResolver = new EmptyLocaleResolver();
 
     private TofuCompiler tofuCompiler = new DefaultTofuCompiler();
 
-    private SoyMsgBundleResolver soyMsgBundleResolver = new SoyMsgBundleResolverImpl();
+    private SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
     private TemplateFilesResolver templateFilesResolver = new DefaultTemplateFilesResolver(new ClassPathResource("/WEB-INF/templates"), true);
 
-    private ToSoyDataConverter toSoyDataConverter = new PojoReflectionToSoyDataConverter();
+    private ToSoyDataConverter toSoyDataConverter = new CleverToSoyDataConverter();
 
     public void setDebugOn(final boolean debugOn) {
         isDebugOn = debugOn;

@@ -9,27 +9,15 @@
 	<mvc:annotation-driven />
 	<context:component-scan base-package="soy" />
 
-    <bean id="templatesResolver" class="soy.template.DefaultTemplateFilesResolver">
-        <property name="templatesLocation" value="/WEB-INF/templates" />
-    </bean>
-
-    <bean id="soyConfig"
-		class="soy.config.DefaultSoyViewConfig">
+    <bean id="soyConfig" class="soy.config.DefaultSoyViewConfig">
         <property name="templateFilesResolver">
             <bean class="soy.template.DefaultTemplateFilesResolver">
                 <property name="templatesLocation" value="/WEB-INF/templates" />
             </bean>
         </property>
-        <property name="toSoyDataConverter">
-            <bean class="soy.data.EmptyToSoyDataConverter"/>
-        </property>
-        <property name="soyMsgBundleResolver">
-            <bean class="soy.bundle.EmptySoyMsgBundleResolver" />
-        </property>
     </bean>
 
-	<bean id="viewResolver"
-		class="soy.SoyTemplateViewResolver">
+	<bean id="viewResolver" class="soy.SoyTemplateViewResolver">
 		<property name="soyViewConfig" ref="soyConfig" />
 	</bean>
 
