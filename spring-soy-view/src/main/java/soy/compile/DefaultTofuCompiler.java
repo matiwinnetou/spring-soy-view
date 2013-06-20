@@ -25,22 +25,22 @@ public class DefaultTofuCompiler implements TofuCompiler {
             sfsBuilder.add(file);
         }
 
-        final SoyFileSet sfs = sfsBuilder.build();
-
-        return sfs.compileToTofu();
+        return sfsBuilder
+                .build()
+                .compileToTofu();
     }
 
     @Override
-    public final List<String> compileToJsSrc(final File file, SoyJsSrcOptions soyJsSrcOptions, SoyMsgBundle soyMsgBundle) {
+    public final List<String> compileToJsSrc(final File file, final SoyJsSrcOptions soyJsSrcOptions, final SoyMsgBundle soyMsgBundle) {
         final SoyFileSet soyFileSet = buildSoyFileSetFrom(file);
 
         return soyFileSet.compileToJsSrc(soyJsSrcOptions, soyMsgBundle);
     }
 
     private SoyFileSet buildSoyFileSetFrom(final File templateFile) {
-        SoyFileSet soyFileSet = (new SoyFileSet.Builder()).add(templateFile).build();
-
-        return soyFileSet;
+        return new SoyFileSet.Builder()
+                .add(templateFile)
+                .build();
     }
 
 }

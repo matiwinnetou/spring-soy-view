@@ -22,7 +22,7 @@
     </bean>
 
     <bean id="viewResolver" class="soy.SoyTemplateViewResolver">
-		<property name="soyViewConfig" ref="soyConfig" />
+		<property name="config" ref="soyConfig" />
 	</bean>
 
 	<bean

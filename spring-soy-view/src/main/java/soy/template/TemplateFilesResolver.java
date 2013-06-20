@@ -1,7 +1,5 @@
 package soy.template;
 
-import com.google.template.soy.SoyFileSet;
-
 import java.io.File;
 import java.util.Collection;
 

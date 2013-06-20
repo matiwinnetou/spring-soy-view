@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
+import soy.SoyUtils;
 import soy.compile.TofuCompiler;
 import soy.config.SoyViewConfig;
 import soy.locale.LocaleResolver;
@@ -23,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -47,6 +47,7 @@ public class AjaxSoyController {
 
 	@RequestMapping(value="/soy/{templateFileName}.js", method=GET)
 	public ResponseEntity<String> getJsForTemplateFile(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
+        SoyUtils.checkSoyViewConfig(config);
 		if (!config.isDebugOn() && cachedJsTemplates.containsKey(templateFileName)) {
 			return prepareResponseFor(cachedJsTemplates.get(templateFileName));
 		}
@@ -68,7 +69,7 @@ public class AjaxSoyController {
 	}
 
 	private String compileTemplateAndAssertSuccess(final HttpServletRequest request, File templateFile) throws IOException {
-        final Optional<SoyMsgBundle> soyMsgBundle = getSoyBundle(request);
+        final Optional<SoyMsgBundle> soyMsgBundle = SoyUtils.soyMsgBundle(config, request);
         final SoyJsSrcOptions soyJavaSrcOptions = config.getJsSrcOptions();
         final TofuCompiler tofuCompiler = config.getTofuCompiler();
 
@@ -80,17 +81,6 @@ public class AjaxSoyController {
 
 		return compiledTemplates.get(0);
 	}
-
-    private Optional<SoyMsgBundle> getSoyBundle(HttpServletRequest request) throws IOException {
-        final LocaleResolver localeResolver = config.getLocaleResolver();
-        final Locale locale = localeResolver.resolveLocale(request);
-
-        if (locale != null) {
-            return Optional.fromNullable(config.getSoyMsgBundleResolver().resolve(locale));
-        }
-
-        return Optional.absent();
-    }
 
     private File getTemplateFileAndAssertExistence(final String templateFileName) {
         final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
