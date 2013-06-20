@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SoyMsgBundleResolverImpl implements SoyMsgBundleResolver {
 
-    private final String DEF_MESSAGES_PATH = "xliffs/messages_";
+    private final String DEF_MESSAGES_PATH = "xliffs/messages";
 
     private static final Map<Locale, SoyMsgBundle> msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
 
@@ -50,7 +50,7 @@ public class SoyMsgBundleResolverImpl implements SoyMsgBundleResolver {
     }
 
     protected SoyMsgBundle createSoyMsgBundle(final Locale locale) throws IOException {
-        final String path = messagesPath + locale.toString() + ".xlf";
+        final String path = messagesPath  + "_" + locale.toString() + ".xlf";
 
         final Enumeration<URL> e = Thread.currentThread().getContextClassLoader().getResources(path);
 
@@ -63,27 +63,23 @@ public class SoyMsgBundleResolverImpl implements SoyMsgBundleResolver {
             msgBundles.add(msgBundleHandler.createFromResource(msgFile));
         }
 
-        return mergeMsgBundles(msgBundles).orNull();
+        return mergeMsgBundles(locale, msgBundles).orNull();
     }
 
-    private Optional<? extends SoyMsgBundle> mergeMsgBundles(final List<SoyMsgBundle> soyMsgBundles) {
+    private Optional<? extends SoyMsgBundle> mergeMsgBundles(final Locale locale, final List<SoyMsgBundle> soyMsgBundles) {
         if (soyMsgBundles.isEmpty()) {
             return Optional.absent();
         }
 
-        String localeStr = "";
-
         final List<SoyMsg> msgs = Lists.newArrayList();
 
         for (final SoyMsgBundle smb : soyMsgBundles) {
-            localeStr = smb.getLocaleString(); //we assume locale is the same
-
             for (Iterator<SoyMsg> it = smb.iterator(); it.hasNext();) {
                 msgs.add(it.next());
             }
         }
 
-        return Optional.of(new SoyMsgBundleImpl(localeStr, msgs));
+        return Optional.of(new SoyMsgBundleImpl(locale.toString(), msgs));
     }
 
     public void setMessagesPath(final String messagesPath) {

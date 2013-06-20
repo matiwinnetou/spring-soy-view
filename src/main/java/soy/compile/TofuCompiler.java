@@ -2,7 +2,9 @@ package soy.compile;
 
 import com.google.template.soy.tofu.SoyTofu;
 
+import java.io.File;
 import java.net.URL;
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,6 +14,6 @@ import java.net.URL;
  */
 public interface TofuCompiler {
 
-    SoyTofu compile(URL[] urls);
+    SoyTofu compile(Collection<File> files);
 
 }

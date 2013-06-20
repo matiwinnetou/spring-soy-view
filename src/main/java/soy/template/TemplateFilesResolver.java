@@ -1,6 +1,7 @@
 package soy.template;
 
-import java.net.URL;
+import java.io.File;
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,6 +11,6 @@ import java.net.URL;
  */
 public interface TemplateFilesResolver {
 
-    URL[] resolve();
+    Collection<File> resolve();
 
 }
