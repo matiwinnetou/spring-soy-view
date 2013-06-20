@@ -1,0 +1,97 @@
+{namespace soy.example}
+
+/**
+ * Index page
+ * @param serverTime The server time
+ */
+{template .index}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Name       : Memoranda  
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20100801
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Spring Closure Templates Example @ {$serverTime}</title>
+<link href="../style.css" rel="stylesheet" type="text/css" media="screen" />
+
+<script type="text/javascript" src="/spring-closure-templates-example/js/jquery-1.6.2.js"></script>
+<script type="text/javascript" src="/spring-closure-templates-example/js/soyutils.js"></script>
+<script type="text/javascript" src="/spring-closure-templates-example/app/tmpl/server-time.js"></script>
+<script type="text/javascript" src="/spring-closure-templates-example/app/tmpl/client-words.js"></script>
+
+<script type="text/javascript" src="/spring-closure-templates-example/js/page-behaviour.js"></script>
+
+</head>
+<body>
+<div id="wrapper">
+	<div id="page">
+		<div id="page-bgtop">
+			<div id="page-bgbtm">
+				<div id="content">
+					<div class="post">
+						<h2 class="title">Server-side rendering example</h2>
+						<div style="clear: both;">&nbsp;</div>
+						<div class="entry">
+							{call .serverTime data="all"/} 
+						</div>
+					</div>
+					<div class="post">
+						<h2 class="title"><a href="#">Client-side rendering example</a></h2>
+						<div style="clear: both;">&nbsp;</div>
+						<div class="entry">
+							<p>Type a word in the box on the left and hit Submit</p>
+							<p id="clientWords">{call .clientWords data="all" /}</p>
+						</div>
+					</div>
+					
+					<div style="clear: both;">&nbsp;</div>
+				</div>
+				<!-- end #content -->
+				<div id="sidebar">
+					<div id="logo">
+						<h1><a href="#">Memoranda </a></h1>
+						<p>by <a href="http://www.freecsstemplates.org/">Free CSS Templates</a></p>
+					</div>
+					<div id="menu">
+						<ul>
+							<li><a id="getServerTimeLink" href="#">Get Server Time</a></li>
+						</ul>
+					</div>
+					<ul>
+						<li>
+							<div id="search" >
+								<form id="wordsForm" method="get" action="#">
+									<div>
+										<input type="text" name="newWordTextField" id="newWordTextField" value="" />
+										<input type="button" id="submitButton" />
+									</div>
+								</form>
+							</div>
+							<div style="clear: both;">&nbsp;</div>
+						</li>
+					</ul>
+				</div>
+				<!-- end #sidebar -->
+				<div style="clear: both;">&nbsp;</div>
+			</div>
+		</div>
+	</div>
+	<!-- end #page -->
+</div>
+<div id="footer">
+	<p>Copyright (c) 2008 Sitename.com. All rights reserved. Design by <a href="http://www.freecsstemplates.org/">Free CSS Templates</a>.</p>
+</div>
+<!-- end #footer -->
+</body>
+</html>
+{/template}
+

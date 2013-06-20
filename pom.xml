@@ -1,11 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>spring-soy-templates</groupId>
-	<artifactId>spring-soy-templates</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<name>spring-soy-templates</name>
-	
+    <groupId>spring-soy-view</groupId>
+    <artifactId>spring-soy-view-root</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>spring-soy-view-root</name>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -51,19 +52,11 @@
             <version>20111222</version>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>com.google.template</groupId>-->
-            <!--<artifactId>soy</artifactId>-->
-            <!--<version>2012-12-21</version>-->
-        <!--</dependency>-->
-
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>codedance on Github</id>
-            <url>https://github.com/codedance/maven-repository/raw/master</url>
-        </repository>
-    </repositories>
+    <modules>
+      <module>spring-soy-view</module>
+      <module>spring-soy-view-example</module>
+    </modules>
 
 </project>
