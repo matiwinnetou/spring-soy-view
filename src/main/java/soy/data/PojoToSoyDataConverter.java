@@ -1,4 +1,4 @@
-package spring.soy.templates.data;
+package soy.data;
 
 import java.util.Map;
 
@@ -8,7 +8,7 @@ import java.util.Map;
  * Date: 20/06/2013
  * Time: 00:27
  */
-public interface ModelToSoyDataConverter {
+public interface PojoToSoyDataConverter {
 
     Map<String, ?> convert(Object model) throws Exception;
 

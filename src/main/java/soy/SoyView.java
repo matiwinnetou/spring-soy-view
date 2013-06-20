@@ -1,10 +1,12 @@
-package spring.soy.templates;
+package soy;
 
 import com.google.template.soy.tofu.SoyTofu;
 import org.springframework.web.servlet.view.AbstractTemplateView;
-import spring.soy.templates.bundle.SoyMsgBundleResolver;
-import spring.soy.templates.data.ModelToSoyDataConverter;
-import spring.soy.templates.locale.LocaleResolver;
+import soy.bundle.SoyMsgBundleResolver;
+import soy.compile.TofuCompiler;
+import soy.data.PojoToSoyDataConverter;
+import soy.locale.LocaleResolver;
+import soy.template.TemplateFilesResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +30,16 @@ public class SoyView extends AbstractTemplateView {
 
     private LocaleResolver localeResolver;
 
-    private ModelToSoyDataConverter modelToSoyDataConverter;
+    private PojoToSoyDataConverter pojoToSoyDataConverter;
+
+    private TofuCompiler tofuCompiler;
+
+    private TemplateFilesResolver templateFilesResolver;
+
+    public SoyView(final String templateName) {
+        this.templateName = templateName;
+        compiledTemplates = tofuCompiler.compile(templateFilesResolver.resolve());
+    }
 
     @Override
     protected void renderMergedTemplateModel(final Map<String, Object> model,
@@ -36,7 +47,7 @@ public class SoyView extends AbstractTemplateView {
                                              final HttpServletResponse response) throws Exception {
         final Writer writer = response.getWriter();
 
-        final Map<String, ?> soyData = modelToSoyDataConverter.convert(model);
+        final Map<String, ?> soyData = pojoToSoyDataConverter.convert(model);
 
         final Locale locale = localeResolver.resolveLocale(request);
 
@@ -64,8 +75,16 @@ public class SoyView extends AbstractTemplateView {
         this.localeResolver = localeResolver;
     }
 
-    public void setModelToSoyDataConverter(ModelToSoyDataConverter modelToSoyDataConverter) {
-        this.modelToSoyDataConverter = modelToSoyDataConverter;
+    public void setPojoToSoyDataConverter(PojoToSoyDataConverter pojoToSoyDataConverter) {
+        this.pojoToSoyDataConverter = pojoToSoyDataConverter;
+    }
+
+    public void setTofuCompiler(TofuCompiler tofuCompiler) {
+        this.tofuCompiler = tofuCompiler;
+    }
+
+    public void setTemplateFilesResolver(TemplateFilesResolver templateFilesResolver) {
+        this.templateFilesResolver = templateFilesResolver;
     }
 
 }

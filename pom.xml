@@ -51,6 +51,19 @@
             <version>20111222</version>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>com.google.template</groupId>-->
+            <!--<artifactId>soy</artifactId>-->
+            <!--<version>2012-12-21</version>-->
+        <!--</dependency>-->
+
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>codedance on Github</id>
+            <url>https://github.com/codedance/maven-repository/raw/master</url>
+        </repository>
+    </repositories>
 
 </project>

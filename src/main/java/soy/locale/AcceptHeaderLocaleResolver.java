@@ -1,4 +1,4 @@
-package spring.soy.templates.locale;
+package soy.locale;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;

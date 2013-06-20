@@ -1,4 +1,4 @@
-package spring.soy.templates.bundle;
+package soy.bundle;
 
 import com.google.template.soy.msgs.SoyMsgBundle;
 

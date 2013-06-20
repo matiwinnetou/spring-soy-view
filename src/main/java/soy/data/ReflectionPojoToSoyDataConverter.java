@@ -1,4 +1,4 @@
-package spring.soy.templates.data;
+package soy.data;
 
 import com.google.template.soy.data.SoyData;
 import com.google.template.soy.data.SoyDataException;
@@ -15,7 +15,7 @@ import java.util.Map;
  * Date: 20/06/2013
  * Time: 00:28
  */
-public class SimpleModelToSoyDataConverter implements ModelToSoyDataConverter {
+public class ReflectionPojoToSoyDataConverter implements PojoToSoyDataConverter {
 
     @Override
     public Map<String, ?> convert(Object model) throws Exception {
