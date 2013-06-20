@@ -10,7 +10,6 @@ Supported:
 1. POJO rendering
 2. SoyMsgBundle
 3. AjaxJavaScript endpoint
-4. Debug flag
 
 author: Mateusz Szczap
 
