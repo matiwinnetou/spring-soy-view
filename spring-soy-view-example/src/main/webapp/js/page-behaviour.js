@@ -1,17 +1,17 @@
 var APP = {}
 
-APP.words = []
+APP.words = ['hi!']
 
 APP.pushNewWord = function() {
 	var newWord = $('#newWordTextField').val();
 	APP.words.push(newWord);
-	$('#clientWords').html(com.tomakehurst.clientWords({ words: APP.words }));
+	$('#clientWords').html(soy.example.clientWords({ words: APP.words }));
 }
 
 $(document).ready(function() {
 	$('#getServerTimeLink').click(function() {
 		$.ajax({
-		  url: "/spring-closure-templates-example/app/server-time",
+		  url: "/spring-soy-view-example/app/server-time",
 		  context: document.body,
 		  success: function(data) {
 		    $('#serverTime').html(data);

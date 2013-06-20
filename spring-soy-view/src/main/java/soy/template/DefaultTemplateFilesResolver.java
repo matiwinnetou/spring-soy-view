@@ -1,6 +1,7 @@
 package soy.template;
 
 import com.google.common.collect.Lists;
+import com.google.template.soy.SoyFileSet;
 import org.springframework.core.io.Resource;
 
 import java.io.File;

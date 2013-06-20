@@ -17,7 +17,11 @@
         </property>
     </bean>
 
-	<bean id="viewResolver" class="soy.SoyTemplateViewResolver">
+    <bean id="ajaxSoyController" class="soy.ajax.AjaxSoyController">
+        <property name="config" ref="soyConfig" />
+    </bean>
+
+    <bean id="viewResolver" class="soy.SoyTemplateViewResolver">
 		<property name="soyViewConfig" ref="soyConfig" />
 	</bean>
 

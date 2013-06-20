@@ -1,10 +1,13 @@
 package soy.compile;
 
+import com.google.template.soy.jssrc.SoyJsSrcOptions;
+import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,5 +18,7 @@ import java.util.Collection;
 public interface TofuCompiler {
 
     SoyTofu compile(Collection<File> files);
+
+    List<String> compileToJsSrc(File template, SoyJsSrcOptions soyJsSrcOptions, SoyMsgBundle soyMsgBundle);
 
 }
