@@ -16,4 +16,3 @@ public class AcceptHeaderLocaleResolver implements LocaleResolver {
     }
 
 }
-

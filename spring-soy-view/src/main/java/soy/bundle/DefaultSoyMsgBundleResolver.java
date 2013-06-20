@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 20/06/2013
  * Time: 00:01
  */
-public class SoyMsgBundleResolverImpl implements SoyMsgBundleResolver {
+public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     private final String DEF_MESSAGES_PATH = "xliffs/messages";
 

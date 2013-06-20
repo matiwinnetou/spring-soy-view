@@ -21,8 +21,6 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     private boolean recursive = true;
 
-    private String extension = "soy";
-
     public DefaultTemplateFilesResolver() {
     }
 
@@ -66,7 +64,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         if (files != null) {
             for (final File file : files) {
                 if (file.isFile()) {
-                    if (file.getName().endsWith("." + extension)) {
+                    if (file.getName().endsWith(".soy")) {
                         soyFiles.add(file);
                     }
                 } else if (file.isDirectory() && recursive) {
@@ -86,7 +84,4 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         this.recursive = recursive;
     }
 
-    public void setExtension(String extension) {
-        this.extension = extension;
-    }
 }
