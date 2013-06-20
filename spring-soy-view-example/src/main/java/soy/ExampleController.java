@@ -16,13 +16,13 @@ public class ExampleController {
 		addServerTimeStringToModel(model);
 		model.addAttribute("words", new ArrayList<String>());
 
-		return "soy.index";
+		return "soy.example.index";
 	}
 	
 	@RequestMapping(value="/server-time")
 	public String getServerTime(Model model) {
 		addServerTimeStringToModel(model);
-		return "soy.serverTime";
+		return "soy.example.serverTime";
 	}
 
 	private void addServerTimeStringToModel(Model model) {
