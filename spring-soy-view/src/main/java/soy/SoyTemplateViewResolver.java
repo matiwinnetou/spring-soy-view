@@ -40,48 +40,29 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         return SoyView.class;
     }
 
-    private boolean shouldCompileAgain() {
-        if (isCache()) return false;
-        if (!config.isDebugOn()) return false;
-
-        return true;
-    }
-
     @Override
     protected AbstractUrlBasedView buildView(final String viewName) throws Exception {
         SoyUtils.checkSoyViewConfig(config);
         final SoyView view = (SoyView) super.buildView(viewName);
         view.setTemplateName(viewName);
 
-        if (shouldCompileAgain()) {
+        if (isCache()) {
             view.setCompiledTemplates(compileTemplates());
         } else {
-            if (compiledTemplates == null) {
-                this.compiledTemplates = compileTemplates();
-            }
-
             view.setCompiledTemplates(compiledTemplates);
         }
 
-        view.setSoyViewConfig(config);
+        view.setConfig(config);
 
         return view;
     }
 
     private SoyTofu compileTemplates() {
-        System.out.println("SoyTofu compilation of all templates...");
-        final long time1 = System.currentTimeMillis();
         final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
         final Collection<File> templateFiles = templateFilesResolver.resolve();
         final TofuCompiler tofuCompiler = config.getTofuCompiler();
 
-        final SoyTofu soyTofu = tofuCompiler.compile(templateFiles);
-
-        final long time2 = System.currentTimeMillis();
-
-        System.out.println("SoyTofu compilation complete." + (time2 - time1) + " ms");
-
-        return soyTofu;
+        return tofuCompiler.compile(templateFiles);
     }
 
     public void setConfig(final SoyViewConfig config) {

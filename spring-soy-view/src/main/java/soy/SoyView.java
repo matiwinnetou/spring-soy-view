@@ -8,7 +8,9 @@ import soy.config.SoyViewConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -23,7 +25,7 @@ public class SoyView extends AbstractTemplateView {
 
     private String templateName;
 
-    private SoyViewConfig soyViewConfig;
+    private SoyViewConfig config;
 
     public SoyView() {
     }
@@ -34,26 +36,31 @@ public class SoyView extends AbstractTemplateView {
                                              final HttpServletResponse response) throws Exception {
         final Writer writer = response.getWriter();
 
-        final SoyTofu.Renderer renderer = compiledTemplates.newRenderer(templateName);
-        final Map<String, ?> soyData = soyViewConfig.getToSoyDataConverter().convert(model);
-                if (soyData != null) {
-                    renderer.setData(soyData);
-                }
-                final Optional<SoyMsgBundle> soyMsgBundleOptional = SoyUtils.soyMsgBundle(soyViewConfig, request);
-                if (soyMsgBundleOptional.isPresent()) {
-                    renderer.setMsgBundle(soyMsgBundleOptional.get());
-                }
-                final Map<String, ?> globalModel = soyViewConfig.getGlobalModelResolver().resolveData();
-                if (globalModel != null) {
-                    renderer.setIjData(globalModel);
-                }
+        if (config.isDebugOn()) {
+            final Collection<File> files = config.getTemplateFilesResolver().resolve();
+            compiledTemplates = config.getTofuCompiler().compile(files);
+        }
 
-                renderer.render(writer);
+        final SoyTofu.Renderer renderer = compiledTemplates.newRenderer(templateName);
+        final Map<String, ?> soyData = config.getToSoyDataConverter().convert(model);
+        if (soyData != null) {
+            renderer.setData(soyData);
+        }
+        final Optional<SoyMsgBundle> soyMsgBundleOptional = SoyUtils.soyMsgBundle(config, request);
+        if (soyMsgBundleOptional.isPresent()) {
+            renderer.setMsgBundle(soyMsgBundleOptional.get());
+        }
+        final Map<String, ?> globalModel = config.getGlobalModelResolver().resolveData();
+        if (globalModel != null) {
+            renderer.setIjData(globalModel);
+        }
+
+        renderer.render(writer);
         writer.flush();
     }
 
-    public void setSoyViewConfig(final SoyViewConfig soyViewConfig) {
-        this.soyViewConfig = soyViewConfig;
+    public void setConfig(final SoyViewConfig config) {
+        this.config = config;
     }
 
     public void setTemplateName(final String templateName) {

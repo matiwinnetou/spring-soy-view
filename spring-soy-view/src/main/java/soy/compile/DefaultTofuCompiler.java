@@ -19,15 +19,22 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
     @Override
     public SoyTofu compile(final Collection<File> files) {
+//        System.out.println("SoyTofu compilation of all templates...");
+//        final long time1 = System.currentTimeMillis();
+
         final SoyFileSet.Builder sfsBuilder = new SoyFileSet.Builder();
 
         for (final File file : files) {
             sfsBuilder.add(file);
         }
 
-        return sfsBuilder
-                .build()
-                .compileToTofu();
+        final SoyFileSet soyFileSet = sfsBuilder.build();
+        final SoyTofu soyTofu = soyFileSet.compileToTofu();
+
+//        final long time2 = System.currentTimeMillis();
+//        System.out.println("SoyTofu compilation complete." + (time2 - time1) + " ms");
+
+        return soyTofu;
     }
 
     @Override
