@@ -6,6 +6,7 @@ import soy.bundle.SoyMsgBundleResolver;
 import soy.compile.TofuCompiler;
 import soy.data.ToSoyDataConverter;
 import soy.locale.LocaleResolver;
+import soy.model.GlobalModelResolver;
 import soy.template.TemplateFilesResolver;
 
 /**
@@ -27,6 +28,8 @@ public interface SoyViewConfig {
     SoyMsgBundleResolver getSoyMsgBundleResolver();
 
     ToSoyDataConverter getToSoyDataConverter();
+
+    GlobalModelResolver getGlobalModelResolver();
 
     SoyJsSrcOptions getJsSrcOptions();
 

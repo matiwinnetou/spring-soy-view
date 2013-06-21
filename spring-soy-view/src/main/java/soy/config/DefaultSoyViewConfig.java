@@ -10,6 +10,8 @@ import soy.data.CleverToSoyDataConverter;
 import soy.data.ToSoyDataConverter;
 import soy.locale.EmptyLocaleResolver;
 import soy.locale.LocaleResolver;
+import soy.model.EmptyGlobalModelResolver;
+import soy.model.GlobalModelResolver;
 import soy.template.DefaultTemplateFilesResolver;
 import soy.template.TemplateFilesResolver;
 
@@ -33,6 +35,8 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
 
     private ToSoyDataConverter toSoyDataConverter = new CleverToSoyDataConverter();
 
+    private GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
+
     private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();
 
     public void setDebugOn(final boolean debugOn) {
@@ -40,6 +44,18 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
     }
 
     public SoyJsSrcOptions getJsSrcOptions() {
+        return soyJsSrcOptions;
+    }
+
+    public GlobalModelResolver getGlobalModelResolver() {
+        return globalModelResolver;
+    }
+
+    public void setGlobalModelResolver(GlobalModelResolver globalModelResolver) {
+        this.globalModelResolver = globalModelResolver;
+    }
+
+    public SoyJsSrcOptions getSoyJsSrcOptions() {
         return soyJsSrcOptions;
     }
 

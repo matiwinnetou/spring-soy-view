@@ -1,5 +1,6 @@
 package soy;
 
+import com.google.common.base.Optional;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 import org.springframework.web.servlet.view.AbstractTemplateView;
@@ -8,7 +9,6 @@ import soy.config.SoyViewConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Writer;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -34,23 +34,21 @@ public class SoyView extends AbstractTemplateView {
                                              final HttpServletResponse response) throws Exception {
         final Writer writer = response.getWriter();
 
-        final Map<String, ?> soyData = soyViewConfig.getToSoyDataConverter().convert(model);
-
-        final Locale locale = soyViewConfig.getLocaleResolver().resolveLocale(request);
-
-        SoyMsgBundle soyMsgBundle = null;
-        if (locale != null) {
-            soyMsgBundle = soyViewConfig.getSoyMsgBundleResolver().resolve(locale);
-        }
-
         final SoyTofu.Renderer renderer = compiledTemplates.newRenderer(templateName);
-                renderer.setData(soyData);
-                if (soyMsgBundle != null) {
-                    renderer.setMsgBundle(soyMsgBundle);
+        final Map<String, ?> soyData = soyViewConfig.getToSoyDataConverter().convert(model);
+                if (soyData != null) {
+                    renderer.setData(soyData);
+                }
+                final Optional<SoyMsgBundle> soyMsgBundleOptional = SoyUtils.soyMsgBundle(soyViewConfig, request);
+                if (soyMsgBundleOptional.isPresent()) {
+                    renderer.setMsgBundle(soyMsgBundleOptional.get());
+                }
+                final Map<String, ?> globalModel = soyViewConfig.getGlobalModelResolver().resolveData();
+                if (globalModel != null) {
+                    renderer.setIjData(globalModel);
                 }
 
                 renderer.render(writer);
-
         writer.flush();
     }
 
