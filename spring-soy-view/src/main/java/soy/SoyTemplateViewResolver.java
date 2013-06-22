@@ -1,5 +1,6 @@
 package soy;
 
+import com.google.common.base.Optional;
 import com.google.template.soy.tofu.SoyTofu;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
@@ -31,7 +32,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     protected void initApplicationContext() {
         super.initApplicationContext();
         if (isCache()) {
-            this.compiledTemplates = compileTemplates();
+            this.compiledTemplates = compileTemplates().orNull();
         }
     }
 
@@ -48,9 +49,9 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         view.setContentType(contentType());
 
         if (isCache()) {
-            view.setCompiledTemplates(compileTemplates());
-        } else {
             view.setCompiledTemplates(compiledTemplates);
+        } else {
+            view.setCompiledTemplates(compileTemplates().orNull());
         }
 
         view.setConfig(config);
@@ -67,16 +68,16 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         return "text/html; charset=" + encoding;
     }
 
-    private SoyTofu compileTemplates() {
+    private Optional<SoyTofu> compileTemplates() {
         final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
         final Collection<File> templateFiles = templateFilesResolver.resolve();
         if (templateFiles != null && templateFiles.size() > 0) {
             final TofuCompiler tofuCompiler = config.getTofuCompiler();
 
-            return tofuCompiler.compile(templateFiles);
+            return Optional.fromNullable(tofuCompiler.compile(templateFiles));
         }
 
-        return null;
+        return Optional.absent();
     }
 
     public void setConfig(final SoyViewConfig config) {

@@ -2,7 +2,7 @@
 1. Extend logging
 2. Soy Msg Bundle files generator if debug is on?
 3. Namespace compilation support?
-4. Soy admin controller - flush, compile, etc for soy files
+4. Soy admin controller - flush, compile, etc for soy files ?
 5. replace optional with null or not?
 6. Understand CSSRenamingMap
 7. Autowiring support

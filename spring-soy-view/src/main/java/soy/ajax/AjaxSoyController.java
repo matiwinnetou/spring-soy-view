@@ -35,8 +35,8 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
     private static final Logger logger = LoggerFactory.getLogger(AjaxSoyController.class);
 
     private String cacheControl = "public, max-age=3600";
-	
-	private ConcurrentHashMap<String, String> cachedJsTemplates = new ConcurrentHashMap<String, String>();
+
+	private ConcurrentHashMap<File, String> cachedJsTemplates = new ConcurrentHashMap<File, String>();
 
 	public AjaxSoyController() {
 	}
@@ -50,16 +50,14 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
 
         final File templateFile = getTemplateFileAndAssertExistence(templateFileName);
 
-        logger.info("Debug enabled - compiling JavaScript template:" + templateFile);
+        logger.info("Debug true - compiling JavaScript template:" + templateFile);
 
         final String templateContent = compileTemplateAndAssertSuccess(request, templateFile);
         if (!config.isDebugOn()) {
-            cachedJsTemplates.putIfAbsent(templateFileName, templateContent);
+            cachedJsTemplates.putIfAbsent(templateFile, templateContent);
         }
 
-        final ResponseEntity<String> response = prepareResponseFor(templateContent);
-
-        return response;
+        return prepareResponseFor(templateContent);
     }
 
 	private ResponseEntity<String> prepareResponseFor(final String templateContent) {
