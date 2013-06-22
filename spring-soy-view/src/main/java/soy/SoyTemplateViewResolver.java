@@ -45,6 +45,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         SoyUtils.checkSoyViewConfig(config);
         final SoyView view = (SoyView) super.buildView(viewName);
         view.setTemplateName(viewName);
+        view.setContentType(contentType());
 
         if (isCache()) {
             view.setCompiledTemplates(compileTemplates());
@@ -55,6 +56,15 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         view.setConfig(config);
 
         return view;
+    }
+
+    private String contentType() {
+        String encoding = config.getEncoding();
+        if (encoding == null) {
+            encoding = "utf-8";
+        }
+
+        return "text/html; charset=" + encoding;
     }
 
     private SoyTofu compileTemplates() {

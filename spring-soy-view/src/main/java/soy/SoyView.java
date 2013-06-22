@@ -35,6 +35,7 @@ public class SoyView extends AbstractTemplateView {
     protected void renderMergedTemplateModel(final Map<String, Object> model,
                                              final HttpServletRequest request,
                                              final HttpServletResponse response) throws Exception {
+        SoyUtils.checkSoyViewConfig(config);
         final Writer writer = response.getWriter();
 
         if (config.isDebugOn()) {

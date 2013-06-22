@@ -18,6 +18,8 @@ public interface SoyViewConfig {
 
     boolean isDebugOn();
 
+    String getEncoding(); //e.g. utf-8
+
     LocaleResolver getLocaleResolver();
 
     TemplateFilesResolver getTemplateFilesResolver();

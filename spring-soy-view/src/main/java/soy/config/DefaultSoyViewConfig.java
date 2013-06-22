@@ -23,6 +23,8 @@ import soy.template.TemplateFilesResolver;
  */
 public class DefaultSoyViewConfig implements SoyViewConfig {
 
+    public static final String DEFAULT_ENCODING = "utf-8";
+
     private boolean isDebugOn;
 
     private LocaleResolver localeResolver = new EmptyLocaleResolver();
@@ -39,8 +41,17 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
 
     private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();
 
-    public DefaultSoyViewConfig() {
+    private String encoding = DEFAULT_ENCODING;
 
+    public DefaultSoyViewConfig() {
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(final String encoding) {
+        this.encoding = encoding;
     }
 
     public void setDebugOn(final boolean debugOn) {
