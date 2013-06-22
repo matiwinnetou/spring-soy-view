@@ -80,7 +80,7 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
 			return prepareResponseFor(cachedJsTemplates.get(templateFile.get()));
 		}
 
-        logger.debug("Compiling JavaScript template:" + templateFile);
+        logger.debug("Compiling JavaScript template:" + templateFile.orNull());
 
         if (!templateFile.isPresent()) {
             throw notFound("File not found:" + templateFileName + ".soy");
@@ -113,7 +113,7 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
 
         final Iterator it = compiledTemplates.iterator();
 		if (!it.hasNext()) {
-			throw notFound("No compiled templates found");
+			throw notFound("No compiled templates found!");
 		}
 
 		return (String) it.next();

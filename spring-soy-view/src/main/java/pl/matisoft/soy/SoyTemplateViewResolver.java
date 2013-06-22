@@ -25,7 +25,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     private SoyViewConfig config;
 
-    private Optional<SoyTofu> compiledTemplates;
+    private Optional<SoyTofu> compiledTemplates = Optional.absent();
 
     public SoyTemplateViewResolver() {
         super();
