@@ -1,6 +1,5 @@
 package soy.config;
 
-import com.google.template.soy.javasrc.SoyJavaSrcOptions;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import soy.bundle.SoyMsgBundleResolver;
 import soy.compile.TofuCompiler;

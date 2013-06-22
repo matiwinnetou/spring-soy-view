@@ -17,21 +17,13 @@ import java.util.Map;
  * Date: 20/06/2013
  * Time: 22:54
  */
-public class CleverToSoyDataConverter implements ToSoyDataConverter {
+public class DefaultToSoyDataConverter implements ToSoyDataConverter {
 
     @Override
-    public Map<String, ?> convert(Object model) throws Exception {
-        return toSoyCompatibleMap(model);
+    public SoyMapData toSoyMap(Object model) throws Exception {
+        return objectToSoyDataMap(model);
     }
 
-    /**
-     * Convert all data stored in a POJO or Map<String, Object> into a format compatible with Soy's DataMap.
-     * This method will convert nested POJOs to a corresponding nested Maps.
-     *
-     * @param obj The Map or POJO who's data should be converted.
-     * @return A Map of data compatible with Soy.
-     */
-    @SuppressWarnings("unchecked")
     private static Map<String, ?> toSoyCompatibleMap(Object obj) {
         Object ret = toSoyCompatibleObjects(obj);
         if (!(ret instanceof Map)) {
@@ -41,18 +33,7 @@ public class CleverToSoyDataConverter implements ToSoyDataConverter {
         return (Map<String, ?>) ret;
     }
 
-    /**
-     * Convert an object (or graph of objects) to types compatible with Soy (data able to be stored in SoyDataMap).
-     * This will convert:
-     *    - POJOs to Maps
-     *    - Iterables to Lists
-     *    - all strings and primitives remain as is.
-     *
-     * @param obj The object to convert.
-     * @return The object converted (in applicable).
-     */
     private static Object toSoyCompatibleObjects(Object obj) {
-
         if (obj == null) {
             return obj;
         }
@@ -85,7 +66,6 @@ public class CleverToSoyDataConverter implements ToSoyDataConverter {
             return obj;
         }
 
-        // At this point we must assume it's a POJO so map-it.
         {
             @SuppressWarnings("unchecked")
             Map<String, Object> pojoMap = (Map<String, Object>) pojoToMap(obj);
@@ -93,17 +73,12 @@ public class CleverToSoyDataConverter implements ToSoyDataConverter {
             for (String key : pojoMap.keySet()) {
                 newMap.put(key, toSoyCompatibleObjects(pojoMap.get(key)));
             }
+
             return newMap;
         }
     }
 
-    /**
-     * Convert a Java POJO (aka Bean) to a Map<String, Object>.
-     * @param pojo The Java pojo object with standard getters and setters.
-     * @return Pojo data as a Map.
-     */
     private static Map<String, ?> pojoToMap(Object pojo) {
-
         Map<String, Object> map = new HashMap<String, Object>();
 
         BeanInfo beanInfo;
@@ -123,11 +98,6 @@ public class CleverToSoyDataConverter implements ToSoyDataConverter {
         return map;
     }
 
-    /**
-     * Convert (at least attempt) any object to a SoyMapData instance.
-     * @param obj The object to convert.
-     * @return The created SoyMapData.
-     */
     private static SoyMapData objectToSoyDataMap(Object obj) {
         if (obj == null) {
             return new SoyMapData();

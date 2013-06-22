@@ -2,12 +2,11 @@ package soy.config;
 
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 import soy.bundle.EmptySoyMsgBundleResolver;
 import soy.bundle.SoyMsgBundleResolver;
 import soy.compile.DefaultTofuCompiler;
 import soy.compile.TofuCompiler;
-import soy.data.CleverToSoyDataConverter;
+import soy.data.DefaultToSoyDataConverter;
 import soy.data.ToSoyDataConverter;
 import soy.locale.EmptyLocaleResolver;
 import soy.locale.LocaleResolver;
@@ -34,7 +33,7 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
 
     private TemplateFilesResolver templateFilesResolver = new DefaultTemplateFilesResolver(new ClassPathResource("/WEB-INF/templates"), true);
 
-    private ToSoyDataConverter toSoyDataConverter = new CleverToSoyDataConverter();
+    private ToSoyDataConverter toSoyDataConverter = new DefaultToSoyDataConverter();
 
     private GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
 

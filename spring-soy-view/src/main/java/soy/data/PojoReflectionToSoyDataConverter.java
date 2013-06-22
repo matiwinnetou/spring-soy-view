@@ -2,6 +2,7 @@ package soy.data;
 
 import com.google.template.soy.data.SoyData;
 import com.google.template.soy.data.SoyDataException;
+import com.google.template.soy.data.SoyMapData;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -17,8 +18,7 @@ import java.util.Map;
  */
 public class PojoReflectionToSoyDataConverter implements ToSoyDataConverter {
 
-    @Override
-    public Map<String, ?> convert(Object model) throws Exception {
+    private Map<String, ?> convert(Object model) throws Exception {
         Method[] methods = model.getClass().getMethods();
         Map<String, Object> soyParameters = new HashMap<String, Object>();
 
@@ -55,6 +55,13 @@ public class PojoReflectionToSoyDataConverter implements ToSoyDataConverter {
         }
 
         return soyParameters;
+    }
+
+    @Override
+    public SoyMapData toSoyMap(final Object model) throws Exception {
+        final Map<String, ?> map = convert(model);
+
+        return new SoyMapData(map);
     }
 
 }

@@ -1,6 +1,7 @@
 package soy;
 
 import com.google.common.base.Optional;
+import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 import org.springframework.web.servlet.view.AbstractTemplateView;
@@ -42,9 +43,9 @@ public class SoyView extends AbstractTemplateView {
         }
 
         final SoyTofu.Renderer renderer = compiledTemplates.newRenderer(templateName);
-        final Map<String, ?> soyData = config.getToSoyDataConverter().convert(model);
-        if (soyData != null) {
-            renderer.setData(soyData);
+        final SoyMapData soyMapData = config.getToSoyDataConverter().toSoyMap(model);
+        if (soyMapData != null) {
+            renderer.setData(soyMapData);
         }
         final Optional<SoyMsgBundle> soyMsgBundleOptional = SoyUtils.soyMsgBundle(config, request);
         if (soyMsgBundleOptional.isPresent()) {

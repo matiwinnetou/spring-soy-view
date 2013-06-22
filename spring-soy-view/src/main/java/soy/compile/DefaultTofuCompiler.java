@@ -6,8 +6,8 @@ import com.google.template.soy.tofu.SoyTofu;
 import com.google.template.soy.tofu.SoyTofuOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import soy.config.AbstractSoyConfigEnabled;
 import soy.SoyUtils;
+import soy.config.AbstractSoyConfigEnabled;
 import soy.config.SoyViewConfig;
 
 import java.io.File;

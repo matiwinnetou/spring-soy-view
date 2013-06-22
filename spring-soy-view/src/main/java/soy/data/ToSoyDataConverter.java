@@ -1,6 +1,6 @@
 package soy.data;
 
-import java.util.Map;
+import com.google.template.soy.data.SoyMapData;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,6 +12,6 @@ public interface ToSoyDataConverter {
 
     public static final ToSoyDataConverter EMPTY = new EmptyToSoyDataConverter();
 
-    Map<String, ?> convert(Object model) throws Exception;
+    SoyMapData toSoyMap(Object model) throws Exception;
 
 }
