@@ -52,9 +52,9 @@ public class SoyView extends AbstractTemplateView {
         if (soyMsgBundleOptional.isPresent()) {
             renderer.setMsgBundle(soyMsgBundleOptional.get());
         }
-        final Map<String, ?> globalModel = config.getGlobalModelResolver().resolveData();
-        if (globalModel != null) {
-            renderer.setIjData(globalModel);
+        final Optional<SoyMapData> globalModel = config.getGlobalModelResolver().resolveData();
+        if (globalModel.isPresent()) {
+            renderer.setIjData(globalModel.get());
         }
         if (config.isDebugOn()) {
             renderer.setDontAddToCache(true);

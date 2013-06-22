@@ -1,11 +1,7 @@
-0. Ajax Controller - names in different directories support, at the moment flat
-1. Extend logging
-2. Soy Msg Bundle files generator if debug is on?
-3. Namespace compilation support?
-4. Soy admin controller - flush, compile, etc for soy files ?
-5. replace optional with null or not?
-6. Understand CSSRenamingMap
-7. Autowiring support
-8. Compile Time globals support
+1. Soy Msg Bundle files generator if debug is on?
+2. Namespace compilation support?
+3. Soy admin controller - flush, compile, etc for soy files ?
+4. Understand CSSRenamingMap and CssHandlingScheme
+5. Autowiring support
 
 read more about soy and what it offers

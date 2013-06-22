@@ -4,8 +4,9 @@ import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import soy.bundle.SoyMsgBundleResolver;
 import soy.compile.TofuCompiler;
 import soy.data.ToSoyDataConverter;
+import soy.global.compile.CompileTimeGlobalModelResolver;
 import soy.locale.LocaleResolver;
-import soy.model.GlobalModelResolver;
+import soy.global.GlobalModelResolver;
 import soy.template.TemplateFilesResolver;
 
 /**
@@ -31,6 +32,8 @@ public interface SoyViewConfig {
     ToSoyDataConverter getToSoyDataConverter();
 
     GlobalModelResolver getGlobalModelResolver();
+
+    CompileTimeGlobalModelResolver getCompileTimeGlobalModelResolver();
 
     SoyJsSrcOptions getJsSrcOptions();
 

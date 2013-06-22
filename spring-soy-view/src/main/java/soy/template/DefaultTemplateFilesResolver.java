@@ -88,7 +88,7 @@ public class DefaultTemplateFilesResolver extends AbstractSoyConfigEnabled imple
             } else {
                 throw new IllegalArgumentException("Soy template base directory '" + templatesLocation + "' is not a directory");
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalArgumentException("Soy template base directory '" + templatesLocation + "' does not exist", e);
         }
 

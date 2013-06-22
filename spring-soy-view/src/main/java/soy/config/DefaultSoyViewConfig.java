@@ -8,10 +8,12 @@ import soy.compile.DefaultTofuCompiler;
 import soy.compile.TofuCompiler;
 import soy.data.DefaultToSoyDataConverter;
 import soy.data.ToSoyDataConverter;
+import soy.global.compile.CompileTimeGlobalModelResolver;
+import soy.global.compile.EmptyCompileTimeGlobalModelResolver;
 import soy.locale.EmptyLocaleResolver;
 import soy.locale.LocaleResolver;
-import soy.model.EmptyGlobalModelResolver;
-import soy.model.GlobalModelResolver;
+import soy.global.EmptyGlobalModelResolver;
+import soy.global.GlobalModelResolver;
 import soy.template.DefaultTemplateFilesResolver;
 import soy.template.TemplateFilesResolver;
 
@@ -39,6 +41,8 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
 
     private GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
 
+    private CompileTimeGlobalModelResolver compileTimeGlobalModelResolver = new EmptyCompileTimeGlobalModelResolver();
+
     private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();
 
     private String encoding = DEFAULT_ENCODING;
@@ -48,6 +52,14 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
 
     public String getEncoding() {
         return encoding;
+    }
+
+    public CompileTimeGlobalModelResolver getCompileTimeGlobalModelResolver() {
+        return compileTimeGlobalModelResolver;
+    }
+
+    public void setCompileTimeGlobalModelResolver(CompileTimeGlobalModelResolver compileTimeGlobalModelResolver) {
+        this.compileTimeGlobalModelResolver = compileTimeGlobalModelResolver;
     }
 
     public void setEncoding(final String encoding) {

@@ -1,4 +1,7 @@
-package soy.model;
+package soy.global;
+
+import com.google.common.base.Optional;
+import com.google.template.soy.data.SoyMapData;
 
 import java.util.Map;
 
@@ -13,8 +16,12 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
     private Map data;
 
     @Override
-    public Map<String, ?> resolveData() {
-        return data;
+    public Optional<SoyMapData> resolveData() {
+        if (data == null || data.isEmpty()) {
+            return Optional.absent();
+        }
+
+        return Optional.of(new SoyMapData(data));
     }
 
     public void setData(final Map data) {

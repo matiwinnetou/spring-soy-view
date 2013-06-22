@@ -1,6 +1,8 @@
 package soy.compile;
 
+import com.google.common.base.Optional;
 import com.google.template.soy.SoyFileSet;
+import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 import com.google.template.soy.tofu.SoyTofuOptions;
@@ -9,10 +11,12 @@ import org.slf4j.LoggerFactory;
 import soy.SoyUtils;
 import soy.config.AbstractSoyConfigEnabled;
 import soy.config.SoyViewConfig;
+import soy.global.compile.CompileTimeGlobalModelResolver;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -73,9 +77,22 @@ public class DefaultTofuCompiler extends AbstractSoyConfigEnabled implements Tof
     }
 
     private SoyFileSet buildSoyFileSetFrom(final File templateFile) {
-        return new SoyFileSet.Builder()
-                .add(templateFile)
-                .build();
+        final SoyFileSet.Builder builder = new SoyFileSet.Builder();
+        builder.setAllowExternalCalls(true);
+        builder.add(templateFile);
+
+        final CompileTimeGlobalModelResolver compileTimeGlobalModelResolver = config.getCompileTimeGlobalModelResolver();
+        final Optional<SoyMapData> soyMapData = compileTimeGlobalModelResolver.resolveData();
+
+        if (soyMapData.isPresent()) {
+            final Map<String, ?> mapData = soyMapData.get().asMap();
+            if (mapData.size() > 0) {
+                logger.debug("Setting compile time globals, entries number:" + mapData.size());
+                builder.setCompileTimeGlobals(mapData);
+            }
+        }
+
+        return builder.build();
     }
 
 }
