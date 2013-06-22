@@ -11,7 +11,7 @@
     <artifactId>spring-soy-view-root</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Spring Soy View</name>
+    <name>spring-soy-view-root</name>
     <description>Implementation of Spring MVC View in Google-Closure library</description>
     <url>https://github.com/mati1979/spring-soy-view</url>
 
@@ -39,6 +39,10 @@
             <name>Mateusz Szczap</name>
             <email>mateusz.szczap@gmail.com</email>
             <timezone>GMT+1</timezone>
+            <roles>
+                <role>Project Lead</role>
+                <role>CM</role>
+            </roles>
         </developer>
     </developers>
 
@@ -54,8 +58,25 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <!--mvn verify -Dgpg.passphrase=thephrase-->
+    <!--mvn release:perform -Darguments=-Dgpg.passphrase=thephrase-->
 
     <modules>
         <module>spring-soy-view</module>
