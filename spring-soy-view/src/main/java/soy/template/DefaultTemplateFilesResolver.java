@@ -1,16 +1,23 @@
 package soy.template;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import soy.SoyUtils;
+import soy.config.AbstractSoyConfigEnabled;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,13 +25,15 @@ import java.util.List;
  * Date: 20/06/2013
  * Time: 19:58
  */
-public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
+public class DefaultTemplateFilesResolver extends AbstractSoyConfigEnabled implements TemplateFilesResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);
 
     private Resource templatesLocation;
 
     private boolean recursive = true;
+
+    private CopyOnWriteArrayList<File> cachedFiles = new CopyOnWriteArrayList<File>();
 
     public DefaultTemplateFilesResolver() {
     }
@@ -36,18 +45,38 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     @Override
     public Collection<File> resolve() {
+        SoyUtils.checkSoyViewConfig(config);
         if (templatesLocation == null) throw new IllegalArgumentException("templates location not defined");
 
-        final List<File> files = toFiles(templatesLocation);
-        logger.debug("Resolved files:" + files.size());
+        if (config.isDebugOn()) {
+            final List<File> files = toFiles(templatesLocation);
+            logger.debug("Debug on - resolved files:" + files.size());
 
-//        if (logger.isDebugEnabled()) {
-//            for (final File file : files) {
-//                logger.debug("Found file:" + file);
-//            }
-//        }
+            return files;
+        }
 
-        return files;
+        //no debug
+        if (cachedFiles.isEmpty()) {
+            final List<File> files = toFiles(templatesLocation);
+            logger.debug("Using cache resolve, debug off:" + files.size());
+            cachedFiles.addAll(files);
+        }
+
+        return cachedFiles;
+    }
+
+    @Override
+    public Optional<File> resolve(final String templateFileName) {
+        final Collection<File> files = resolve();
+
+        final File templateFile = Iterables.find(files, new Predicate<File>() {
+            @Override
+            public boolean apply(@Nullable File file) {
+                return file.getName().equalsIgnoreCase(templateFileName + ".soy");
+            }
+        }, null);
+
+        return Optional.fromNullable(templateFile);
     }
 
     private @Nonnull List<File> toFiles(final Resource templatesLocation) {

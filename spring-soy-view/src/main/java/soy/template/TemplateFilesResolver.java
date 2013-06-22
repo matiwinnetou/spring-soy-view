@@ -1,5 +1,7 @@
 package soy.template;
 
+import com.google.common.base.Optional;
+
 import java.io.File;
 import java.util.Collection;
 
@@ -12,5 +14,7 @@ import java.util.Collection;
 public interface TemplateFilesResolver {
 
     Collection<File> resolve();
+
+    Optional<File> resolve(String templateName);
 
 }

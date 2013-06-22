@@ -1,8 +1,6 @@
 package soy.ajax;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +15,10 @@ import soy.compile.TofuCompiler;
 import soy.config.AbstractSoyConfigEnabled;
 import soy.template.TemplateFilesResolver;
 
-import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -48,13 +45,20 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
 			return prepareResponseFor(cachedJsTemplates.get(templateFileName));
 		}
 
-        final File templateFile = getTemplateFileAndAssertExistence(templateFileName);
+        final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
+        final Optional<File> templateFile = templateFilesResolver.resolve(templateFileName);
 
         logger.debug("Debug true - compiling JavaScript template:" + templateFile);
 
+        if (!templateFile.isPresent()) {
+            throw notFound("File not found:" + templateFileName + ".soy");
+        }
+
         final String templateContent = compileTemplateAndAssertSuccess(request, templateFile);
         if (!config.isDebugOn()) {
-            cachedJsTemplates.putIfAbsent(templateFile, templateContent);
+            if (templateFile.isPresent()) {
+                cachedJsTemplates.putIfAbsent(templateFile.get(), templateContent);
+            }
         }
 
         return prepareResponseFor(templateContent);
@@ -68,35 +72,18 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
 		return new ResponseEntity<String>(templateContent, headers, OK);
 	}
 
-	private String compileTemplateAndAssertSuccess(final HttpServletRequest request, File templateFile) throws IOException {
+	private String compileTemplateAndAssertSuccess(final HttpServletRequest request, Optional<File> templateFile) throws IOException {
         final Optional<SoyMsgBundle> soyMsgBundle = SoyUtils.soyMsgBundle(config, request);
         final TofuCompiler tofuCompiler = config.getTofuCompiler();
 
-		final List<String> compiledTemplates = tofuCompiler.compileToJsSrc(templateFile, soyMsgBundle.orNull());
+		final List<String> compiledTemplates = tofuCompiler.compileToJsSrc(templateFile.orNull(), soyMsgBundle.orNull());
 
-		if (compiledTemplates.size() < 1) {
+        final Iterator it = compiledTemplates.iterator();
+		if (!it.hasNext()) {
 			throw notFound("No compiled templates found");
 		}
 
-		return compiledTemplates.get(0);
-	}
-
-    private File getTemplateFileAndAssertExistence(final String templateFileName) {
-        final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
-        final Collection<File> files = templateFilesResolver.resolve();
-
-        final File templateFile = Iterables.find(files, new Predicate<File>() {
-            @Override
-            public boolean apply(@Nullable File file) {
-                return file.getName().equalsIgnoreCase(templateFileName + ".soy");
-            }
-        }, null);
-
-        if (templateFile == null) {
-            throw notFound(templateFileName);
-        }
-
-		return templateFile;
+		return (String) it.next();
 	}
 
 	private HttpClientErrorException notFound(String file) {

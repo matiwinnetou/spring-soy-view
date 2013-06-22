@@ -12,6 +12,7 @@
     <bean id="soyConfig" class="soy.config.DefaultSoyViewConfig">
         <property name="templateFilesResolver">
             <bean class="soy.template.DefaultTemplateFilesResolver">
+                <property name="config" ref="soyConfig" />
                 <property name="templatesLocation" value="/WEB-INF/templates" />
             </bean>
         </property>
