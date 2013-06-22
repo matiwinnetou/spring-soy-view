@@ -2,6 +2,8 @@ package soy.template;
 
 import com.google.common.collect.Lists;
 import com.google.template.soy.SoyFileSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -17,6 +19,8 @@ import java.util.List;
  * Time: 19:58
  */
 public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);
 
     private Resource templatesLocation;
 
@@ -34,7 +38,15 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
     public Collection<File> resolve() {
         if (templatesLocation == null) throw new IllegalArgumentException("templates location not defined");
 
-        return toFiles(templatesLocation);
+        final List<File> files = toFiles(templatesLocation);
+
+        if (logger.isDebugEnabled()) {
+            for (final File file : files) {
+                logger.debug("Found file:" + file);
+            }
+        }
+
+        return files;
     }
 
     private List<File> toFiles(final Resource templatesLocation) {

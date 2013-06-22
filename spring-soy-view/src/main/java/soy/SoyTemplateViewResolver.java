@@ -32,7 +32,9 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     @Override
     protected void initApplicationContext() {
         super.initApplicationContext();
-        compiledTemplates = compileTemplates();
+        if (isCache()) {
+            this.compiledTemplates = compileTemplates();
+        }
     }
 
     @Override
@@ -60,9 +62,13 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     private SoyTofu compileTemplates() {
         final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
         final Collection<File> templateFiles = templateFilesResolver.resolve();
-        final TofuCompiler tofuCompiler = config.getTofuCompiler();
+        if (templateFiles != null && templateFiles.size() > 0) {
+            final TofuCompiler tofuCompiler = config.getTofuCompiler();
 
-        return tofuCompiler.compile(templateFiles);
+            return tofuCompiler.compile(templateFiles);
+        }
+
+        return null;
     }
 
     public void setConfig(final SoyViewConfig config) {

@@ -7,6 +7,9 @@ import com.google.template.soy.msgs.SoyMsgBundleHandler;
 import com.google.template.soy.msgs.restricted.SoyMsg;
 import com.google.template.soy.msgs.restricted.SoyMsgBundleImpl;
 import com.google.template.soy.xliffmsgplugin.XliffMsgPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import soy.config.SoyViewConfig;
 
 import java.io.IOException;
 import java.net.URL;
@@ -21,13 +24,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
+    private static final Logger logger = LoggerFactory.getLogger(DefaultSoyMsgBundleResolver.class);
+
     private final String DEF_MESSAGES_PATH = "xliffs/messages";
 
-    private static final Map<Locale, SoyMsgBundle> msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
+    private static Map<Locale, SoyMsgBundle> msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
 
     private String messagesPath = DEF_MESSAGES_PATH;
 
+    private SoyViewConfig config;
+
     public SoyMsgBundle resolve(final Locale locale) throws IOException {
+        if (config.isDebugOn()) {
+            logger.info("Debug is on, clearing all cached bundles");
+            msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
+        }
         SoyMsgBundle soyMsgBundle = msgBundles.get(locale);
         if (soyMsgBundle == null) {
             soyMsgBundle = createSoyMsgBundle(locale);
@@ -84,6 +95,10 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     public void setMessagesPath(final String messagesPath) {
         this.messagesPath = messagesPath;
+    }
+
+    public void setConfig(final SoyViewConfig config) {
+        this.config = config;
     }
 
 }
