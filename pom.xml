@@ -1,15 +1,46 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
     <groupId>spring-soy-view</groupId>
     <artifactId>spring-soy-view-root</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>spring-soy-view-root</name>
+    <name>Spring Soy View</name>
+    <description>Implementation of Spring MVC View in Google-Closure library</description>
+    <url>https://github.com/mati1979/spring-soy-view</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>git://github.com/mati1979/spring-soy-view.git</url>
+        <connection>scm:git:git://github.com/mati1979/spring-soy-view.git</connection>
+        <developerConnection>scm:git:https://github.com/mati1979/spring-soy-view.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>mati</id>
+            <name>Mateusz Szczap</name>
+            <email>mateusz.szczap@gmail.com</email>
+            <timezone>GMT+1</timezone>
+        </developer>
+    </developers>
 
     <build>
         <plugins>
@@ -27,8 +58,8 @@
     </build>
 
     <modules>
-      <module>spring-soy-view</module>
-      <module>spring-soy-view-example</module>
+        <module>spring-soy-view</module>
+        <module>spring-soy-view-example</module>
     </modules>
 
 </project>

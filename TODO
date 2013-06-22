@@ -1,7 +1,10 @@
-1. Soy Msg Bundle files generator if debug is on or controller to generate them?
-2. Namespace compilation support?
-3. Soy admin controller - flush, compile, etc for soy files ?
-4. Understand CSSRenamingMap and CssHandlingScheme
-5. Autowiring support
-
-read more about soy and what it offers
+1. Namespace compilation support?
+2. Soy admin controller - flush, compile, etc for soy files ?
+3. Understand CSSRenamingMap and CssHandlingScheme
+4. Autowiring support
+5. Maven sonatype or java.net open source license - push artefacts
+6. Create documentation in JavaDocs and ReadMe + developers guide
+7. Ajax rendering for JQuery provided ModelResolver is present
+8. Read more about soy and what it offers
+9. Unit tests
+10. Soy Msg Bundle files generator if debug is on or controller to generate them?

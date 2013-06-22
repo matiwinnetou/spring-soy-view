@@ -22,9 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Controller
 public class AjaxSoyController extends AbstractSoyConfigEnabled {
@@ -38,7 +37,29 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
 	public AjaxSoyController() {
 	}
 
-	@RequestMapping(value="/soy/{templateFileName}.js", method=GET)
+//    @RequestMapping(value="/soy/render/{templateName}.soy", method=GET)
+//    public ResponseEntity<String> renderTemplate(@PathVariable final String templateName, final HttpServletRequest request) throws IOException {
+//        SoyUtils.checkSoyViewConfig(config);
+//
+//        final HttpHeaders headers = new HttpHeaders();
+//        headers.add("Content-Type", "text/javascript");
+//        headers.add("Cache-Control", config.isDebugOn() ? "no-cache" : cacheControl);
+//
+//        final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
+//        final Collection<File> templateFiles = templateFilesResolver.resolve();
+//
+//        final Optional<SoyMsgBundle> soyMsgBundle = SoyUtils.soyMsgBundle(config, request);
+//        final TofuCompiler tofuCompiler = config.getTofuCompiler();
+//        final SoyTofu tofuData = tofuCompiler.compile(templateFiles);
+//        final SoyTofu.Renderer renderer = tofuData.newRenderer(templateName);
+//        final SoyMapData soyMapData = config.getToSoyDataConverter().toSoyMap() //model resolver?
+//
+//        final List<String> compiledTemplates = tofuCompiler.compileToJsSrc(templateFile.orNull(), soyMsgBundle.orNull());
+//
+//        return new ResponseEntity<String>(templateContent, headers, OK);
+//    }
+
+    @RequestMapping(value="/soy/{templateFileName}.js", method=GET)
 	public ResponseEntity<String> getJsForTemplateFile(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
         SoyUtils.checkSoyViewConfig(config);
         final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
