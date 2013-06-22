@@ -9,7 +9,8 @@ import com.google.template.soy.msgs.restricted.SoyMsgBundleImpl;
 import com.google.template.soy.xliffmsgplugin.XliffMsgPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import soy.config.SoyViewConfig;
+import soy.SoyUtils;
+import soy.config.AbstractSoyConfigEnabled;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 20/06/2013
  * Time: 00:01
  */
-public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
+public class DefaultSoyMsgBundleResolver extends AbstractSoyConfigEnabled implements SoyMsgBundleResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultSoyMsgBundleResolver.class);
 
@@ -32,11 +33,10 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     private String messagesPath = DEF_MESSAGES_PATH;
 
-    private SoyViewConfig config;
-
     public SoyMsgBundle resolve(final Locale locale) throws IOException {
+        SoyUtils.checkSoyViewConfig(config);
         if (config.isDebugOn()) {
-            logger.info("Debug is on, clearing all cached bundles");
+            logger.info("Debug is on, clearing all cached msg bundles.");
             msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
         }
         SoyMsgBundle soyMsgBundle = msgBundles.get(locale);
@@ -95,10 +95,6 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     public void setMessagesPath(final String messagesPath) {
         this.messagesPath = messagesPath;
-    }
-
-    public void setConfig(final SoyViewConfig config) {
-        this.config = config;
     }
 
 }

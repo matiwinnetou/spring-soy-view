@@ -1,11 +1,11 @@
 package soy.template;
 
 import com.google.common.collect.Lists;
-import com.google.template.soy.SoyFileSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,17 +39,18 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         if (templatesLocation == null) throw new IllegalArgumentException("templates location not defined");
 
         final List<File> files = toFiles(templatesLocation);
+        logger.info("Resolved files:" + files.size());
 
-        if (logger.isDebugEnabled()) {
-            for (final File file : files) {
-                logger.debug("Found file:" + file);
-            }
-        }
+//        if (logger.isDebugEnabled()) {
+//            for (final File file : files) {
+//                logger.debug("Found file:" + file);
+//            }
+//        }
 
         return files;
     }
 
-    private List<File> toFiles(final Resource templatesLocation) {
+    private @Nonnull List<File> toFiles(final Resource templatesLocation) {
         final List<File> templateFiles = Lists.newArrayList();
         try {
             File baseDirectory = templatesLocation.getFile();
@@ -65,7 +66,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         return templateFiles;
     }
 
-    protected List<File> findSoyFiles(final File baseDirectory, final boolean recursive) {
+    protected @Nonnull List<File> findSoyFiles(final File baseDirectory, final boolean recursive) {
         final List<File> soyFiles = new ArrayList<File>();
         findSoyFiles(soyFiles, baseDirectory, recursive);
 
@@ -93,7 +94,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         this.templatesLocation = templatesLocation;
     }
 
-    public void setRecursive(boolean recursive) {
+    public void setRecursive(final boolean recursive) {
         this.recursive = recursive;
     }
 

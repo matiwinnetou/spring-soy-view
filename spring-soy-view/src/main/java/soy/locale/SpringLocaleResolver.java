@@ -9,11 +9,17 @@ import java.util.Locale;
  * Date: 20/06/2013
  * Time: 22:59
  */
-public class EmptyLocaleResolver implements LocaleResolver {
+public class SpringLocaleResolver implements LocaleResolver {
+
+    private Locale locale;
 
     @Override
     public Locale resolveLocale(final HttpServletRequest request) {
-        return null;
+        return locale;
+    }
+
+    public void setLocale(final Locale locale) {
+        this.locale = locale;
     }
 
 }

@@ -2,6 +2,7 @@ package soy.config;
 
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 import soy.bundle.EmptySoyMsgBundleResolver;
 import soy.bundle.SoyMsgBundleResolver;
 import soy.compile.DefaultTofuCompiler;
@@ -38,6 +39,10 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
     private GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
 
     private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();
+
+    public DefaultSoyViewConfig() {
+
+    }
 
     public void setDebugOn(final boolean debugOn) {
         isDebugOn = debugOn;

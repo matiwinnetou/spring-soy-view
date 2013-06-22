@@ -19,9 +19,19 @@
             <bean class="soy.model.SpringGlobalModelResolver">
                 <property name="data">
                     <map>
-                        <entry key="gHomePageUrl" value="http://mobile.de/cz" />
+                        <entry key="homePageUrl" value="http://mobile.de/cz" />
                     </map>
                 </property>
+            </bean>
+        </property>
+        <property name="tofuCompiler">
+            <bean class="soy.compile.DefaultTofuCompiler">
+                <property name="config" ref="soyConfig" />
+            </bean>
+        </property>
+        <property name="soyMsgBundleResolver">
+            <bean class="soy.bundle.DefaultSoyMsgBundleResolver">
+                <property name="config" ref="soyConfig" />
             </bean>
         </property>
         <property name="debugOn" value="true" />
@@ -35,8 +45,7 @@
         <property name="config" ref="soyConfig" />
     </bean>
 
-    <bean
-            class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="mediaTypes">
             <map>
                 <entry key="html" value="text/html" />

@@ -1,11 +1,14 @@
 package soy.compile;
 
 import com.google.template.soy.SoyFileSet;
-import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
+import com.google.template.soy.tofu.SoyTofuOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soy.config.AbstractSoyConfigEnabled;
+import soy.SoyUtils;
+import soy.config.SoyViewConfig;
 
 import java.io.File;
 import java.util.Collection;
@@ -17,13 +20,14 @@ import java.util.List;
  * Date: 20.06.13
  * Time: 17:40
  */
-public class DefaultTofuCompiler implements TofuCompiler {
+public class DefaultTofuCompiler extends AbstractSoyConfigEnabled implements TofuCompiler {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTofuCompiler.class);
 
     @Override
     public SoyTofu compile(final Collection<File> files) {
-        logger.info("SoyTofu compilation of all templates:" + files.size());
+        SoyUtils.checkSoyViewConfig(config);
+        logger.info("SoyTofu compilation of templates:" + files.size());
         final long time1 = System.currentTimeMillis();
 
         final SoyFileSet.Builder sfsBuilder = new SoyFileSet.Builder();
@@ -33,7 +37,9 @@ public class DefaultTofuCompiler implements TofuCompiler {
         }
 
         final SoyFileSet soyFileSet = sfsBuilder.build();
-        final SoyTofu soyTofu = soyFileSet.compileToTofu();
+
+        final SoyTofuOptions soyTofuOptions = createSoyTofuOptions(config);
+        final SoyTofu soyTofu = soyFileSet.compileToTofu(soyTofuOptions);
 
         final long time2 = System.currentTimeMillis();
 
@@ -42,11 +48,28 @@ public class DefaultTofuCompiler implements TofuCompiler {
         return soyTofu;
     }
 
+    private SoyTofuOptions createSoyTofuOptions(final SoyViewConfig config) {
+        final SoyTofuOptions soyTofuOptions = new SoyTofuOptions();
+        soyTofuOptions.setUseCaching(!config.isDebugOn());
+
+        return soyTofuOptions;
+    }
+
     @Override
-    public final List<String> compileToJsSrc(final File file, final SoyJsSrcOptions soyJsSrcOptions, final SoyMsgBundle soyMsgBundle) {
+    public final List<String> compileToJsSrc(final File file, final SoyMsgBundle soyMsgBundle) {
+        SoyUtils.checkSoyViewConfig(config);
+        logger.debug("SoyJavaScript compilation of template:" + file);
+        final long time1 = System.currentTimeMillis();
+
         final SoyFileSet soyFileSet = buildSoyFileSetFrom(file);
 
-        return soyFileSet.compileToJsSrc(soyJsSrcOptions, soyMsgBundle);
+        final List<String> ret = soyFileSet.compileToJsSrc(config.getJsSrcOptions(), soyMsgBundle);
+
+        final long time2 = System.currentTimeMillis();
+
+        logger.debug("SoyJavaScript compilation complete." + (time2 - time1) + " ms");
+
+        return ret;
     }
 
     private SoyFileSet buildSoyFileSetFrom(final File templateFile) {

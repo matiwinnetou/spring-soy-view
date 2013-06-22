@@ -1,7 +1,6 @@
 package soy;
 
 import com.google.template.soy.tofu.SoyTofu;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import soy.compile.TofuCompiler;
@@ -19,7 +18,6 @@ import java.util.Collection;
  */
 public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
-    @Autowired
     private SoyViewConfig config;
 
     private SoyTofu compiledTemplates;

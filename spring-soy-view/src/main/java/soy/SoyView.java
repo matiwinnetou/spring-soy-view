@@ -54,6 +54,9 @@ public class SoyView extends AbstractTemplateView {
         if (globalModel != null) {
             renderer.setIjData(globalModel);
         }
+        if (config.isDebugOn()) {
+            renderer.setDontAddToCache(true);
+        }
 
         renderer.render(writer);
         writer.flush();
