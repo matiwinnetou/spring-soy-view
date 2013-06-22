@@ -35,7 +35,7 @@
                 <property name="config" ref="soyConfig" />
             </bean>
         </property>
-        <property name="debugOn" value="true" />
+        <property name="debugOn" value="false" />
     </bean>
 
     <bean id="ajaxSoyController" class="soy.ajax.AjaxSoyController">
@@ -44,7 +44,7 @@
 
     <bean id="viewResolver" class="soy.SoyTemplateViewResolver">
         <property name="config" ref="soyConfig" />
-        <property name="cache" value="false" />
+        <property name="cache" value="true" />
     </bean>
 
     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">

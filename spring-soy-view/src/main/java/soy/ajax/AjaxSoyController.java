@@ -41,14 +41,15 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
 	@RequestMapping(value="/soy/{templateFileName}.js", method=GET)
 	public ResponseEntity<String> getJsForTemplateFile(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
         SoyUtils.checkSoyViewConfig(config);
-		if (!config.isDebugOn() && cachedJsTemplates.containsKey(templateFileName)) {
-			return prepareResponseFor(cachedJsTemplates.get(templateFileName));
-		}
-
         final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
         final Optional<File> templateFile = templateFilesResolver.resolve(templateFileName);
 
-        logger.debug("Debug true - compiling JavaScript template:" + templateFile);
+		if (!config.isDebugOn() && cachedJsTemplates.containsKey(templateFile.get())) {
+            logger.debug("Debug off and returning cached compiled file:" + templateFile.get());
+			return prepareResponseFor(cachedJsTemplates.get(templateFile.get()));
+		}
+
+        logger.debug("Compiling JavaScript template:" + templateFile);
 
         if (!templateFile.isPresent()) {
             throw notFound("File not found:" + templateFileName + ".soy");
@@ -57,6 +58,7 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
         final String templateContent = compileTemplateAndAssertSuccess(request, templateFile);
         if (!config.isDebugOn()) {
             if (templateFile.isPresent()) {
+                logger.debug("Debug off adding to templateFile to cache:" + templateFile.get());
                 cachedJsTemplates.putIfAbsent(templateFile.get(), templateContent);
             }
         }
