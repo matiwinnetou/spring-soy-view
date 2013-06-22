@@ -43,7 +43,7 @@
         <property name="debugOn" value="true" />
     </bean>
 
-    <bean id="ajaxSoyController" class="pl.matisoft.soy.ajax.AjaxSoyController">
+    <bean id="ajaxSoyController" class="pl.matisoft.soy.ajax.SoyAjaxController">
         <property name="config" ref="soyConfig" />
     </bean>
 

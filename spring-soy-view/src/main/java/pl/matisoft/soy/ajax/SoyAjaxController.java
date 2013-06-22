@@ -27,15 +27,15 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
-public class AjaxSoyController extends AbstractSoyConfigEnabled {
+public class SoyAjaxController extends AbstractSoyConfigEnabled {
 
-    private static final Logger logger = LoggerFactory.getLogger(AjaxSoyController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SoyAjaxController.class);
 
     private String cacheControl = "public, max-age=3600";
 
 	private ConcurrentHashMap<File, String> cachedJsTemplates = new ConcurrentHashMap<File, String>();
 
-	public AjaxSoyController() {
+	public SoyAjaxController() {
 	}
 
 //    @RequestMapping(value="/soy/render/{templateName}.soy", method=GET)
