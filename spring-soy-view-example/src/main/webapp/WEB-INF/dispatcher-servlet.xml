@@ -20,7 +20,7 @@
             <bean class="pl.matisoft.soy.global.DefaultGlobalModelResolver">
                 <property name="data">
                     <map>
-                        <entry key="homePageUrl" value="http://mobile.de/cz" />
+                        <entry key="test1" value="test1Value" />
                     </map>
                 </property>
             </bean>
