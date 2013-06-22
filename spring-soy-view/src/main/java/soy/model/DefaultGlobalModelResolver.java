@@ -8,7 +8,7 @@ import java.util.Map;
  * Date: 21/06/2013
  * Time: 23:06
  */
-public class SpringGlobalModelResolver implements GlobalModelResolver {
+public class DefaultGlobalModelResolver implements GlobalModelResolver {
 
     private Map data;
 

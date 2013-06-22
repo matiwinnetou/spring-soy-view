@@ -9,7 +9,7 @@ import java.util.Locale;
  * Date: 20/06/2013
  * Time: 22:59
  */
-public class SpringLocaleResolver implements LocaleResolver {
+public class DefaultLocaleResolver implements LocaleResolver {
 
     private Locale locale;
 

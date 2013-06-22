@@ -16,6 +16,7 @@ import java.util.Map;
  * Date: 20/06/2013
  * Time: 00:28
  */
+@Deprecated //- use DefaultToSoyDataConverter instead
 public class PojoReflectionToSoyDataConverter implements ToSoyDataConverter {
 
     private Map<String, ?> convert(Object model) throws Exception {

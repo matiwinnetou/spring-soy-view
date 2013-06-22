@@ -16,7 +16,7 @@
             </bean>
         </property>
         <property name="globalModelResolver">
-            <bean class="soy.model.SpringGlobalModelResolver">
+            <bean class="soy.model.DefaultGlobalModelResolver">
                 <property name="data">
                     <map>
                         <entry key="homePageUrl" value="http://mobile.de/cz" />
