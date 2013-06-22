@@ -14,6 +14,8 @@ import pl.matisoft.soy.locale.EmptyLocaleResolver;
 import pl.matisoft.soy.locale.LocaleResolver;
 import pl.matisoft.soy.global.EmptyGlobalModelResolver;
 import pl.matisoft.soy.global.GlobalModelResolver;
+import pl.matisoft.soy.render.DefaultTemplateRenderer;
+import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
@@ -43,6 +45,8 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
 
     private CompileTimeGlobalModelResolver compileTimeGlobalModelResolver = new EmptyCompileTimeGlobalModelResolver();
 
+    private TemplateRenderer templateRenderer = new DefaultTemplateRenderer();
+
     private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();
 
     private String encoding = DEFAULT_ENCODING;
@@ -52,6 +56,14 @@ public class DefaultSoyViewConfig implements SoyViewConfig {
 
     public String getEncoding() {
         return encoding;
+    }
+
+    public TemplateRenderer getTemplateRenderer() {
+        return templateRenderer;
+    }
+
+    public void setTemplateRenderer(TemplateRenderer templateRenderer) {
+        this.templateRenderer = templateRenderer;
     }
 
     public CompileTimeGlobalModelResolver getCompileTimeGlobalModelResolver() {

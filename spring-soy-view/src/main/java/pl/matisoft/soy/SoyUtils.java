@@ -20,12 +20,12 @@ public class SoyUtils {
 
     public static Optional<SoyMsgBundle> soyMsgBundle(final SoyViewConfig config, HttpServletRequest request) throws IOException {
         final LocaleResolver localeResolver = config.getLocaleResolver();
-        final Locale locale = localeResolver.resolveLocale(request);
+        final Optional<Locale> locale = localeResolver.resolveLocale(request);
 
-        if (locale != null) {
+        if (locale.isPresent()) {
             final SoyMsgBundleResolver bundleResolver = config.getSoyMsgBundleResolver();
 
-            return Optional.fromNullable(bundleResolver.resolve(locale));
+            return bundleResolver.resolve(locale.get());
         }
 
         return Optional.absent();

@@ -25,7 +25,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     private SoyViewConfig config;
 
-    private SoyTofu compiledTemplates;
+    private Optional<SoyTofu> compiledTemplates;
 
     public SoyTemplateViewResolver() {
         super();
@@ -36,7 +36,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     protected void initApplicationContext() {
         super.initApplicationContext();
         if (isCache()) {
-            this.compiledTemplates = compileTemplates("<class_init>").orNull();
+            this.compiledTemplates = compileTemplates("<class_init>");
         }
     }
 
@@ -51,16 +51,18 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         final SoyView view = (SoyView) super.buildView(viewName);
         view.setTemplateName(viewName);
         view.setContentType(contentType());
+        view.setConfig(config);
 
-        if (isCache()) {
-            view.setCompiledTemplates(compiledTemplates);
-        } else {
-            if (!viewName.endsWith(".html")) { //????
-                view.setCompiledTemplates(compileTemplates(viewName).orNull());
-            }
+        if (!compiledTemplates.isPresent()) {
+            //if (!viewName.endsWith(".html")) { //strange we get extra call for a page itself, investigate more
+                view.setCompiledTemplates(compileTemplates(viewName));
+            //}
+            return view;
         }
 
-        view.setConfig(config);
+        if (isCache() && compiledTemplates.isPresent()) { //extra sanity check if compiled templates are available
+            view.setCompiledTemplates(compiledTemplates);
+        }
 
         return view;
     }
@@ -81,7 +83,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         if (templateFiles != null && templateFiles.size() > 0) {
             final TofuCompiler tofuCompiler = config.getTofuCompiler();
 
-            return Optional.fromNullable(tofuCompiler.compile(templateFiles));
+            return tofuCompiler.compile(templateFiles);
         }
 
         return Optional.absent();

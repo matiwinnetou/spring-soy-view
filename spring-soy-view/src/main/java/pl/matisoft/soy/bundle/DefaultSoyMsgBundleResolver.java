@@ -33,7 +33,7 @@ public class DefaultSoyMsgBundleResolver extends AbstractSoyConfigEnabled implem
 
     private String messagesPath = DEF_MESSAGES_PATH;
 
-    public SoyMsgBundle resolve(final Locale locale) throws IOException {
+    public Optional<SoyMsgBundle> resolve(final Locale locale) throws IOException {
         SoyUtils.checkSoyViewConfig(config);
         if (config.isDebugOn()) {
             logger.debug("Debug is on, clearing all cached msg bundles.");
@@ -57,7 +57,7 @@ public class DefaultSoyMsgBundleResolver extends AbstractSoyConfigEnabled implem
             msgBundles.put(locale, soyMsgBundle);
         }
 
-        return soyMsgBundle;
+        return Optional.fromNullable(soyMsgBundle);
     }
 
     protected SoyMsgBundle createSoyMsgBundle(final Locale locale) throws IOException {

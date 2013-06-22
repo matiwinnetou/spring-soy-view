@@ -13,6 +13,7 @@ import pl.matisoft.soy.config.AbstractSoyConfigEnabled;
 import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +30,10 @@ public class DefaultTofuCompiler extends AbstractSoyConfigEnabled implements Tof
     private static final Logger logger = LoggerFactory.getLogger(DefaultTofuCompiler.class);
 
     @Override
-    public SoyTofu compile(final Collection<File> files) {
+    public Optional<SoyTofu> compile(@Nullable final Collection<File> files) {
+        if (files == null || files.isEmpty()) {
+            return Optional.absent();
+        }
         SoyUtils.checkSoyViewConfig(config);
         logger.debug("SoyTofu compilation of templates:" + files.size());
         final long time1 = System.currentTimeMillis();
@@ -49,7 +53,7 @@ public class DefaultTofuCompiler extends AbstractSoyConfigEnabled implements Tof
 
         logger.debug("SoyTofu compilation complete." + (time2 - time1) + " ms");
 
-        return soyTofu;
+        return Optional.fromNullable(soyTofu);
     }
 
     private SoyTofuOptions createSoyTofuOptions(final SoyViewConfig config) {

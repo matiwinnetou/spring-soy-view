@@ -1,5 +1,7 @@
 package pl.matisoft.soy.locale;
 
+import com.google.common.base.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
@@ -11,8 +13,8 @@ import java.util.Locale;
  */
 public class AcceptHeaderLocaleResolver implements LocaleResolver {
 
-    public Locale resolveLocale(final HttpServletRequest request) {
-        return request.getLocale();
+    public Optional<Locale> resolveLocale(final HttpServletRequest request) {
+        return Optional.of(request.getLocale());
     }
 
 }

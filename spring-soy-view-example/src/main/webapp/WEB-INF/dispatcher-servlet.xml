@@ -35,6 +35,11 @@
                 <property name="config" ref="soyConfig" />
             </bean>
         </property>
+        <property name="templateRenderer">
+            <bean class="pl.matisoft.soy.render.DefaultTemplateRenderer">
+                <property name="config" ref="soyConfig" />
+            </bean>
+        </property>
         <property name="debugOn" value="false" />
     </bean>
 

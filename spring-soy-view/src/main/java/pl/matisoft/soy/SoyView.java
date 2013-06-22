@@ -1,11 +1,10 @@
 package pl.matisoft.soy;
 
 import com.google.common.base.Optional;
-import com.google.template.soy.data.SoyMapData;
-import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 import pl.matisoft.soy.config.SoyViewConfig;
+import pl.matisoft.soy.render.TemplateRenderer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,7 +19,7 @@ import java.util.Map;
  */
 public class SoyView extends AbstractTemplateView {
 
-    private SoyTofu compiledTemplates;
+    private Optional<SoyTofu> compiledTemplates;
 
     private String templateName;
 
@@ -36,33 +35,15 @@ public class SoyView extends AbstractTemplateView {
         SoyUtils.checkSoyViewConfig(config);
         final Writer writer = response.getWriter();
 
-//        if (config.isDebugOn()) {
-//            final Collection<File> files = config.getTemplateFilesResolver().resolve();
-//            compiledTemplates = config.getTofuCompiler().compile(files);
-//        }
-
-        if (compiledTemplates == null) {
-            throw new RuntimeException("compiles templates are empty!");
+        if (!compiledTemplates.isPresent()) {
+            throw new RuntimeException("Unable to render - compiled templates are empty!");
         }
 
-        final SoyTofu.Renderer renderer = compiledTemplates.newRenderer(templateName);
-        final SoyMapData soyMapData = config.getToSoyDataConverter().toSoyMap(model);
-        if (soyMapData != null) {
-            renderer.setData(soyMapData);
-        }
-        final Optional<SoyMsgBundle> soyMsgBundleOptional = SoyUtils.soyMsgBundle(config, request);
-        if (soyMsgBundleOptional.isPresent()) {
-            renderer.setMsgBundle(soyMsgBundleOptional.get());
-        }
-        final Optional<SoyMapData> globalModel = config.getGlobalModelResolver().resolveData();
-        if (globalModel.isPresent()) {
-            renderer.setIjData(globalModel.get());
-        }
-        if (config.isDebugOn()) {
-            renderer.setDontAddToCache(true);
-        }
+        final TemplateRenderer templateRenderer = config.getTemplateRenderer();
+        final String renderedTemplate = templateRenderer.render(compiledTemplates.orNull(), templateName, request, model);
 
-        renderer.render(writer);
+        writer.write(renderedTemplate);
+
         writer.flush();
     }
 
@@ -74,7 +55,7 @@ public class SoyView extends AbstractTemplateView {
         this.templateName = templateName;
     }
 
-    public void setCompiledTemplates(final SoyTofu compiledTemplates) {
+    public void setCompiledTemplates(Optional<SoyTofu> compiledTemplates) {
         this.compiledTemplates = compiledTemplates;
     }
 

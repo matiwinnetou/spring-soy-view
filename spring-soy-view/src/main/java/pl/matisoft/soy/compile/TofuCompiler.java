@@ -1,5 +1,6 @@
 package pl.matisoft.soy.compile;
 
+import com.google.common.base.Optional;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public interface TofuCompiler {
 
-    SoyTofu compile(Collection<File> files);
+    Optional<SoyTofu> compile(Collection<File> files);
 
     List<String> compileToJsSrc(File template, SoyMsgBundle soyMsgBundle);
 

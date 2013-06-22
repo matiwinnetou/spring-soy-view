@@ -7,6 +7,7 @@ import pl.matisoft.soy.data.ToSoyDataConverter;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.locale.LocaleResolver;
 import pl.matisoft.soy.global.GlobalModelResolver;
+import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
 /**
@@ -34,6 +35,8 @@ public interface SoyViewConfig {
     GlobalModelResolver getGlobalModelResolver();
 
     CompileTimeGlobalModelResolver getCompileTimeGlobalModelResolver();
+
+    TemplateRenderer getTemplateRenderer();
 
     SoyJsSrcOptions getJsSrcOptions();
 

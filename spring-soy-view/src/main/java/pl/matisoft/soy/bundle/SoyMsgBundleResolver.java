@@ -1,5 +1,6 @@
 package pl.matisoft.soy.bundle;
 
+import com.google.common.base.Optional;
 import com.google.template.soy.msgs.SoyMsgBundle;
 
 import java.io.IOException;
@@ -13,6 +14,6 @@ import java.util.Locale;
  */
 public interface SoyMsgBundleResolver {
 
-    SoyMsgBundle resolve(Locale locale) throws IOException;
+    Optional<SoyMsgBundle> resolve(Locale locale) throws IOException;
 
 }

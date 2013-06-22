@@ -1,5 +1,6 @@
 package pl.matisoft.soy.data;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Primitives;
 import com.google.template.soy.data.SoyMapData;
@@ -20,8 +21,12 @@ import java.util.Map;
 public class DefaultToSoyDataConverter implements ToSoyDataConverter {
 
     @Override
-    public SoyMapData toSoyMap(Object model) throws Exception {
-        return objectToSoyDataMap(model);
+    public Optional<SoyMapData> toSoyMap(final Object model) throws Exception {
+        if (model == null) {
+            return Optional.absent();
+        }
+
+        return Optional.fromNullable(objectToSoyDataMap(model));
     }
 
     private static Map<String, ?> toSoyCompatibleMap(Object obj) {

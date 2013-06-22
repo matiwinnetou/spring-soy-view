@@ -17,7 +17,7 @@ public class DefaultCompileTimeGlobalModelResolver implements CompileTimeGlobalM
 
     @Override
     public Optional<SoyMapData> resolveData() {
-        if (data == null || data.isEmpty()) throw new RuntimeException("empty global pl.matisoft.soy data map!");
+        if (data == null || data.isEmpty()) throw new RuntimeException("empty global soy data map!");
 
         return Optional.of(new SoyMapData(data));
     }

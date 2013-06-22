@@ -1,5 +1,7 @@
 package pl.matisoft.soy.locale;
 
+import com.google.common.base.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
@@ -11,6 +13,6 @@ import java.util.Locale;
  */
 public interface LocaleResolver {
 
-    Locale resolveLocale(HttpServletRequest request);
+    Optional<Locale> resolveLocale(HttpServletRequest request);
 
 }

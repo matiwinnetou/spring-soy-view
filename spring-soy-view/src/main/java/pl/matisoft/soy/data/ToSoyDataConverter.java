@@ -1,5 +1,6 @@
 package pl.matisoft.soy.data;
 
+import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 
 /**
@@ -12,6 +13,6 @@ public interface ToSoyDataConverter {
 
     public static final ToSoyDataConverter EMPTY = new EmptyToSoyDataConverter();
 
-    SoyMapData toSoyMap(Object model) throws Exception;
+    Optional<SoyMapData> toSoyMap(Object model) throws Exception;
 
 }
