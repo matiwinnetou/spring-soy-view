@@ -7,17 +7,17 @@
                 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
     <mvc:annotation-driven />
-    <context:component-scan base-package="soy" />
+    <context:component-scan base-package="pl.matisoft.soy.example" />
 
-    <bean id="soyConfig" class="soy.config.DefaultSoyViewConfig">
+    <bean id="soyConfig" class="pl.matisoft.soy.config.DefaultSoyViewConfig">
         <property name="templateFilesResolver">
-            <bean class="soy.template.DefaultTemplateFilesResolver">
+            <bean class="pl.matisoft.soy.template.DefaultTemplateFilesResolver">
                 <property name="config" ref="soyConfig" />
                 <property name="templatesLocation" value="/WEB-INF/templates" />
             </bean>
         </property>
         <property name="globalModelResolver">
-            <bean class="soy.global.DefaultGlobalModelResolver">
+            <bean class="pl.matisoft.soy.global.DefaultGlobalModelResolver">
                 <property name="data">
                     <map>
                         <entry key="homePageUrl" value="http://mobile.de/cz" />
@@ -26,23 +26,23 @@
             </bean>
         </property>
         <property name="tofuCompiler">
-            <bean class="soy.compile.DefaultTofuCompiler">
+            <bean class="pl.matisoft.soy.compile.DefaultTofuCompiler">
                 <property name="config" ref="soyConfig" />
             </bean>
         </property>
         <property name="soyMsgBundleResolver">
-            <bean class="soy.bundle.DefaultSoyMsgBundleResolver">
+            <bean class="pl.matisoft.soy.bundle.DefaultSoyMsgBundleResolver">
                 <property name="config" ref="soyConfig" />
             </bean>
         </property>
         <property name="debugOn" value="false" />
     </bean>
 
-    <bean id="ajaxSoyController" class="soy.ajax.AjaxSoyController">
+    <bean id="ajaxSoyController" class="pl.matisoft.soy.ajax.AjaxSoyController">
         <property name="config" ref="soyConfig" />
     </bean>
 
-    <bean id="viewResolver" class="soy.SoyTemplateViewResolver">
+    <bean id="viewResolver" class="pl.matisoft.soy.SoyTemplateViewResolver">
         <property name="config" ref="soyConfig" />
         <property name="cache" value="true" />
     </bean>

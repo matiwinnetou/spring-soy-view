@@ -6,6 +6,6 @@
        default-lazy-init="true">
 
     <context:annotation-config/>
-    <context:component-scan base-package="soy"/>
+    <context:component-scan base-package="pl.matisoft.soy"/>
 
 </beans>

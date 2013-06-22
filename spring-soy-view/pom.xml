@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>spring-soy-view</groupId>
+        <groupId>pl.matisoft</groupId>
         <artifactId>spring-soy-view-root</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
@@ -53,12 +53,6 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.6.6</version>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>com.google.template</groupId>-->
-            <!--<artifactId>soy</artifactId>-->
-            <!--<version>2012-12-21</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>com.google.closure</groupId>
