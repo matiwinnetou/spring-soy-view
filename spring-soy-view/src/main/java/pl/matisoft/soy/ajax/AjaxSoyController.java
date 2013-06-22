@@ -47,11 +47,20 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
 //        headers.add("Cache-Control", config.isDebugOn() ? "no-cache" : cacheControl);
 //
 //        final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
-//        final Collection<File> templateFiles = templateFilesResolver.resolve();
+//        final Optional<File> templateFile = templateFilesResolver.resolve(templateName);
+//
+//        if (!templateFile.isPresent()) {
+//            throw notFound(templateName);
+//        }
 //
 //        final Optional<SoyMsgBundle> soyMsgBundle = SoyUtils.soyMsgBundle(config, request);
 //        final TofuCompiler tofuCompiler = config.getTofuCompiler();
-//        final SoyTofu tofuData = tofuCompiler.compile(templateFiles);
+//        final Optional<SoyTofu> soyTofu = tofuCompiler.compile(Lists.newArrayList(templateFile.get()));
+//        if (soyTofu.isPresent()) {
+//            final TemplateRenderer templateRenderer = config.getTemplateRenderer();
+//            templateRenderer.render(soyTofu.get(), te)
+//        }
+//
 //        final SoyTofu.Renderer renderer = tofuData.newRenderer(templateName);
 //        final SoyMapData soyMapData = config.getToSoyDataConverter().toSoyMap() //model resolver?
 //

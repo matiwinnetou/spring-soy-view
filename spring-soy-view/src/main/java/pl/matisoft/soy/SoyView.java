@@ -40,11 +40,11 @@ public class SoyView extends AbstractTemplateView {
         }
 
         final TemplateRenderer templateRenderer = config.getTemplateRenderer();
-        final String renderedTemplate = templateRenderer.render(compiledTemplates.orNull(), templateName, request, model);
-
-        writer.write(renderedTemplate);
-
-        writer.flush();
+        final Optional<String> renderedTemplate = templateRenderer.render(compiledTemplates, templateName, request, model);
+        if (renderedTemplate.isPresent()) {
+            writer.write(renderedTemplate.get());
+            writer.flush();
+        }
     }
 
     public void setConfig(final SoyViewConfig config) {
@@ -55,7 +55,7 @@ public class SoyView extends AbstractTemplateView {
         this.templateName = templateName;
     }
 
-    public void setCompiledTemplates(Optional<SoyTofu> compiledTemplates) {
+    public void setCompiledTemplates(final Optional<SoyTofu> compiledTemplates) {
         this.compiledTemplates = compiledTemplates;
     }
 

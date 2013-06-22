@@ -19,14 +19,14 @@ import javax.servlet.http.HttpServletRequest;
 public class DefaultTemplateRenderer extends AbstractSoyConfigEnabled implements TemplateRenderer {
 
     @Override
-    public String render(final SoyTofu compiledTemplates, final String templateName, final HttpServletRequest request, final Object model) throws Exception {
+    public Optional<String> render(final Optional<SoyTofu> compiledTemplates, final String templateName, final HttpServletRequest request, final Object model) throws Exception {
         SoyUtils.checkSoyViewConfig(config);
 
-        if (compiledTemplates == null) {
-            throw new RuntimeException("compiles templates are empty!");
+        if (!compiledTemplates.isPresent()) {
+            return Optional.absent();
         }
 
-        final SoyTofu.Renderer renderer = compiledTemplates.newRenderer(templateName);
+        final SoyTofu.Renderer renderer = compiledTemplates.get().newRenderer(templateName);
         final ToSoyDataConverter soyDataConverter = config.getToSoyDataConverter();
         final Optional<SoyMapData> soyMapData = soyDataConverter.toSoyMap(model);
         if (soyMapData.isPresent()) {
@@ -44,7 +44,7 @@ public class DefaultTemplateRenderer extends AbstractSoyConfigEnabled implements
             renderer.setDontAddToCache(true);
         }
 
-        return renderer.render();
+        return Optional.of(renderer.render());
     }
 
 }

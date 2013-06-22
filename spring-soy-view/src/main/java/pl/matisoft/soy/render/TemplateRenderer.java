@@ -1,5 +1,6 @@
 package pl.matisoft.soy.render;
 
+import com.google.common.base.Optional;
 import com.google.template.soy.tofu.SoyTofu;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface TemplateRenderer {
 
-    String render(final SoyTofu compiledTemplates, final String templateName, final HttpServletRequest request, final Object model) throws Exception;
+    Optional<String> render(final Optional<SoyTofu> compiledTemplates, final String templateName, final HttpServletRequest request, final Object model) throws Exception;
 
 }
