@@ -2,6 +2,8 @@ package soy;
 
 import com.google.common.base.Optional;
 import com.google.template.soy.tofu.SoyTofu;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import soy.compile.TofuCompiler;
@@ -19,6 +21,8 @@ import java.util.Collection;
  */
 public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
+    private static final Logger logger = LoggerFactory.getLogger(SoyTemplateViewResolver.class);
+
     private SoyViewConfig config;
 
     private SoyTofu compiledTemplates;
@@ -32,7 +36,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     protected void initApplicationContext() {
         super.initApplicationContext();
         if (isCache()) {
-            this.compiledTemplates = compileTemplates().orNull();
+            this.compiledTemplates = compileTemplates("<class_init>").orNull();
         }
     }
 
@@ -51,7 +55,9 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         if (isCache()) {
             view.setCompiledTemplates(compiledTemplates);
         } else {
-            view.setCompiledTemplates(compileTemplates().orNull());
+            if (!viewName.endsWith(".html")) { //????
+                view.setCompiledTemplates(compileTemplates(viewName).orNull());
+            }
         }
 
         view.setConfig(config);
@@ -68,7 +74,8 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         return "text/html; charset=" + encoding;
     }
 
-    private Optional<SoyTofu> compileTemplates() {
+    private Optional<SoyTofu> compileTemplates(final String viewName) {
+        logger.debug("Compile all templates, initBy: " + viewName);
         final TemplateFilesResolver templateFilesResolver = config.getTemplateFilesResolver();
         final Collection<File> templateFiles = templateFilesResolver.resolve();
         if (templateFiles != null && templateFiles.size() > 0) {

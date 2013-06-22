@@ -38,10 +38,10 @@ public class SoyView extends AbstractTemplateView {
         SoyUtils.checkSoyViewConfig(config);
         final Writer writer = response.getWriter();
 
-        if (config.isDebugOn()) {
-            final Collection<File> files = config.getTemplateFilesResolver().resolve();
-            compiledTemplates = config.getTofuCompiler().compile(files);
-        }
+//        if (config.isDebugOn()) {
+//            final Collection<File> files = config.getTemplateFilesResolver().resolve();
+//            compiledTemplates = config.getTofuCompiler().compile(files);
+//        }
 
         final SoyTofu.Renderer renderer = compiledTemplates.newRenderer(templateName);
         final SoyMapData soyMapData = config.getToSoyDataConverter().toSoyMap(model);

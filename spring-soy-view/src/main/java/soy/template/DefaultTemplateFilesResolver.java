@@ -39,7 +39,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         if (templatesLocation == null) throw new IllegalArgumentException("templates location not defined");
 
         final List<File> files = toFiles(templatesLocation);
-        logger.info("Resolved files:" + files.size());
+        logger.debug("Resolved files:" + files.size());
 
 //        if (logger.isDebugEnabled()) {
 //            for (final File file : files) {

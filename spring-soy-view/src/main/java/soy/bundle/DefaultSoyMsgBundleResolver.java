@@ -36,7 +36,7 @@ public class DefaultSoyMsgBundleResolver extends AbstractSoyConfigEnabled implem
     public SoyMsgBundle resolve(final Locale locale) throws IOException {
         SoyUtils.checkSoyViewConfig(config);
         if (config.isDebugOn()) {
-            logger.info("Debug is on, clearing all cached msg bundles.");
+            logger.debug("Debug is on, clearing all cached msg bundles.");
             msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
         }
         SoyMsgBundle soyMsgBundle = msgBundles.get(locale);

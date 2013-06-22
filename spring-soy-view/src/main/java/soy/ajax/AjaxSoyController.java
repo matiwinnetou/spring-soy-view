@@ -50,7 +50,7 @@ public class AjaxSoyController extends AbstractSoyConfigEnabled {
 
         final File templateFile = getTemplateFileAndAssertExistence(templateFileName);
 
-        logger.info("Debug true - compiling JavaScript template:" + templateFile);
+        logger.debug("Debug true - compiling JavaScript template:" + templateFile);
 
         final String templateContent = compileTemplateAndAssertSuccess(request, templateFile);
         if (!config.isDebugOn()) {

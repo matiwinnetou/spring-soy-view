@@ -43,6 +43,7 @@
 
     <bean id="viewResolver" class="soy.SoyTemplateViewResolver">
         <property name="config" ref="soyConfig" />
+        <property name="cache" value="false" />
     </bean>
 
     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">

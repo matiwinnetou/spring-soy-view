@@ -27,7 +27,7 @@ public class DefaultTofuCompiler extends AbstractSoyConfigEnabled implements Tof
     @Override
     public SoyTofu compile(final Collection<File> files) {
         SoyUtils.checkSoyViewConfig(config);
-        logger.info("SoyTofu compilation of templates:" + files.size());
+        logger.debug("SoyTofu compilation of templates:" + files.size());
         final long time1 = System.currentTimeMillis();
 
         final SoyFileSet.Builder sfsBuilder = new SoyFileSet.Builder();
@@ -43,7 +43,7 @@ public class DefaultTofuCompiler extends AbstractSoyConfigEnabled implements Tof
 
         final long time2 = System.currentTimeMillis();
 
-        logger.info("SoyTofu compilation complete." + (time2 - time1) + " ms");
+        logger.debug("SoyTofu compilation complete." + (time2 - time1) + " ms");
 
         return soyTofu;
     }
