@@ -1,21 +1,20 @@
 #Introduction
 
-Implementation of soy view in spring.
+Implementation of Spring's MVC View in Google Closure (soy)
 
 None of the publically available implementation did satisfied me so I wrote my own.
 
-It is highly customizable via injectable providers
+It is highly customizable via pluggable interfaces.
 
-Supported:
-1. POJO rendering and flat structure rendering
-2. SoyMsgBundle based on resolvable locale
-3. AjaxJavaScript endpoint
-4. Global variables support
-5. Compile time global variables support
-6. Debug flag support
-7. Extensible all via pluggable interfaces
+#### Supported
+* POJO rendering and flat structure rendering
+* SoyMsgBundle based on resolvable locale
+* JavaScript compilation via AJAX endpoint
+* Global variables support
+* Compile time global variables support
+* Debug flag support
 
-author: Mateusz Szczap
-
+author: Mateusz Szczap<br/>
+<mati@sz.home.pl>
 
 
