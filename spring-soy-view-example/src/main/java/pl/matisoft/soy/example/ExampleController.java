@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,11 +13,11 @@ import java.util.Date;
 public class ExampleController {
 
 	@RequestMapping(value="/")
-	public String openHomepage(final Model model) {
+	public ModelAndView openHomepage(final Model model) {
 		addServerTimeStringToModel(model);
 		model.addAttribute("words", Lists.newArrayList("hello", "world", "from", "spring", "controller!"));
 
-		return "soy.example.index";
+        return new ModelAndView("soy.example.index", model.asMap());
 	}
 
 	@RequestMapping(value="/server-time")
