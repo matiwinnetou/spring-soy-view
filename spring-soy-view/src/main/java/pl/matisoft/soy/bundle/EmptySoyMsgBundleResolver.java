@@ -15,7 +15,7 @@ import java.util.Locale;
 public class EmptySoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     @Override
-    public Optional<SoyMsgBundle> resolve(Locale locale) throws IOException {
+    public Optional<SoyMsgBundle> resolve(final Optional<Locale> locale) throws IOException {
         return Optional.absent();
     }
 

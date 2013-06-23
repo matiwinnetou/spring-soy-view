@@ -9,3 +9,4 @@
 8. Unit tests
 9. Soy Msg Bundle files generator if debug is on or controller to generate them?
 12. Forward based rendering - > via ajax controller -> like Silken does it as na option (Ajax rendering for JQuery provided ModelResolver is present)
+13. Placeholder for compiled templates -> serving as a cache

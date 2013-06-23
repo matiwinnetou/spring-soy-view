@@ -9,47 +9,54 @@
     <mvc:annotation-driven />
     <context:component-scan base-package="pl.matisoft.soy.example" />
 
-    <bean id="soyConfig" class="pl.matisoft.soy.config.DefaultSoyViewConfig">
-        <property name="templateFilesResolver">
-            <bean class="pl.matisoft.soy.template.DefaultTemplateFilesResolver">
-                <property name="config" ref="soyConfig" />
-                <property name="templatesLocation" value="/WEB-INF/templates" />
-            </bean>
+    <bean id="templateFilesResolver" class="pl.matisoft.soy.template.DefaultTemplateFilesResolver">
+        <property name="templatesLocation" value="/WEB-INF/templates" />
+        <property name="recursive" value="true" />
+        <property name="debugOn" value="false" />
+    </bean>
+
+    <bean id="compileTimeGlobalModelResolver" class="pl.matisoft.soy.global.compile.DefaultCompileTimeGlobalModelResolver" />
+
+    <bean id="globalModelResolver" class="pl.matisoft.soy.global.DefaultGlobalModelResolver">
+        <property name="data">
+            <map>
+                <entry key="test1" value="test1Value" />
+            </map>
         </property>
-        <property name="globalModelResolver">
-            <bean class="pl.matisoft.soy.global.DefaultGlobalModelResolver">
-                <property name="data">
-                    <map>
-                        <entry key="test1" value="test1Value" />
-                    </map>
-                </property>
-            </bean>
-        </property>
-        <property name="tofuCompiler">
-            <bean class="pl.matisoft.soy.compile.DefaultTofuCompiler">
-                <property name="config" ref="soyConfig" />
-            </bean>
-        </property>
-        <property name="soyMsgBundleResolver">
-            <bean class="pl.matisoft.soy.bundle.DefaultSoyMsgBundleResolver">
-                <property name="config" ref="soyConfig" />
-            </bean>
-        </property>
-        <property name="templateRenderer">
-            <bean class="pl.matisoft.soy.render.DefaultTemplateRenderer">
-                <property name="config" ref="soyConfig" />
-            </bean>
-        </property>
-        <property name="debugOn" value="true" />
+    </bean>
+
+    <bean id="tofuCompiler" class="pl.matisoft.soy.compile.DefaultTofuCompiler">
+        <property name="compileTimeGlobalModelResolver" ref="compileTimeGlobalModelResolver" />
+        <property name="debugOn" value="false" />
+    </bean>
+
+    <bean id="localeProvider" class="pl.matisoft.soy.locale.EmptyLocaleProvider" />
+
+    <bean id="soyMsgBundleResolver" class="pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver" />
+
+    <bean id="toSoyDataConverter" class="pl.matisoft.soy.data.DefaultToSoyDataConverter" />
+
+    <bean id="templateRenderer" class="pl.matisoft.soy.render.DefaultTemplateRenderer">
+        <property name="localeProvider" ref="localeProvider" />
+        <property name="globalModelResolver" ref="globalModelResolver" />
+        <property name="soyMsgBundleResolver" ref="soyMsgBundleResolver" />
+        <property name="toSoyDataConverter" ref="toSoyDataConverter" />
+        <property name="debugOn" value="false" />
     </bean>
 
     <bean id="ajaxSoyController" class="pl.matisoft.soy.ajax.SoyAjaxController">
-        <property name="config" ref="soyConfig" />
+        <property name="localeProvider" ref="localeProvider" />
+        <property name="soyMsgBundleResolver" ref="soyMsgBundleResolver" />
+        <property name="templateFilesResolver" ref="templateFilesResolver" />
+        <property name="tofuCompiler" ref="tofuCompiler" />
+        <property name="debugOn" value="false" />
     </bean>
 
     <bean id="viewResolver" class="pl.matisoft.soy.SoyTemplateViewResolver">
-        <property name="config" ref="soyConfig" />
-        <property name="cache" value="false" />
+        <property name="templateFilesResolver" ref="templateFilesResolver" />
+        <property name="tofuCompiler" ref="tofuCompiler" />
+        <property name="templateRenderer" ref="templateRenderer" />
+        <property name="debugOn" value="false" /> <!-- mutually exclusive with cache flag -->
     </bean>
 
     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
@@ -61,7 +68,7 @@
         </property>
         <property name="viewResolvers">
             <list>
-                <ref local="viewResolver"/>
+                <ref bean="viewResolver" />
             </list>
         </property>
         <property name="defaultViews">

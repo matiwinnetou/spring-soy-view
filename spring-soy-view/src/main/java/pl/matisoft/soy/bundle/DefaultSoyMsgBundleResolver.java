@@ -1,6 +1,7 @@
 package pl.matisoft.soy.bundle;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.msgs.SoyMsgBundleHandler;
@@ -9,8 +10,6 @@ import com.google.template.soy.msgs.restricted.SoyMsgBundleImpl;
 import com.google.template.soy.xliffmsgplugin.XliffMsgPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.matisoft.soy.SoyUtils;
-import pl.matisoft.soy.config.AbstractSoyConfigEnabled;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,27 +22,31 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date: 20/06/2013
  * Time: 00:01
  */
-public class DefaultSoyMsgBundleResolver extends AbstractSoyConfigEnabled implements SoyMsgBundleResolver {
+public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
+
+    public final static String DEF_MESSAGES_PATH = "messages";
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultSoyMsgBundleResolver.class);
-
-    private final String DEF_MESSAGES_PATH = "xliffs/messages";
 
     private static Map<Locale, SoyMsgBundle> msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
 
     private String messagesPath = DEF_MESSAGES_PATH;
 
-    public Optional<SoyMsgBundle> resolve(final Locale locale) throws IOException {
-        SoyUtils.checkSoyViewConfig(config);
-        if (config.isDebugOn()) {
+    private boolean debugOn = false;
+
+    public Optional<SoyMsgBundle> resolve(final Optional<Locale> locale) throws IOException {
+        if (!locale.isPresent()) {
+            return Optional.absent();
+        }
+        if (debugOn) {
             logger.debug("Debug is on, clearing all cached msg bundles.");
             msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
         }
-        SoyMsgBundle soyMsgBundle = msgBundles.get(locale);
+        SoyMsgBundle soyMsgBundle = msgBundles.get(locale.get());
         if (soyMsgBundle == null) {
-            soyMsgBundle = createSoyMsgBundle(locale);
+            soyMsgBundle = createSoyMsgBundle(locale.get());
             if (soyMsgBundle == null) {
-                soyMsgBundle = createSoyMsgBundle(new Locale(locale.getLanguage()));
+                soyMsgBundle = createSoyMsgBundle(new Locale(locale.get().getLanguage()));
             }
 
             if (soyMsgBundle == null) {
@@ -54,13 +57,14 @@ public class DefaultSoyMsgBundleResolver extends AbstractSoyConfigEnabled implem
                 throw new IOException("No message bundle found.");
             }
 
-            msgBundles.put(locale, soyMsgBundle);
+            msgBundles.put(locale.get(), soyMsgBundle);
         }
 
         return Optional.fromNullable(soyMsgBundle);
     }
 
     protected SoyMsgBundle createSoyMsgBundle(final Locale locale) throws IOException {
+        Preconditions.checkNotNull(messagesPath, "messagesPath cannot be null!");
         final String path = messagesPath  + "_" + locale.toString() + ".xlf";
 
         final Enumeration<URL> e = Thread.currentThread().getContextClassLoader().getResources(path);
@@ -95,6 +99,10 @@ public class DefaultSoyMsgBundleResolver extends AbstractSoyConfigEnabled implem
 
     public void setMessagesPath(final String messagesPath) {
         this.messagesPath = messagesPath;
+    }
+
+    public void setDebugOn(final boolean debugOn) {
+        this.debugOn = debugOn;
     }
 
 }

@@ -1,9 +1,10 @@
 package pl.matisoft.soy;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
 import org.springframework.web.servlet.view.AbstractTemplateView;
-import pl.matisoft.soy.config.SoyViewConfig;
+import pl.matisoft.soy.render.DefaultTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,11 +20,11 @@ import java.util.Map;
  */
 public class SoyView extends AbstractTemplateView {
 
-    private Optional<SoyTofu> compiledTemplates;
+    private Optional<SoyTofu> compiledTemplates = Optional.absent();
 
     private String templateName;
 
-    private SoyViewConfig config;
+    private TemplateRenderer templateRenderer = new DefaultTemplateRenderer();
 
     public SoyView() {
     }
@@ -32,23 +33,19 @@ public class SoyView extends AbstractTemplateView {
     protected void renderMergedTemplateModel(final Map<String, Object> model,
                                              final HttpServletRequest request,
                                              final HttpServletResponse response) throws Exception {
-        SoyUtils.checkSoyViewConfig(config);
+        Preconditions.checkNotNull(templateName, "templateName cannot be null");
+        Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null");
         final Writer writer = response.getWriter();
 
         if (!compiledTemplates.isPresent()) {
             throw new RuntimeException("Unable to render - compiled templates are empty!");
         }
 
-        final TemplateRenderer templateRenderer = config.getTemplateRenderer();
         final Optional<String> renderedTemplate = templateRenderer.render(compiledTemplates, templateName, request, model);
         if (renderedTemplate.isPresent()) {
             writer.write(renderedTemplate.get());
             writer.flush();
         }
-    }
-
-    public void setConfig(final SoyViewConfig config) {
-        this.config = config;
     }
 
     public void setTemplateName(final String templateName) {
@@ -57,6 +54,10 @@ public class SoyView extends AbstractTemplateView {
 
     public void setCompiledTemplates(final Optional<SoyTofu> compiledTemplates) {
         this.compiledTemplates = compiledTemplates;
+    }
+
+    public void setTemplateRenderer(final TemplateRenderer templateRenderer) {
+        this.templateRenderer = templateRenderer;
     }
 
 }

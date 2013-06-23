@@ -1,14 +1,13 @@
 package pl.matisoft.soy.template;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import pl.matisoft.soy.SoyUtils;
-import pl.matisoft.soy.config.AbstractSoyConfigEnabled;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,7 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Date: 20/06/2013
  * Time: 19:58
  */
-public class DefaultTemplateFilesResolver extends AbstractSoyConfigEnabled implements TemplateFilesResolver {
+public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);
 
@@ -34,22 +33,18 @@ public class DefaultTemplateFilesResolver extends AbstractSoyConfigEnabled imple
 
     private boolean recursive = true;
 
+    private boolean debugOn = false;
+
     private CopyOnWriteArrayList<File> cachedFiles = new CopyOnWriteArrayList<File>();
 
     public DefaultTemplateFilesResolver() {
     }
 
-    public DefaultTemplateFilesResolver(final Resource templatesLocation, final boolean recursive) {
-        this.templatesLocation = templatesLocation;
-        this.recursive = recursive;
-    }
-
     @Override
     public Collection<File> resolve() {
-        SoyUtils.checkSoyViewConfig(config);
-        if (templatesLocation == null) throw new IllegalArgumentException("templates location not defined");
+        Preconditions.checkNotNull(templatesLocation, "templatesLocation cannot be null!");
 
-        if (config.isDebugOn()) {
+        if (debugOn) {
             final List<File> files = toFiles(templatesLocation);
             logger.debug("Debug on - resolved files:" + files.size());
 
@@ -127,6 +122,10 @@ public class DefaultTemplateFilesResolver extends AbstractSoyConfigEnabled imple
 
     public void setRecursive(final boolean recursive) {
         this.recursive = recursive;
+    }
+
+    public void setDebugOn(final boolean debugOn) {
+        this.debugOn = debugOn;
     }
 
 }

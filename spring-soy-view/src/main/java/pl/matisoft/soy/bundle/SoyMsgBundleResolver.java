@@ -14,6 +14,6 @@ import java.util.Locale;
  */
 public interface SoyMsgBundleResolver {
 
-    Optional<SoyMsgBundle> resolve(Locale locale) throws IOException;
+    Optional<SoyMsgBundle> resolve(Optional<Locale> locale) throws IOException;
 
 }
