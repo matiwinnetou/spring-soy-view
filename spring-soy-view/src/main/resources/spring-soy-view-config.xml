@@ -3,10 +3,19 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+    <bean id="soyViewConfig" class="pl.matisoft.soy.config.SoyViewConfig">
+        <property name="debugOn" value="true" />
+    </bean>
+
     <bean id="templateFilesResolver" class="pl.matisoft.soy.template.DefaultTemplateFilesResolver">
         <property name="templatesLocation" value="/WEB-INF/templates" />
         <property name="recursive" value="true" />
-        <property name="debugOn" value="false" />
+        <property name="debugOn">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName" value="soyViewConfig" />
+                <property name="propertyPath" value="debugOn" />
+            </bean>
+        </property>
     </bean>
 
     <bean id="compileTimeGlobalModelResolver" class="pl.matisoft.soy.global.compile.DefaultCompileTimeGlobalModelResolver" />
@@ -15,7 +24,12 @@
 
     <bean id="tofuCompiler" class="pl.matisoft.soy.compile.DefaultTofuCompiler">
         <property name="compileTimeGlobalModelResolver" ref="compileTimeGlobalModelResolver" />
-        <property name="debugOn" value="false" />
+        <property name="debugOn">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName" value="soyViewConfig" />
+                <property name="propertyPath" value="debugOn" />
+            </bean>
+        </property>
     </bean>
 
     <bean id="localeProvider" class="pl.matisoft.soy.locale.EmptyLocaleProvider" />
@@ -29,7 +43,12 @@
         <property name="globalModelResolver" ref="globalModelResolver" />
         <property name="soyMsgBundleResolver" ref="soyMsgBundleResolver" />
         <property name="toSoyDataConverter" ref="toSoyDataConverter" />
-        <property name="debugOn" value="false" />
+        <property name="debugOn">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName" value="soyViewConfig" />
+                <property name="propertyPath" value="debugOn" />
+            </bean>
+        </property>
     </bean>
 
     <bean id="ajaxSoyController" class="pl.matisoft.soy.ajax.SoyAjaxController">
@@ -37,14 +56,24 @@
         <property name="soyMsgBundleResolver" ref="soyMsgBundleResolver" />
         <property name="templateFilesResolver" ref="templateFilesResolver" />
         <property name="tofuCompiler" ref="tofuCompiler" />
-        <property name="debugOn" value="false" />
+        <property name="debugOn">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName" value="soyViewConfig" />
+                <property name="propertyPath" value="debugOn" />
+            </bean>
+        </property>
     </bean>
 
     <bean id="viewResolver" class="pl.matisoft.soy.SoyTemplateViewResolver">
         <property name="templateFilesResolver" ref="templateFilesResolver" />
         <property name="tofuCompiler" ref="tofuCompiler" />
         <property name="templateRenderer" ref="templateRenderer" />
-        <property name="debugOn" value="false" /> <!-- mutually exclusive with cache flag -->
+        <property name="debugOn"> <!-- mutually exclusive with cache flag -->
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName" value="soyViewConfig" />
+                <property name="propertyPath" value="debugOn" />
+            </bean>
+        </property>
     </bean>
 
 </beans>
