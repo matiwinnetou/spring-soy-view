@@ -52,6 +52,8 @@ public class DefaultTofuCompiler implements TofuCompiler {
             sfsBuilder.add(url);
         }
 
+        addRuntimeGlobals(sfsBuilder);
+
         final SoyFileSet soyFileSet = sfsBuilder.build();
 
         final SoyTofuOptions soyTofuOptions = createSoyTofuOptions();
@@ -62,6 +64,17 @@ public class DefaultTofuCompiler implements TofuCompiler {
         logger.debug("SoyTofu compilation complete." + (time2 - time1) + " ms");
 
         return Optional.fromNullable(soyTofu);
+    }
+
+    private void addRuntimeGlobals(SoyFileSet.Builder sfsBuilder) {
+        final Optional<SoyMapData> soyMapData = compileTimeGlobalModelResolver.resolveData();
+        if (soyMapData.isPresent()) {
+            final Map<String, ?> mapData = soyMapData.get().asMap();
+            if (mapData.size() > 0) {
+                logger.debug("Setting compile time globals, entries number:" + mapData.size());
+                sfsBuilder.setCompileTimeGlobals(mapData);
+            }
+        }
     }
 
     private SoyTofuOptions createSoyTofuOptions() {
@@ -92,15 +105,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
         builder.setAllowExternalCalls(true);
         builder.add(url);
 
-        final Optional<SoyMapData> soyMapData = compileTimeGlobalModelResolver.resolveData();
-
-        if (soyMapData.isPresent()) {
-            final Map<String, ?> mapData = soyMapData.get().asMap();
-            if (mapData.size() > 0) {
-                logger.debug("Setting compile time globals, entries number:" + mapData.size());
-                builder.setCompileTimeGlobals(mapData);
-            }
-        }
+        addRuntimeGlobals(builder);
 
         return builder.build();
     }
