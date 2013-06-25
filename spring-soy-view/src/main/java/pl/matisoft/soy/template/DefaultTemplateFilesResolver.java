@@ -70,7 +70,9 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         final URL templateFile = Iterables.find(files, new Predicate<URL>() {
             @Override
             public boolean apply(final URL url) {
-                return url.getFile().equalsIgnoreCase(templateFileName + ".soy");
+                final String fileName = url.getFile();
+                final File file = new File(fileName);
+                return file.getName().equalsIgnoreCase(templateFileName + ".soy");
             }
         }, null);
 
