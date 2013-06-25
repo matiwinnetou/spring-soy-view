@@ -4,7 +4,7 @@
     <parent>
         <groupId>pl.matisoft</groupId>
         <artifactId>spring-soy-view-root</artifactId>
-        <version>1.2</version>
+        <version>1.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>spring-soy-view</artifactId>
