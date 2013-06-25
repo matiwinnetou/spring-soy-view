@@ -55,26 +55,38 @@ public class SoyAjaxController {
 
     @RequestMapping(value="/soy/{templateFileName}.js", method=GET)
 	public ResponseEntity<String> getJsForTemplateFile(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
+        return compileJs(templateFileName, request);
+    }
+
+    @RequestMapping(value="/soy/{templateFileName}", method=GET)
+    public ResponseEntity<String> getJsForTemplateFileExt(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
+        return compileJs(templateFileName, request);
+    }
+
+    private ResponseEntity<String> compileJs(String templateFileName, final HttpServletRequest request) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templateFilesResolver cannot be null");
 
-        final Optional<URL> templateFile = templateFilesResolver.resolve(templateFileName);
+        final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
+        if (!templateUrl.isPresent()) {
+            throw notFound(templateFileName);
+        }
 
-		if (!debugOn && cachedJsTemplates.containsKey(templateFile.get())) {
-            logger.debug("Debug off and returning cached compiled file:" + templateFile.get());
-			return prepareResponseFor(cachedJsTemplates.get(templateFile.get()));
-		}
+        if (!debugOn && cachedJsTemplates.containsKey(templateUrl.get())) {
+            logger.debug("Debug off and returning cached compiled file:" + templateUrl.get());
+            return prepareResponseFor(cachedJsTemplates.get(templateUrl.get()));
+        }
 
-        logger.debug("Compiling JavaScript template:" + templateFile.orNull());
+        logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
 
-        if (!templateFile.isPresent()) {
+        if (!templateUrl.isPresent()) {
             throw notFound("File not found:" + templateFileName + ".soy");
         }
 
-        final String templateContent = compileTemplateAndAssertSuccess(request, templateFile);
+        final String templateContent = compileTemplateAndAssertSuccess(request, templateUrl);
         if (!debugOn) {
-            if (templateFile.isPresent()) {
-                logger.debug("Debug off adding to templateFile to cache:" + templateFile.get());
-                cachedJsTemplates.putIfAbsent(templateFile.get(), templateContent);
+            if (templateUrl.isPresent()) {
+                logger.debug("Debug off adding to templateUrl to cache:" + templateUrl.get());
+                cachedJsTemplates.putIfAbsent(templateUrl.get(), templateContent);
             }
         }
 
