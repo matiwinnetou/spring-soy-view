@@ -10,9 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,17 +36,17 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     private boolean debugOn = false;
 
-    private CopyOnWriteArrayList<File> cachedFiles = new CopyOnWriteArrayList<File>();
+    private CopyOnWriteArrayList<URL> cachedFiles = new CopyOnWriteArrayList<URL>();
 
     public DefaultTemplateFilesResolver() {
     }
 
     @Override
-    public Collection<File> resolve() {
+    public Collection<URL> resolve() throws IOException {
         Preconditions.checkNotNull(templatesLocation, "templatesLocation cannot be null!");
 
         if (debugOn) {
-            final List<File> files = toFiles(templatesLocation);
+            final List<URL> files = toFiles(templatesLocation);
             logger.debug("Debug on - resolved files:" + files.size());
 
             return files;
@@ -53,9 +54,9 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
         //no debug
         if (cachedFiles.isEmpty()) {
-            final List<File> files = toFiles(templatesLocation);
+            final List<URL> files = toFiles(templatesLocation);
             logger.debug("templates location:" + templatesLocation);
-            logger.debug("Using cache resolve, debug off, files:" + files.size());
+            logger.debug("Using cache resolve, debug off, urls:" + files.size());
             cachedFiles.addAll(files);
         }
 
@@ -63,21 +64,21 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
     }
 
     @Override
-    public Optional<File> resolve(final String templateFileName) {
-        final Collection<File> files = resolve();
+    public Optional<URL> resolve(final String templateFileName) throws IOException {
+        final Collection<URL> files = resolve();
 
-        final File templateFile = Iterables.find(files, new Predicate<File>() {
+        final URL templateFile = Iterables.find(files, new Predicate<URL>() {
             @Override
-            public boolean apply(@Nullable File file) {
-                return file.getName().equalsIgnoreCase(templateFileName + ".soy");
+            public boolean apply(final URL url) {
+                return url.getFile().equalsIgnoreCase(templateFileName + ".soy");
             }
         }, null);
 
         return Optional.fromNullable(templateFile);
     }
 
-    private @Nonnull List<File> toFiles(final Resource templatesLocation) {
-        final List<File> templateFiles = Lists.newArrayList();
+    private @Nonnull List<URL> toFiles(final Resource templatesLocation) {
+        final List<URL> templateFiles = Lists.newArrayList();
         try {
             File baseDirectory = templatesLocation.getFile();
             if (baseDirectory.isDirectory()) {
@@ -92,20 +93,20 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         return templateFiles;
     }
 
-    protected @Nonnull List<File> findSoyFiles(final File baseDirectory, final boolean recursive) {
-        final List<File> soyFiles = new ArrayList<File>();
+    protected @Nonnull List<URL> findSoyFiles(final File baseDirectory, final boolean recursive) throws MalformedURLException {
+        final List<URL> soyFiles = new ArrayList<URL>();
         findSoyFiles(soyFiles, baseDirectory, recursive);
 
         return soyFiles;
     }
 
-    protected void findSoyFiles(final List<File> soyFiles, final File baseDirectory, final boolean recursive) {
+    protected void findSoyFiles(final List<URL> soyFiles, final File baseDirectory, final boolean recursive) throws MalformedURLException {
         final File[] files = baseDirectory.listFiles();
         if (files != null) {
             for (final File file : files) {
                 if (file.isFile()) {
                     if (file.getName().endsWith(".soy")) {
-                        soyFiles.add(file);
+                        soyFiles.add(file.toURI().toURL());
                     }
                 } else if (file.isDirectory() && recursive) {
                     findSoyFiles(soyFiles, file, recursive);

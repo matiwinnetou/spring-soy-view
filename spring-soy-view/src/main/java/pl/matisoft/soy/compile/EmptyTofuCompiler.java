@@ -5,7 +5,7 @@ import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 
 import javax.annotation.Nullable;
-import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -19,12 +19,12 @@ import java.util.List;
 public class EmptyTofuCompiler implements TofuCompiler {
 
     @Override
-    public Optional<SoyTofu> compile(Collection<File> files) {
+    public Optional<SoyTofu> compile(Collection<URL> urls) {
         return Optional.absent();
     }
 
     @Override
-    public List<String> compileToJsSrc(File template, @Nullable SoyMsgBundle soyMsgBundle) {
+    public List<String> compileToJsSrc(URL template, @Nullable SoyMsgBundle soyMsgBundle) {
         return Collections.emptyList();
     }
 

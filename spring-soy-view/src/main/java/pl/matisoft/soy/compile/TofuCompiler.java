@@ -5,7 +5,7 @@ import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 
 import javax.annotation.Nullable;
-import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,8 +17,8 @@ import java.util.List;
  */
 public interface TofuCompiler {
 
-    Optional<SoyTofu> compile(Collection<File> files);
+    Optional<SoyTofu> compile(Collection<URL> files);
 
-    List<String> compileToJsSrc(File template, @Nullable SoyMsgBundle soyMsgBundle);
+    List<String> compileToJsSrc(URL template, @Nullable SoyMsgBundle soyMsgBundle);
 
 }

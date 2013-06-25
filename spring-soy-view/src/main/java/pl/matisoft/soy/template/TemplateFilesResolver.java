@@ -2,7 +2,8 @@ package pl.matisoft.soy.template;
 
 import com.google.common.base.Optional;
 
-import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collection;
 
 /**
@@ -13,8 +14,8 @@ import java.util.Collection;
  */
 public interface TemplateFilesResolver {
 
-    Collection<File> resolve();
+    Collection<URL> resolve() throws IOException;
 
-    Optional<File> resolve(String templateName);
+    Optional<URL> resolve(String templateName) throws IOException;
 
 }

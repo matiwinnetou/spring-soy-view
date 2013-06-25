@@ -14,7 +14,8 @@ import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
-import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collection;
 
 /**
@@ -46,7 +47,11 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     protected void initApplicationContext() {
         super.initApplicationContext();
         if (isCache()) {
-            this.compiledTemplates = compileTemplates("<class_init>");
+            try {
+                this.compiledTemplates = compileTemplates("<class_init>");
+            } catch (IOException ex) {
+                logger.error("Unable to compile template files", ex);
+            }
         }
     }
 
@@ -87,12 +92,12 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 //        return viewName.endsWith("*.html");
 //    }
 
-    private Optional<SoyTofu> compileTemplates(final String viewName) {
+    private Optional<SoyTofu> compileTemplates(final String viewName) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templatesRenderer cannot be null!");
         Preconditions.checkNotNull(tofuCompiler, "tofuCompiler cannot be null!");
 
         logger.debug("Compile all templates, initBy: " + viewName);
-        final Collection<File> templateFiles = templateFilesResolver.resolve();
+        final Collection<URL> templateFiles = templateFilesResolver.resolve();
         if (templateFiles != null && templateFiles.size() > 0) {
             return tofuCompiler.compile(templateFiles);
         }

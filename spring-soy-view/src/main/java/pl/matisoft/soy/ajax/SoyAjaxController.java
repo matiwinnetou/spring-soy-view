@@ -21,16 +21,15 @@ import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Controller
 public class SoyAjaxController {
@@ -39,7 +38,7 @@ public class SoyAjaxController {
 
     private String cacheControl = "public, max-age=3600";
 
-	private ConcurrentHashMap<File, String> cachedJsTemplates = new ConcurrentHashMap<File, String>();
+	private ConcurrentHashMap<URL, String> cachedJsTemplates = new ConcurrentHashMap<URL, String>();
 
     private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
@@ -58,7 +57,7 @@ public class SoyAjaxController {
 	public ResponseEntity<String> getJsForTemplateFile(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templateFilesResolver cannot be null");
 
-        final Optional<File> templateFile = templateFilesResolver.resolve(templateFileName);
+        final Optional<URL> templateFile = templateFilesResolver.resolve(templateFileName);
 
 		if (!debugOn && cachedJsTemplates.containsKey(templateFile.get())) {
             logger.debug("Debug off and returning cached compiled file:" + templateFile.get());
@@ -90,7 +89,7 @@ public class SoyAjaxController {
 		return new ResponseEntity<String>(templateContent, headers, OK);
 	}
 
-	private String compileTemplateAndAssertSuccess(final HttpServletRequest request, Optional<File> templateFile) throws IOException {
+	private String compileTemplateAndAssertSuccess(final HttpServletRequest request, Optional<URL> templateFile) throws IOException {
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
         Preconditions.checkNotNull(tofuCompiler, "tofuCompiler cannot be null");
