@@ -9,6 +9,8 @@ import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.data.EmptyToSoyDataConverter;
 import pl.matisoft.soy.data.ToSoyDataConverter;
+import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
+import pl.matisoft.soy.data.adjust.ModelAdjuster;
 import pl.matisoft.soy.global.EmptyGlobalModelResolver;
 import pl.matisoft.soy.global.GlobalModelResolver;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
@@ -31,6 +33,8 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
 
     private LocaleProvider localeProvider = new EmptyLocaleProvider();
 
+    private ModelAdjuster modelAdjuster = new EmptyModelAdjuster();
+
     private SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
     private boolean debugOn = false;
@@ -47,7 +51,10 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
         }
 
         final SoyTofu.Renderer renderer = compiledTemplates.get().newRenderer(templateName);
-        final Optional<SoyMapData> soyMapData = toSoyDataConverter.toSoyMap(model);
+
+        final Object adjustedModel = modelAdjuster.adjust(model);
+
+        final Optional<SoyMapData> soyMapData = toSoyDataConverter.toSoyMap(adjustedModel);
         if (soyMapData.isPresent()) {
             renderer.setData(soyMapData.get());
         }
@@ -85,6 +92,10 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
 
     public void setSoyMsgBundleResolver(SoyMsgBundleResolver soyMsgBundleResolver) {
         this.soyMsgBundleResolver = soyMsgBundleResolver;
+    }
+
+    public void setModelAdjuster(ModelAdjuster modelAdjuster) {
+        this.modelAdjuster = modelAdjuster;
     }
 
 }

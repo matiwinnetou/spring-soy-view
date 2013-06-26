@@ -99,9 +99,8 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
     private static Map<String, ?> pojoToMap(Object pojo) {
         Map<String, Object> map = new HashMap<String, Object>();
 
-        BeanInfo beanInfo;
         try {
-            beanInfo = Introspector.getBeanInfo(pojo.getClass());
+            final BeanInfo beanInfo = Introspector.getBeanInfo(pojo.getClass());
 
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
             for (PropertyDescriptor pd : propertyDescriptors) {
@@ -113,6 +112,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
         return map;
     }
 
