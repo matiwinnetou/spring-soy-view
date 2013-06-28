@@ -20,7 +20,7 @@
 
     <bean id="compileTimeGlobalModelResolver" class="pl.matisoft.soy.global.compile.DefaultCompileTimeGlobalModelResolver" />
 
-    <bean id="globalModelResolver" class="pl.matisoft.soy.global.DefaultGlobalModelResolver" />
+    <bean id="globalModelResolver" class="pl.matisoft.soy.global.EmptyGlobalModelResolver" />
 
     <bean id="tofuCompiler" class="pl.matisoft.soy.compile.DefaultTofuCompiler">
         <property name="compileTimeGlobalModelResolver" ref="compileTimeGlobalModelResolver" />

@@ -3,6 +3,8 @@ package pl.matisoft.soy.global;
 import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mati
@@ -11,6 +13,6 @@ import com.google.template.soy.data.SoyMapData;
  */
 public interface GlobalModelResolver {
 
-    Optional<SoyMapData> resolveData();
+    Optional<SoyMapData> resolveData(HttpServletRequest request);
 
 }

@@ -63,7 +63,7 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
         if (soyMsgBundleOptional.isPresent()) {
             renderer.setMsgBundle(soyMsgBundleOptional.get());
         }
-        final Optional<SoyMapData> globalModel = globalModelResolver.resolveData();
+        final Optional<SoyMapData> globalModel = globalModelResolver.resolveData(request);
         if (globalModel.isPresent()) {
             renderer.setIjData(globalModel.get());
         }
