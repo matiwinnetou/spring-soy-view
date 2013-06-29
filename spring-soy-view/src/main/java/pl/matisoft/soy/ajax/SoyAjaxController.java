@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
@@ -37,6 +38,8 @@ public class SoyAjaxController {
     private static final Logger logger = LoggerFactory.getLogger(SoyAjaxController.class);
 
     private String cacheControl = "no-cache";
+
+    private String expiresHeaders = "";
 
     private ConcurrentHashMap<String, ConcurrentHashMap> cachedJsTemplates = new ConcurrentHashMap<String, ConcurrentHashMap>();
 
@@ -116,8 +119,10 @@ public class SoyAjaxController {
     private ResponseEntity<String> prepareResponseFor(final String templateContent) {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/javascript; charset=" + encoding);
-
         headers.add("Cache-Control", debugOn ? "no-cache" : cacheControl);
+        if (StringUtils.hasText(expiresHeaders)) {
+            headers.add("Expires", expiresHeaders);
+        }
 
         return new ResponseEntity<String>(templateContent, headers, OK);
     }
@@ -169,6 +174,10 @@ public class SoyAjaxController {
 
     public void setEncoding(String encoding) {
         this.encoding = encoding;
+    }
+
+    public void setExpiresHeaders(String expiresHeaders) {
+        this.expiresHeaders = expiresHeaders;
     }
 
 }

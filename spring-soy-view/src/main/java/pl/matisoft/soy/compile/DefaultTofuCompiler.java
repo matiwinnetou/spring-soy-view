@@ -65,7 +65,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
         return Optional.fromNullable(soyTofu);
     }
 
-    private void addRuntimeGlobals(SoyFileSet.Builder sfsBuilder) {
+    private void addRuntimeGlobals(final SoyFileSet.Builder sfsBuilder) {
         final Optional<SoyMapData> soyMapData = compileTimeGlobalModelResolver.resolveData();
         if (soyMapData.isPresent()) {
             final Map<String, ?> mapData = soyMapData.get().asMap();
