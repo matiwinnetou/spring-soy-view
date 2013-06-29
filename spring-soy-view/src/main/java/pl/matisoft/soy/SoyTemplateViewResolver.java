@@ -38,6 +38,8 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     private String encoding = "utf-8";
 
+    private boolean ignoreHtmlView = false;
+
     public SoyTemplateViewResolver() {
         super();
         setExposeSpringMacroHelpers(false);
@@ -71,9 +73,10 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         view.setTemplateRenderer(templateRenderer);
 
         if (!compiledTemplates.isPresent()) {
-            //if (!isHtmlView(viewName)) {
+            if (!isHtmlView(viewName)) {
                 view.setCompiledTemplates(compileTemplates(viewName));
-            //}
+            }
+
             return view;
         }
 
@@ -88,9 +91,9 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         return "text/html; charset=" + encoding;
     }
 
-//    private boolean isHtmlView(final String viewName) {
-//        return viewName.endsWith("*.html");
-//    }
+    private boolean isHtmlView(final String viewName) {
+        return ignoreHtmlView && viewName.endsWith(".html");
+    }
 
     private Optional<SoyTofu> compileTemplates(final String viewName) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templatesRenderer cannot be null!");
@@ -123,6 +126,10 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     public void setDebugOn(final boolean debugOn) {
         setCache(!debugOn);
+    }
+
+    public void setIgnoreHtmlView(boolean ignoreHtmlView) {
+        this.ignoreHtmlView = ignoreHtmlView;
     }
 
 }

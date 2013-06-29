@@ -36,9 +36,9 @@ public class SoyAjaxController {
 
     private static final Logger logger = LoggerFactory.getLogger(SoyAjaxController.class);
 
-    private String cacheControl = "public, max-age=3600";
+    private String cacheControl = "no-cache";
 
-	private ConcurrentHashMap<URL, String> cachedJsTemplates = new ConcurrentHashMap<URL, String>();
+    private ConcurrentHashMap<String, ConcurrentHashMap> cachedJsTemplates = new ConcurrentHashMap<String, ConcurrentHashMap>();
 
     private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
@@ -50,81 +50,102 @@ public class SoyAjaxController {
 
     private boolean debugOn = false;
 
-	public SoyAjaxController() {
-	}
+    private String encoding = "utf-8";
+
+    public SoyAjaxController() {
+    }
+
+    @RequestMapping(value="/soy/{hash}/{templateFileName}", method=GET)
+    public ResponseEntity<String> getJsForTemplateFileHash(@PathVariable String hash, @PathVariable String templateFileName , final HttpServletRequest request) throws IOException {
+        return compileJs(templateFileName, hash, request);
+    }
+
+    @RequestMapping(value="/soy/{hash}/{templateFileName}.js", method=GET)
+    public ResponseEntity<String> getJsForTemplateFileHashExt(@PathVariable String hash, @PathVariable String templateFileName , final HttpServletRequest request) throws IOException {
+        return compileJs(templateFileName, hash, request);
+    }
 
     @RequestMapping(value="/soy/{templateFileName}.js", method=GET)
-	public ResponseEntity<String> getJsForTemplateFile(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
-        return compileJs(templateFileName, request);
+    public ResponseEntity<String> getJsForTemplateFile(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
+        return compileJs(templateFileName, "", request);
     }
 
     @RequestMapping(value="/soy/{templateFileName}", method=GET)
     public ResponseEntity<String> getJsForTemplateFileExt(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
-        return compileJs(templateFileName, request);
+        return compileJs(templateFileName, "", request);
     }
 
-    private ResponseEntity<String> compileJs(String templateFileName, final HttpServletRequest request) throws IOException {
+    private ResponseEntity<String> compileJs(final String templateFileName, final String hash, final HttpServletRequest request) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templateFilesResolver cannot be null");
 
         final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
-        if (!templateUrl.isPresent()) {
-            throw notFound(templateFileName);
-        }
-
-        if (!debugOn && cachedJsTemplates.containsKey(templateUrl.get())) {
-            logger.debug("Debug off and returning cached compiled file:" + templateUrl.get());
-            return prepareResponseFor(cachedJsTemplates.get(templateUrl.get()));
-        }
-
-        logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
 
         if (!templateUrl.isPresent()) {
             throw notFound("File not found:" + templateFileName + ".soy");
         }
 
-        final String templateContent = compileTemplateAndAssertSuccess(request, templateUrl);
         if (!debugOn) {
-            if (templateUrl.isPresent()) {
-                logger.debug("Debug off adding to templateUrl to cache:" + templateUrl.get());
-                cachedJsTemplates.putIfAbsent(templateUrl.get(), templateContent);
+            final ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
+            logger.debug("Debug off and returning cached compiled hash:" + hash);
+            if (map != null) {
+                final String template = map.get(templateUrl.get());
+                if (template != null) {
+                    return prepareResponseFor(template);
+                }
             }
+        }
+
+        logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
+
+        final String templateContent = compileTemplateAndAssertSuccess(request, templateUrl);
+
+        if (!debugOn) {
+            logger.debug("Debug off adding to templateUrl to cache:" + templateUrl.get());
+            ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
+            if (map == null) {
+                map = new ConcurrentHashMap<URL, String>();
+            } else {
+                map.putIfAbsent(templateUrl.get(), templateContent);
+            }
+            cachedJsTemplates.putIfAbsent(hash, map);
         }
 
         return prepareResponseFor(templateContent);
     }
 
-	private ResponseEntity<String> prepareResponseFor(final String templateContent) {
-		final HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Type", "text/javascript");
-		headers.add("Cache-Control", debugOn ? "no-cache" : cacheControl);
+    private ResponseEntity<String> prepareResponseFor(final String templateContent) {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "text/javascript; charset=" + encoding);
 
-		return new ResponseEntity<String>(templateContent, headers, OK);
-	}
+        headers.add("Cache-Control", debugOn ? "no-cache" : cacheControl);
 
-	private String compileTemplateAndAssertSuccess(final HttpServletRequest request, Optional<URL> templateFile) throws IOException {
+        return new ResponseEntity<String>(templateContent, headers, OK);
+    }
+
+    private String compileTemplateAndAssertSuccess(final HttpServletRequest request, Optional<URL> templateFile) throws IOException {
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
         Preconditions.checkNotNull(tofuCompiler, "tofuCompiler cannot be null");
 
         final Optional<Locale> locale = localeProvider.resolveLocale(request);
         final Optional<SoyMsgBundle> soyMsgBundle = soyMsgBundleResolver.resolve(locale);
-		final List<String> compiledTemplates = tofuCompiler.compileToJsSrc(templateFile.orNull(), soyMsgBundle.orNull());
+        final List<String> compiledTemplates = tofuCompiler.compileToJsSrc(templateFile.orNull(), soyMsgBundle.orNull());
 
         final Iterator it = compiledTemplates.iterator();
-		if (!it.hasNext()) {
-			throw notFound("No compiled templates found!");
-		}
+        if (!it.hasNext()) {
+            throw notFound("No compiled templates found!");
+        }
 
-		return (String) it.next();
-	}
+        return (String) it.next();
+    }
 
-	private HttpClientErrorException notFound(String file) {
-		return new HttpClientErrorException(NOT_FOUND, file);
-	}
+    private HttpClientErrorException notFound(String file) {
+        return new HttpClientErrorException(NOT_FOUND, file);
+    }
 
-	public void setCacheControl(final String cacheControl) {
-		this.cacheControl = cacheControl;
-	}
+    public void setCacheControl(final String cacheControl) {
+        this.cacheControl = cacheControl;
+    }
 
     public void setTemplateFilesResolver(final TemplateFilesResolver templateFilesResolver) {
         this.templateFilesResolver = templateFilesResolver;
@@ -144,6 +165,10 @@ public class SoyAjaxController {
 
     public void setDebugOn(boolean debugOn) {
         this.debugOn = debugOn;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 
 }

@@ -38,7 +38,6 @@ public class DefaultTofuCompiler implements TofuCompiler {
     @Override
     public Optional<SoyTofu> compile(@Nullable final Collection<URL> urls) {
         Preconditions.checkNotNull("compileTimeGlobalModelResolver", compileTimeGlobalModelResolver);
-        Preconditions.checkNotNull("soyJsSrcOptions", soyJsSrcOptions);
 
         if (urls == null || urls.isEmpty()) {
             return Optional.absent();
@@ -86,6 +85,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
     @Override
     public final List<String> compileToJsSrc(final URL url, @Nullable final SoyMsgBundle soyMsgBundle) {
+        Preconditions.checkNotNull("soyJsSrcOptions", soyJsSrcOptions);
         logger.debug("SoyJavaScript compilation of template:" + url);
         final long time1 = System.currentTimeMillis();
 
