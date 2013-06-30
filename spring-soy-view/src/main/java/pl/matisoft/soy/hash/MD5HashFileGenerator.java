@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,15 +17,30 @@ import java.security.NoSuchAlgorithmException;
  */
 public class MD5HashFileGenerator implements HashFileGenerator {
 
+    private boolean debugOn = false;
+
+    private ConcurrentHashMap<URL, String> cache = new ConcurrentHashMap<URL, String>();
+
     @Override
     public Optional<String> hash(final Optional<URL> url) throws IOException {
         if (!url.isPresent()) {
             return Optional.absent();
         }
+        if (!debugOn) {
+            final String md5 = cache.get(url.get());
+            if (md5 != null) {
+                return Optional.of(md5);
+            }
+        }
 
         final InputStream is = url.get().openStream();
+        final String md5 = getMD5Checksum(is);
 
-        return Optional.fromNullable(getMD5Checksum(is));
+        if (!debugOn) {
+            cache.put(url.get(), md5);
+        }
+
+        return Optional.fromNullable(md5);
     }
 
     public static byte[] createChecksum(final InputStream is) {
@@ -62,6 +78,10 @@ public class MD5HashFileGenerator implements HashFileGenerator {
         }
 
         return result;
+    }
+
+    public void setDebugOn(boolean debugOn) {
+        this.debugOn = debugOn;
     }
 
 }
