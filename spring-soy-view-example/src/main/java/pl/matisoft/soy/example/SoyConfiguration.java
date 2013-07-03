@@ -27,11 +27,15 @@ import pl.matisoft.soy.global.EmptyGlobalModelResolver;
 import pl.matisoft.soy.global.GlobalModelResolver;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
+import pl.matisoft.soy.hash.HashFileGenerator;
+import pl.matisoft.soy.hash.MD5HashFileGenerator;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.DefaultTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
+import pl.matisoft.soy.url.DefaultTemplateUrlComposer;
+import pl.matisoft.soy.url.TemplateUrlComposer;
 
 import java.util.Properties;
 
@@ -157,6 +161,25 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
 //        }
 
         return contentNegotiatingViewResolver;
+    }
+
+    @Bean
+    public TemplateUrlComposer templateUrlComposer() {
+        final DefaultTemplateUrlComposer urlComposer = new DefaultTemplateUrlComposer();
+        urlComposer.setDebugOn(true);
+        urlComposer.setSiteUrl("http://localhost:8080/spring-soy-view-example/app");
+        urlComposer.setTemplateFilesResolver(templateFilesResolver());
+        urlComposer.setHashFileGenerator(hashFileGenerator());
+
+        return urlComposer;
+    }
+
+    @Bean
+    public HashFileGenerator hashFileGenerator() {
+        final MD5HashFileGenerator md5HashFileGenerator = new MD5HashFileGenerator();
+        md5HashFileGenerator.setDebugOn(true);
+
+        return md5HashFileGenerator;
     }
 
     @Bean
