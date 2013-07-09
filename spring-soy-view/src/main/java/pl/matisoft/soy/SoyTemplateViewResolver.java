@@ -108,11 +108,11 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         return Optional.absent();
     }
 
-    public void setTemplateRenderer(TemplateRenderer templateRenderer) {
+    public void setTemplateRenderer(final TemplateRenderer templateRenderer) {
         this.templateRenderer = templateRenderer;
     }
 
-    public void setEncoding(String encoding) {
+    public void setEncoding(final String encoding) {
         this.encoding = encoding;
     }
 
@@ -128,7 +128,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         setCache(!debugOn);
     }
 
-    public void setIgnoreHtmlView(boolean ignoreHtmlView) {
+    public void setIgnoreHtmlView(final boolean ignoreHtmlView) {
         this.ignoreHtmlView = ignoreHtmlView;
     }
 

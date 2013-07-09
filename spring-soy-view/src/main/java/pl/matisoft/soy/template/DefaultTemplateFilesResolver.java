@@ -29,7 +29,6 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);
 
-    //private Resource templatesLocation = new ServletContextResource("/WEB-INF/templates");
     private Resource templatesLocation;
 
     private boolean recursive = true;

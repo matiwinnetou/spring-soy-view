@@ -45,6 +45,7 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null!");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null!");
         Preconditions.checkNotNull(globalModelResolver, "globalModelResolver cannot be null!");
+        Preconditions.checkNotNull(modelAdjuster, "modelAdjuster cannot be null!");
 
         if (!compiledTemplates.isPresent()) {
             return Optional.absent();
