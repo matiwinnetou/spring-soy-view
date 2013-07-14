@@ -23,7 +23,7 @@ import pl.matisoft.soy.compile.DefaultTofuCompiler;
 import pl.matisoft.soy.compile.TofuCompiler;
 import pl.matisoft.soy.data.DefaultToSoyDataConverter;
 import pl.matisoft.soy.data.ToSoyDataConverter;
-import pl.matisoft.soy.global.EmptyGlobalModelResolver;
+import pl.matisoft.soy.global.DefaultGlobalModelResolver;
 import pl.matisoft.soy.global.GlobalModelResolver;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
@@ -84,7 +84,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     public GlobalModelResolver globalModelResolver() {
-        return new EmptyGlobalModelResolver();
+        return new DefaultGlobalModelResolver();
     }
 
     @Bean
