@@ -1,10 +1,5 @@
 package pl.matisoft.soy.render;
 
-import com.google.common.base.Optional;
-import com.google.template.soy.tofu.SoyTofu;
-
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Created with IntelliJ IDEA.
  * User: mati
@@ -13,6 +8,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface TemplateRenderer {
 
-    Optional<String> render(final Optional<SoyTofu> compiledTemplates, final String templateName, final HttpServletRequest request, final Object model) throws Exception;
+    void render(final RenderRequest renderRequest) throws Exception;
 
 }

@@ -4,12 +4,22 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
 import org.springframework.web.servlet.view.AbstractTemplateView;
+import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
+import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
+import pl.matisoft.soy.data.EmptyToSoyDataConverter;
+import pl.matisoft.soy.data.ToSoyDataConverter;
+import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
+import pl.matisoft.soy.data.adjust.ModelAdjuster;
+import pl.matisoft.soy.global.EmptyGlobalModelResolver;
+import pl.matisoft.soy.global.GlobalModelResolver;
+import pl.matisoft.soy.locale.EmptyLocaleProvider;
+import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.DefaultTemplateRenderer;
+import pl.matisoft.soy.render.RenderRequest;
 import pl.matisoft.soy.render.TemplateRenderer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -20,11 +30,21 @@ import java.util.Map;
  */
 public class SoyView extends AbstractTemplateView {
 
-    private Optional<SoyTofu> compiledTemplates = Optional.absent();
+    protected Optional<SoyTofu> compiledTemplates = Optional.absent();
 
-    private String templateName;
+    protected String templateName;
 
-    private TemplateRenderer templateRenderer = new DefaultTemplateRenderer();
+    protected TemplateRenderer templateRenderer = new DefaultTemplateRenderer();
+
+    protected ModelAdjuster modelAdjuster = new EmptyModelAdjuster();
+
+    protected ToSoyDataConverter toSoyDataConverter = new EmptyToSoyDataConverter();
+
+    protected GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
+
+    protected LocaleProvider localeProvider = new EmptyLocaleProvider();
+
+    protected SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
     public SoyView() {
     }
@@ -35,17 +55,30 @@ public class SoyView extends AbstractTemplateView {
                                              final HttpServletResponse response) throws Exception {
         Preconditions.checkNotNull(templateName, "templateName cannot be null");
         Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null");
-        final Writer writer = response.getWriter();
+        Preconditions.checkNotNull(modelAdjuster, "modelAdjuster cannot be null");
+        Preconditions.checkNotNull(toSoyDataConverter, "toSoyDataConverter cannot be null");
+        Preconditions.checkNotNull(globalModelResolver, "globalModelResolver cannot be null");
+        Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
+        Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
 
         if (!compiledTemplates.isPresent()) {
             throw new RuntimeException("Unable to render - compiled templates are empty!");
         }
 
-        final Optional<String> renderedTemplate = templateRenderer.render(compiledTemplates, templateName, request, model);
-        if (renderedTemplate.isPresent()) {
-            writer.write(renderedTemplate.get());
-            writer.flush();
-        }
+        final Object adjustedModel = modelAdjuster.adjust(model);
+
+        final RenderRequest renderRequest = new RenderRequest.Builder()
+                .compiledTemplates(compiledTemplates)
+                .templateName(templateName)
+                .model(adjustedModel)
+                .request(request)
+                .response(response)
+                .globalRuntimeModel(globalModelResolver.resolveData(request))
+                .soyMapData(toSoyDataConverter.toSoyMap(adjustedModel))
+                .soyMsgBundle(soyMsgBundleResolver.resolve(localeProvider.resolveLocale(request)))
+                .build();
+
+        templateRenderer.render(renderRequest);
     }
 
     public void setTemplateName(final String templateName) {
@@ -58,6 +91,26 @@ public class SoyView extends AbstractTemplateView {
 
     public void setTemplateRenderer(final TemplateRenderer templateRenderer) {
         this.templateRenderer = templateRenderer;
+    }
+
+    public void setModelAdjuster(final ModelAdjuster modelAdjuster) {
+        this.modelAdjuster = modelAdjuster;
+    }
+
+    public void setToSoyDataConverter(ToSoyDataConverter toSoyDataConverter) {
+        this.toSoyDataConverter = toSoyDataConverter;
+    }
+
+    public void setGlobalModelResolver(GlobalModelResolver globalModelResolver) {
+        this.globalModelResolver = globalModelResolver;
+    }
+
+    public void setLocaleProvider(LocaleProvider localeProvider) {
+        this.localeProvider = localeProvider;
+    }
+
+    public void setSoyMsgBundleResolver(SoyMsgBundleResolver soyMsgBundleResolver) {
+        this.soyMsgBundleResolver = soyMsgBundleResolver;
     }
 
 }

@@ -7,8 +7,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
+import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
+import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.DefaultTofuCompiler;
 import pl.matisoft.soy.compile.TofuCompiler;
+import pl.matisoft.soy.data.EmptyToSoyDataConverter;
+import pl.matisoft.soy.data.ToSoyDataConverter;
+import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
+import pl.matisoft.soy.data.adjust.ModelAdjuster;
+import pl.matisoft.soy.global.EmptyGlobalModelResolver;
+import pl.matisoft.soy.global.GlobalModelResolver;
+import pl.matisoft.soy.locale.EmptyLocaleProvider;
+import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.EmptyTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
@@ -28,13 +38,23 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(SoyTemplateViewResolver.class);
 
-    private Optional<SoyTofu> compiledTemplates = Optional.absent();
+    protected Optional<SoyTofu> compiledTemplates = Optional.absent();
 
-    private TemplateRenderer templateRenderer = new EmptyTemplateRenderer();
+    protected TemplateRenderer templateRenderer = new EmptyTemplateRenderer();
 
-    private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
+    protected TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
-    private TofuCompiler tofuCompiler = new DefaultTofuCompiler();
+    protected TofuCompiler tofuCompiler = new DefaultTofuCompiler();
+
+    protected ModelAdjuster modelAdjuster = new EmptyModelAdjuster();
+
+    protected ToSoyDataConverter toSoyDataConverter = new EmptyToSoyDataConverter();
+
+    protected GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
+
+    protected LocaleProvider localeProvider = new EmptyLocaleProvider();
+
+    protected SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
     private String encoding = "utf-8";
 
@@ -71,6 +91,11 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         view.setTemplateName(viewName);
         view.setContentType(contentType());
         view.setTemplateRenderer(templateRenderer);
+        view.setModelAdjuster(modelAdjuster);
+        view.setGlobalModelResolver(globalModelResolver);
+        view.setLocaleProvider(localeProvider);
+        view.setSoyMsgBundleResolver(soyMsgBundleResolver);
+        view.setToSoyDataConverter(toSoyDataConverter);
 
         if (!compiledTemplates.isPresent()) {
             if (!isHtmlView(viewName)) {
@@ -130,6 +155,26 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     public void setIgnoreHtmlView(final boolean ignoreHtmlView) {
         this.ignoreHtmlView = ignoreHtmlView;
+    }
+
+    public void setModelAdjuster(ModelAdjuster modelAdjuster) {
+        this.modelAdjuster = modelAdjuster;
+    }
+
+    public void setToSoyDataConverter(ToSoyDataConverter toSoyDataConverter) {
+        this.toSoyDataConverter = toSoyDataConverter;
+    }
+
+    public void setGlobalModelResolver(GlobalModelResolver globalModelResolver) {
+        this.globalModelResolver = globalModelResolver;
+    }
+
+    public void setLocaleProvider(LocaleProvider localeProvider) {
+        this.localeProvider = localeProvider;
+    }
+
+    public void setSoyMsgBundleResolver(SoyMsgBundleResolver soyMsgBundleResolver) {
+        this.soyMsgBundleResolver = soyMsgBundleResolver;
     }
 
 }

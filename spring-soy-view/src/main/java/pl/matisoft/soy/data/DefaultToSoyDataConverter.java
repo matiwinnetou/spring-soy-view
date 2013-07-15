@@ -25,6 +25,10 @@ import java.beans.PropertyDescriptor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * User: Copyright 2011-2013 PaperCut Software Int. Pty. Ltd. http://www.papercut.com/
@@ -32,6 +36,8 @@ import java.util.Map;
  * https://github.com/codedance/silken
  */
 public class DefaultToSoyDataConverter implements ToSoyDataConverter {
+
+    private long futureTimeOutInSeconds = 2 * 60; // 2 minutes
 
     @Override
     public Optional<SoyMapData> toSoyMap(final Object model) throws Exception {
@@ -42,7 +48,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return Optional.fromNullable(objectToSoyDataMap(model));
     }
 
-    private static Map<String, ?> toSoyCompatibleMap(Object obj) {
+    private Map<String, ?> toSoyCompatibleMap(Object obj) throws InterruptedException, ExecutionException, TimeoutException {
         Object ret = toSoyCompatibleObjects(obj);
         if (!(ret instanceof Map)) {
             throw new IllegalArgumentException("Input should be a Map or POJO.");
@@ -51,7 +57,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return (Map<String, ?>) ret;
     }
 
-    private static Object toSoyCompatibleObjects(Object obj) {
+    private Object toSoyCompatibleObjects(Object obj) throws InterruptedException, ExecutionException, TimeoutException {
         if (obj == null) {
             return obj;
         }
@@ -78,6 +84,12 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
                 list.add(toSoyCompatibleObjects(subValue));
             }
             return list;
+        }
+
+        if (obj instanceof Future<?>) {
+            final Future future = (Future) obj;
+
+            return toSoyCompatibleObjects(future.get(futureTimeOutInSeconds, TimeUnit.SECONDS));
         }
 
         if (obj.getClass().isArray()) {
@@ -116,7 +128,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return map;
     }
 
-    private static SoyMapData objectToSoyDataMap(Object obj) {
+    private SoyMapData objectToSoyDataMap(Object obj) throws InterruptedException, ExecutionException, TimeoutException {
         if (obj == null) {
             return new SoyMapData();
         }
@@ -124,6 +136,10 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
             return (SoyMapData) obj;
         }
         return new SoyMapData(toSoyCompatibleMap(obj));
+    }
+
+    public void setFutureTimeOutInSeconds(long futureTimeOutInSeconds) {
+        this.futureTimeOutInSeconds = futureTimeOutInSeconds;
     }
 
 }
