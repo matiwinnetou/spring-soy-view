@@ -1,6 +1,8 @@
 package pl.matisoft.soy.render;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.tofu.SoyTofu;
 import org.springframework.util.StringUtils;
 
@@ -28,7 +30,11 @@ public class DefaultRenderersProvider implements RenderersProvider {
 
         final SoyTofu compiledTemplates = renderRequest.getCompiledTemplates().get();
 
-        return Lists.newArrayList(new RendererModelTuple(compiledTemplates.newRenderer(templateName), renderRequest.getSoyMapData()));
+        final SoyTofu.Renderer renderer = compiledTemplates.newRenderer(templateName);
+        final Optional<SoyMapData> soyData = renderRequest.getSoyModel();
+        final RendererModelTuple rendererModelTuple = new RendererModelTuple(renderer, soyData);
+
+        return Lists.newArrayList(rendererModelTuple);
     }
 
 }

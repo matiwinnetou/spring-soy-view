@@ -14,7 +14,7 @@ import java.util.Locale;
 public class AcceptHeaderLocaleProvider implements LocaleProvider {
 
     public Optional<Locale> resolveLocale(final HttpServletRequest request) {
-        return Optional.of(request.getLocale());
+        return Optional.fromNullable(request.getLocale());
     }
 
 }

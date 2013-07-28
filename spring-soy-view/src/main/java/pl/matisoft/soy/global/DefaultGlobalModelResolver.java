@@ -2,18 +2,13 @@ package pl.matisoft.soy.global;
 
 import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
-import org.apache.commons.beanutils.BeanMap;
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,7 +20,6 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultGlobalModelResolver.class);
 
-    private boolean injectRequest = true;
     private boolean injectRequestParams = true;
     private boolean injectRequestHeaders = true;
     private boolean injectCookies = true;
@@ -68,25 +62,30 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
             return;
         }
 
-        for (final Cookie cookie : request.getCookies()) {
-            injectSimpleParams(cookie, soyMapData, "request.cookie." + cookie.getName());
+        if (request.getCookies() == null) {
+            logger.debug("no cookies!");
+            return;
         }
-    }
+        for (final Cookie cookie : request.getCookies()) {
+            if (StringUtils.hasLength(cookie.getName())) {
+                final String keyPrefix = "request.cookie." + cookie.getName();
+                soyMapData.put(keyPrefix + ".name", cookie.getName());
+                if (StringUtils.hasLength(cookie.getValue())) {
+                    soyMapData.put(keyPrefix + ".value", cookie.getValue());
+                }
+                if (StringUtils.hasLength(cookie.getComment())) {
+                    soyMapData.put(keyPrefix + ".comment", cookie.getComment());
+                }
+                if (StringUtils.hasLength(cookie.getDomain())) {
+                    soyMapData.put(keyPrefix + ".domain", cookie.getDomain());
+                }
+                soyMapData.put(keyPrefix + ".maxAge", cookie.getMaxAge());
 
-    protected void addServletContext(final HttpServletRequest request, final SoyMapData soyMapData) {
-
-    }
-
-    protected static void injectSimpleParams(final Object obj, final SoyMapData soyMapData, final String keyPrefix) {
-        final BeanMap beanMap = new BeanMap(obj);
-        for (final Iterator<String> it = beanMap.keyIterator(); it.hasNext();) {
-            final String key = it.next();
-            final Object value = beanMap.get(key);
-            if (beanMap.getType(key).equals(Boolean.class)
-                    || beanMap.getType(key).equals(String.class)
-                    || beanMap.getType(key).equals(Integer.class)
-                    || beanMap.getType(key).equals(Double.class)) {
-                soyMapData.put(keyPrefix + "." + key, value);
+                if (StringUtils.hasLength(cookie.getPath())) {
+                    soyMapData.put(keyPrefix + ".path", cookie.getPath());
+                }
+                soyMapData.put(keyPrefix + ".version", cookie.getVersion());
+                soyMapData.put(keyPrefix + ".secure", cookie.getSecure());
             }
         }
     }
@@ -101,10 +100,6 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
 
     public void setInjectRequestHeaders(boolean injectRequestHeaders) {
         this.injectRequestHeaders = injectRequestHeaders;
-    }
-
-    public void setInjectRequest(boolean injectRequest) {
-        this.injectRequest = injectRequest;
     }
 
 }

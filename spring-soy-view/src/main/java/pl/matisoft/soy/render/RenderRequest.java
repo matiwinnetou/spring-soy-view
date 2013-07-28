@@ -20,8 +20,10 @@ public class RenderRequest {
     private final String templateName;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
+
     private final Object model;
-    private final Optional<SoyMapData> soyMapData;
+    private final Optional<SoyMapData> soyModel;
+
     private final Optional<SoyMapData> globalRuntimeModel;
     private final Optional<SoyMsgBundle> soyMsgBundle;
 
@@ -31,13 +33,13 @@ public class RenderRequest {
         this.request = builder.request;
         this.response = builder.response;
         this.model = builder.model;
-        this.soyMapData = builder.soyMapData;
+        this.soyModel = builder.soyModel;
         this.globalRuntimeModel = builder.globalRuntimeModel;
         this.soyMsgBundle = builder.soyMsgBundle;
     }
 
-    public Optional<SoyMapData> getSoyMapData() {
-        return soyMapData;
+    public Optional<SoyMapData> getSoyModel() {
+        return soyModel;
     }
 
     public Optional<SoyMapData> getGlobalRuntimeModel() {
@@ -75,7 +77,7 @@ public class RenderRequest {
         private HttpServletRequest request;
         private HttpServletResponse response;
         private Object model;
-        private Optional<SoyMapData> soyMapData = Optional.absent();
+        private Optional<SoyMapData> soyModel = Optional.absent();
         private Optional<SoyMapData> globalRuntimeModel = Optional.absent();
         private Optional<SoyMsgBundle> soyMsgBundle = Optional.absent();
 
@@ -105,7 +107,7 @@ public class RenderRequest {
         }
 
         public Builder soyMapData(Optional<SoyMapData> soyMapData) {
-            this.soyMapData = soyMapData;
+            this.soyModel = soyMapData;
             return this;
         }
 

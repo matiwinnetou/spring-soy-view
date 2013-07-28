@@ -19,8 +19,6 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
 
     private HashFileGenerator hashFileGenerator;
 
-    private boolean debugOn;
-
     private String siteUrl;
 
     public Optional<String> compose(final String soyTemplateFileName) throws IOException {
@@ -52,10 +50,6 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
 
     public void setHashFileGenerator(HashFileGenerator hashFileGenerator) {
         this.hashFileGenerator = hashFileGenerator;
-    }
-
-    public void setDebugOn(boolean debugOn) {
-        this.debugOn = debugOn;
     }
 
     public void setSiteUrl(String siteUrl) {

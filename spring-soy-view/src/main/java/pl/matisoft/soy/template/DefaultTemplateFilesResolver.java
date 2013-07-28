@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -25,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Date: 20/06/2013
  * Time: 19:58
  */
+@ParametersAreNonnullByDefault
 public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);

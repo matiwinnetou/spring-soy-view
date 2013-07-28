@@ -31,8 +31,7 @@ import pl.matisoft.soy.hash.HashFileGenerator;
 import pl.matisoft.soy.hash.MD5HashFileGenerator;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
-import pl.matisoft.soy.render.DefaultTemplateRenderer;
-import pl.matisoft.soy.render.TemplateRenderer;
+import pl.matisoft.soy.render.*;
 import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
 import pl.matisoft.soy.url.DefaultTemplateUrlComposer;
 import pl.matisoft.soy.url.TemplateUrlComposer;
@@ -102,13 +101,26 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         return new DefaultToSoyDataConverter();
     }
 
+    public RendererConfigurer rendererConfigurer() {
+        final DefaultRendererConfigurer defaultRendererConfigurer = new DefaultRendererConfigurer();
+        defaultRendererConfigurer.setDebugOn(debugOn);
+
+        return defaultRendererConfigurer;
+    }
+
+    public RenderersProvider renderersProvider() {
+        return new DefaultRenderersProvider();
+    }
+
+    public RendererResponseWriter rendererResponseWriter() {
+        return new DefaultRendererResponseWriter();
+    }
+
     public TemplateRenderer templateRenderer() {
         final DefaultTemplateRenderer defaultTemplateRenderer = new DefaultTemplateRenderer();
-        defaultTemplateRenderer.setDebugOn(debugOn);
-        defaultTemplateRenderer.setGlobalModelResolver(globalModelResolver());
-        defaultTemplateRenderer.setLocaleProvider(localeProvider());
-        defaultTemplateRenderer.setSoyMsgBundleResolver(soyMsgBundleResolver());
-        defaultTemplateRenderer.setToSoyDataConverter(toSoyDataConverter());
+        defaultTemplateRenderer.setRendererResponseWriter(rendererResponseWriter());
+        defaultTemplateRenderer.setRendererConfigurer(rendererConfigurer());
+        defaultTemplateRenderer.setRenderersProvider(renderersProvider());
 
         return defaultTemplateRenderer;
     }
@@ -129,6 +141,10 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         soyTemplateViewResolver.setTemplateFilesResolver(templateFilesResolver());
         soyTemplateViewResolver.setTemplateRenderer(templateRenderer());
         soyTemplateViewResolver.setTofuCompiler(tofuCompiler());
+        soyTemplateViewResolver.setGlobalModelResolver(globalModelResolver());
+        soyTemplateViewResolver.setLocaleProvider(localeProvider());
+        soyTemplateViewResolver.setSoyMsgBundleResolver(soyMsgBundleResolver());
+        soyTemplateViewResolver.setToSoyDataConverter(toSoyDataConverter());
 
         return soyTemplateViewResolver;
     }
@@ -152,13 +168,8 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     @Bean
     public ViewResolver contentNegotiatingViewResolver() {
         final ContentNegotiatingViewResolver contentNegotiatingViewResolver = new ContentNegotiatingViewResolver();
-//        try {
-        //contentNegotiatingViewResolver.setContentNegotiationManager((ContentNegotiationManager) contentNegotiationManagerFactoryBean().getObject());
         contentNegotiatingViewResolver.setViewResolvers(Lists.newArrayList(viewResolver()));
         contentNegotiatingViewResolver.setDefaultViews(Lists.<View>newArrayList(new MappingJacksonJsonView()));
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
 
         return contentNegotiatingViewResolver;
     }
@@ -166,7 +177,6 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     @Bean
     public TemplateUrlComposer templateUrlComposer() {
         final DefaultTemplateUrlComposer urlComposer = new DefaultTemplateUrlComposer();
-        urlComposer.setDebugOn(true);
         urlComposer.setSiteUrl("http://localhost:8080/spring-soy-view-example/app");
         urlComposer.setTemplateFilesResolver(templateFilesResolver());
         urlComposer.setHashFileGenerator(hashFileGenerator());

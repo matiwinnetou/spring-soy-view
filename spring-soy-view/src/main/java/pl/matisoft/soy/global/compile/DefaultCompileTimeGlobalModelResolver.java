@@ -3,7 +3,9 @@ package pl.matisoft.soy.global.compile;
 import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,6 +28,13 @@ public class DefaultCompileTimeGlobalModelResolver implements CompileTimeGlobalM
 
     public void setData(final Map data) {
         this.data = data;
+    }
+
+    public void setProperties(final Properties properties) {
+        data = new HashMap();
+        for (String propertyName : properties.stringPropertyNames()) {
+            data.put(propertyName, properties.getProperty(propertyName));
+        }
     }
 
 }

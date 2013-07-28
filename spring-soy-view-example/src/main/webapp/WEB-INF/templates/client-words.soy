@@ -5,13 +5,9 @@
  * @param words The words to display
  */
 {template .clientWords}
-    {if $ij.request.parameter.param1}<p>{$ij.request.parameter.param1}</p>{/if}
-    {if $ij.request.parameter.param2}<p>{$ij.request.parameter.param2}</p>{/if}
+    {if $ij.request.parameter}<p>{$ij.request.parameter}</p>{/if}
     {if $ij.request.cookie}<p>{$ij.request.cookie}</p>{/if}
-    {if $ij.request.cookie.JSESSIONID}<p>{$ij.request.cookie.JSESSIONID}</p>{/if}
-    {if $ij.request.cookie.JSESSIONID.value}<p>{$ij.request.cookie.JSESSIONID.value}</p>{/if}
     {if $ij.request.header}<p>{$ij.request.header}</p>{/if}
-	<ul>
 	<ul>
 		{foreach $word in $words}
 			<li>{$word}</li>
