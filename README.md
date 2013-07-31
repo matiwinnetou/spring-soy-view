@@ -14,5 +14,5 @@ It is highly customizable via pluggable interfaces, for which a default implemen
 * Ability to provide own template file resolver (TemplateFilesResolver interface)
 * Model transformation available (ModelAdjuster interface)
 
-author: Mateusz Szczap<br/>
+author: Mateusz Szczap<br>
 <mati@sz.home.pl>
