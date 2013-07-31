@@ -21,7 +21,7 @@ public class EmptyTemplateFilesResolver implements TemplateFilesResolver {
     }
 
     @Override
-    public Optional<URL> resolve(String templateName) throws IOException {
+    public Optional<URL> resolve(final String templateName) throws IOException {
         return Optional.absent();
     }
 

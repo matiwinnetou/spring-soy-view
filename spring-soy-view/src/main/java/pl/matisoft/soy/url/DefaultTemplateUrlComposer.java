@@ -44,15 +44,15 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
         return Optional.of(newUrl);
     }
 
-    public void setTemplateFilesResolver(TemplateFilesResolver templateFilesResolver) {
+    public void setTemplateFilesResolver(final TemplateFilesResolver templateFilesResolver) {
         this.templateFilesResolver = templateFilesResolver;
     }
 
-    public void setHashFileGenerator(HashFileGenerator hashFileGenerator) {
+    public void setHashFileGenerator(final HashFileGenerator hashFileGenerator) {
         this.hashFileGenerator = hashFileGenerator;
     }
 
-    public void setSiteUrl(String siteUrl) {
+    public void setSiteUrl(final String siteUrl) {
         this.siteUrl = siteUrl;
     }
 

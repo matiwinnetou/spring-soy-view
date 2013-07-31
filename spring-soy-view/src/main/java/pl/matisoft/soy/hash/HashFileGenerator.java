@@ -13,6 +13,6 @@ import java.net.URL;
  */
 public interface HashFileGenerator {
 
-   Optional<String> hash(final Optional<URL> url) throws IOException;
+   Optional<String> hash(Optional<URL> url) throws IOException;
 
 }

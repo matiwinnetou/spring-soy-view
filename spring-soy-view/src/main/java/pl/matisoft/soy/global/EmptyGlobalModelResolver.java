@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class EmptyGlobalModelResolver implements GlobalModelResolver {
 
-    public Optional<SoyMapData> resolveData(final HttpServletRequest request) {
+    public Optional<SoyMapData> resolveData(HttpServletRequest request) {
         return Optional.absent();
     }
 

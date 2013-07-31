@@ -114,11 +114,11 @@ public class DefaultTofuCompiler implements TofuCompiler {
         this.debugOn = debugOn;
     }
 
-    public void setCompileTimeGlobalModelResolver(CompileTimeGlobalModelResolver compileTimeGlobalModelResolver) {
+    public void setCompileTimeGlobalModelResolver(final CompileTimeGlobalModelResolver compileTimeGlobalModelResolver) {
         this.compileTimeGlobalModelResolver = compileTimeGlobalModelResolver;
     }
 
-    public void setSoyJsSrcOptions(SoyJsSrcOptions soyJsSrcOptions) {
+    public void setSoyJsSrcOptions(final SoyJsSrcOptions soyJsSrcOptions) {
         this.soyJsSrcOptions = soyJsSrcOptions;
     }
 

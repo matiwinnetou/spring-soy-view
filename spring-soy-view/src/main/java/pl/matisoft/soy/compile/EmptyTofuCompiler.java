@@ -19,12 +19,12 @@ import java.util.List;
 public class EmptyTofuCompiler implements TofuCompiler {
 
     @Override
-    public Optional<SoyTofu> compile(Collection<URL> urls) {
+    public Optional<SoyTofu> compile(final Collection<URL> urls) {
         return Optional.absent();
     }
 
     @Override
-    public List<String> compileToJsSrc(URL template, @Nullable SoyMsgBundle soyMsgBundle) {
+    public List<String> compileToJsSrc(final URL template, @Nullable SoyMsgBundle soyMsgBundle) {
         return Collections.emptyList();
     }
 

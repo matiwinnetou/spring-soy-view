@@ -59,7 +59,7 @@ public class MD5HashFileGenerator implements HashFileGenerator {
             try {
                 is.close();
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
             return complete.digest();
         } catch (NoSuchAlgorithmException ex) {

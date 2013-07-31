@@ -11,8 +11,6 @@ import com.google.template.soy.data.SoyMapData;
  */
 public interface ToSoyDataConverter {
 
-    public static final ToSoyDataConverter EMPTY = new EmptyToSoyDataConverter();
-
     Optional<SoyMapData> toSoyMap(Object model) throws Exception;
 
 }

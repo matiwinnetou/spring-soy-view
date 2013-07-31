@@ -15,7 +15,7 @@ public class SpringModelAdjuster implements ModelAdjuster {
     private String modelKey = "model";
 
     @Override
-    public Object adjust(Object obj) {
+    public Object adjust(final Object obj) {
         if (obj instanceof Model) {
             final Model model = (Model) obj;
 
@@ -30,7 +30,7 @@ public class SpringModelAdjuster implements ModelAdjuster {
         return obj;
     }
 
-    public void setModelKey(String modelKey) {
+    public void setModelKey(final String modelKey) {
         this.modelKey = modelKey;
     }
 

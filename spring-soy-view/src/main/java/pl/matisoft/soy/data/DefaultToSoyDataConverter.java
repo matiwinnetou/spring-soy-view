@@ -48,7 +48,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return Optional.fromNullable(objectToSoyDataMap(model));
     }
 
-    private Map<String, ?> toSoyCompatibleMap(Object obj) throws InterruptedException, ExecutionException, TimeoutException {
+    private Map<String, ?> toSoyCompatibleMap(final Object obj) throws InterruptedException, ExecutionException, TimeoutException {
         Object ret = toSoyCompatibleObjects(obj);
         if (!(ret instanceof Map)) {
             throw new IllegalArgumentException("Input should be a Map or POJO.");
@@ -108,7 +108,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         }
     }
 
-    private static Map<String, ?> pojoToMap(Object pojo) {
+    private static Map<String, ?> pojoToMap(final Object pojo) {
         Map<String, Object> map = new HashMap<String, Object>();
 
         try {

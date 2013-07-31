@@ -8,6 +8,6 @@ package pl.matisoft.soy.render;
  */
 public interface TemplateRenderer {
 
-    void render(final RenderRequest renderRequest) throws Exception;
+    void render(RenderRequest renderRequest) throws Exception;
 
 }
