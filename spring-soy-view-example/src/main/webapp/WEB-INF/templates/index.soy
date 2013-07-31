@@ -41,7 +41,14 @@ Released   : 20100801
 						<h2 class="title">Server-side rendering example</h2>
 						<div style="clear: both;">&nbsp;</div>
 						<div class="entry">
-							{call .serverTime data="all"/} 
+							{call .serverTime data="all" /}
+							<h4>Request Parameters:</h4>
+                            {if $ij.request.parameter}{$ij.request.parameter}<br>{/if}
+							<h4>Cookies:</h4>
+                            {if $ij.request.cookie}{$ij.request.cookie}<br>{/if}
+
+							<h4>Headers:</h4>
+                            {if $ij.request.header}{$ij.request.header}<br>{/if}
 						</div>
 					</div>
 					<div class="post">

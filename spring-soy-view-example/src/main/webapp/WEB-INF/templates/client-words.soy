@@ -5,9 +5,6 @@
  * @param words The words to display
  */
 {template .clientWords}
-    {if $ij.request.parameter}<p>{$ij.request.parameter}</p>{/if}
-    {if $ij.request.cookie}<p>{$ij.request.cookie}</p>{/if}
-    {if $ij.request.header}<p>{$ij.request.header}</p>{/if}
 	<ul>
 		{foreach $word in $words}
 			<li>{$word}</li>
