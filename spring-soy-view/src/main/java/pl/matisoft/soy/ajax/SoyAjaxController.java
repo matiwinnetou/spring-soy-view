@@ -59,26 +59,35 @@ public class SoyAjaxController {
     }
 
     @RequestMapping(value="/soy/{hash}/{templateFileName}", method=GET)
-    public ResponseEntity<String> getJsForTemplateFileHash(@PathVariable String hash, @PathVariable String templateFileName , final HttpServletRequest request) throws IOException {
+    public ResponseEntity<String> getJsForTemplateFileHash(@PathVariable final String hash,
+                                                           @PathVariable final String templateFileName,
+                                                           final HttpServletRequest request)
+                                                           throws IOException {
         return compileJs(templateFileName, hash, request);
     }
 
     @RequestMapping(value="/soy/{hash}/{templateFileName}.js", method=GET)
-    public ResponseEntity<String> getJsForTemplateFileHashExt(@PathVariable String hash, @PathVariable String templateFileName , final HttpServletRequest request) throws IOException {
+    public ResponseEntity<String> getJsForTemplateFileHashExt(@PathVariable final String hash,
+                                                              @PathVariable final String templateFileName,
+                                                              final HttpServletRequest request) throws IOException {
         return compileJs(templateFileName, hash, request);
     }
 
     @RequestMapping(value="/soy/{templateFileName}.js", method=GET)
-    public ResponseEntity<String> getJsForTemplateFile(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
+    public ResponseEntity<String> getJsForTemplateFile(@PathVariable final String templateFileName,
+                                                       final HttpServletRequest request) throws IOException {
         return compileJs(templateFileName, "", request);
     }
 
     @RequestMapping(value="/soy/{templateFileName}", method=GET)
-    public ResponseEntity<String> getJsForTemplateFileExt(@PathVariable String templateFileName, final HttpServletRequest request) throws IOException {
+    public ResponseEntity<String> getJsForTemplateFileExt(@PathVariable final String templateFileName,
+                                                          final HttpServletRequest request) throws IOException {
         return compileJs(templateFileName, "", request);
     }
 
-    private ResponseEntity<String> compileJs(final String templateFileName, final String hash, final HttpServletRequest request) throws IOException {
+    private ResponseEntity<String> compileJs(final String templateFileName,
+                                             final String hash,
+                                             final HttpServletRequest request) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templateFilesResolver cannot be null");
 
         final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
@@ -127,7 +136,7 @@ public class SoyAjaxController {
         return new ResponseEntity<String>(templateContent, headers, OK);
     }
 
-    private String compileTemplateAndAssertSuccess(final HttpServletRequest request, Optional<URL> templateFile) throws IOException {
+    private String compileTemplateAndAssertSuccess(final HttpServletRequest request, final Optional<URL> templateFile) throws IOException {
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
         Preconditions.checkNotNull(tofuCompiler, "tofuCompiler cannot be null");
@@ -144,7 +153,7 @@ public class SoyAjaxController {
         return (String) it.next();
     }
 
-    private HttpClientErrorException notFound(String file) {
+    private HttpClientErrorException notFound(final String file) {
         return new HttpClientErrorException(NOT_FOUND, file);
     }
 
@@ -160,23 +169,23 @@ public class SoyAjaxController {
         this.tofuCompiler = tofuCompiler;
     }
 
-    public void setSoyMsgBundleResolver(SoyMsgBundleResolver soyMsgBundleResolver) {
+    public void setSoyMsgBundleResolver(final SoyMsgBundleResolver soyMsgBundleResolver) {
         this.soyMsgBundleResolver = soyMsgBundleResolver;
     }
 
-    public void setLocaleProvider(LocaleProvider localeProvider) {
+    public void setLocaleProvider(final LocaleProvider localeProvider) {
         this.localeProvider = localeProvider;
     }
 
-    public void setDebugOn(boolean debugOn) {
+    public void setDebugOn(final boolean debugOn) {
         this.debugOn = debugOn;
     }
 
-    public void setEncoding(String encoding) {
+    public void setEncoding(final String encoding) {
         this.encoding = encoding;
     }
 
-    public void setExpiresHeaders(String expiresHeaders) {
+    public void setExpiresHeaders(final String expiresHeaders) {
         this.expiresHeaders = expiresHeaders;
     }
 
