@@ -6,8 +6,6 @@ import com.google.template.soy.tofu.SoyTofu;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
-import pl.matisoft.soy.data.EmptyToSoyDataConverter;
-import pl.matisoft.soy.data.ToSoyDataConverter;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
 import pl.matisoft.soy.data.adjust.ModelAdjuster;
 import pl.matisoft.soy.global.EmptyGlobalModelResolver;
@@ -38,8 +36,6 @@ public class SoyView extends AbstractTemplateView {
 
     protected ModelAdjuster modelAdjuster = new EmptyModelAdjuster();
 
-    protected ToSoyDataConverter toSoyDataConverter = new EmptyToSoyDataConverter();
-
     protected GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
 
     protected LocaleProvider localeProvider = new EmptyLocaleProvider();
@@ -56,7 +52,6 @@ public class SoyView extends AbstractTemplateView {
         Preconditions.checkNotNull(templateName, "templateName cannot be null");
         Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null");
         Preconditions.checkNotNull(modelAdjuster, "modelAdjuster cannot be null");
-        Preconditions.checkNotNull(toSoyDataConverter, "toSoyDataConverter cannot be null");
         Preconditions.checkNotNull(globalModelResolver, "globalModelResolver cannot be null");
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
@@ -74,7 +69,6 @@ public class SoyView extends AbstractTemplateView {
                 .request(request)
                 .response(response)
                 .globalRuntimeModel(globalModelResolver.resolveData(request))
-                .soyMapData(toSoyDataConverter.toSoyMap(adjustedModel))
                 .soyMsgBundle(soyMsgBundleResolver.resolve(localeProvider.resolveLocale(request)))
                 .build();
 
@@ -95,10 +89,6 @@ public class SoyView extends AbstractTemplateView {
 
     public void setModelAdjuster(final ModelAdjuster modelAdjuster) {
         this.modelAdjuster = modelAdjuster;
-    }
-
-    public void setToSoyDataConverter(ToSoyDataConverter toSoyDataConverter) {
-        this.toSoyDataConverter = toSoyDataConverter;
     }
 
     public void setGlobalModelResolver(GlobalModelResolver globalModelResolver) {

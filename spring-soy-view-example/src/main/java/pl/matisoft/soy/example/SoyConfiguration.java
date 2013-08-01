@@ -101,26 +101,10 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         return new DefaultToSoyDataConverter();
     }
 
-    public RendererConfigurer rendererConfigurer() {
-        final DefaultRendererConfigurer defaultRendererConfigurer = new DefaultRendererConfigurer();
-        defaultRendererConfigurer.setDebugOn(debugOn);
-
-        return defaultRendererConfigurer;
-    }
-
-    public RenderersProvider renderersProvider() {
-        return new DefaultRenderersProvider();
-    }
-
-    public RendererResponseWriter rendererResponseWriter() {
-        return new DefaultRendererResponseWriter();
-    }
-
     public TemplateRenderer templateRenderer() {
         final DefaultTemplateRenderer defaultTemplateRenderer = new DefaultTemplateRenderer();
-        defaultTemplateRenderer.setRendererResponseWriter(rendererResponseWriter());
-        defaultTemplateRenderer.setRendererConfigurer(rendererConfigurer());
-        defaultTemplateRenderer.setRenderersProvider(renderersProvider());
+        defaultTemplateRenderer.setToSoyDataConverter(toSoyDataConverter());
+        defaultTemplateRenderer.setDebugOn(debugOn);
 
         return defaultTemplateRenderer;
     }
@@ -144,7 +128,6 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         soyTemplateViewResolver.setGlobalModelResolver(globalModelResolver());
         soyTemplateViewResolver.setLocaleProvider(localeProvider());
         soyTemplateViewResolver.setSoyMsgBundleResolver(soyMsgBundleResolver());
-        soyTemplateViewResolver.setToSoyDataConverter(toSoyDataConverter());
 
         return soyTemplateViewResolver;
     }

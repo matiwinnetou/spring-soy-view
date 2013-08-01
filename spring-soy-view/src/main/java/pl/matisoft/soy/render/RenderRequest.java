@@ -18,11 +18,11 @@ public class RenderRequest {
 
     private final Optional<SoyTofu> compiledTemplates;
     private final String templateName;
+
     private final HttpServletRequest request;
     private final HttpServletResponse response;
 
     private final Object model;
-    private final Optional<SoyMapData> soyModel;
 
     private final Optional<SoyMapData> globalRuntimeModel;
     private final Optional<SoyMsgBundle> soyMsgBundle;
@@ -33,13 +33,12 @@ public class RenderRequest {
         this.request = builder.request;
         this.response = builder.response;
         this.model = builder.model;
-        this.soyModel = builder.soyModel;
         this.globalRuntimeModel = builder.globalRuntimeModel;
         this.soyMsgBundle = builder.soyMsgBundle;
     }
 
-    public Optional<SoyMapData> getSoyModel() {
-        return soyModel;
+    public Object getModel() {
+        return model;
     }
 
     public Optional<SoyMapData> getGlobalRuntimeModel() {
@@ -66,10 +65,6 @@ public class RenderRequest {
         return response;
     }
 
-    public Object getModel() {
-        return model;
-    }
-
     public static class Builder {
 
         private Optional<SoyTofu> compiledTemplates;
@@ -77,46 +72,40 @@ public class RenderRequest {
         private HttpServletRequest request;
         private HttpServletResponse response;
         private Object model;
-        private Optional<SoyMapData> soyModel = Optional.absent();
         private Optional<SoyMapData> globalRuntimeModel = Optional.absent();
         private Optional<SoyMsgBundle> soyMsgBundle = Optional.absent();
 
-        public Builder compiledTemplates(Optional<SoyTofu> compiledTemplates) {
+        public Builder compiledTemplates(final Optional<SoyTofu> compiledTemplates) {
             this.compiledTemplates = compiledTemplates;
             return this;
         }
 
-        public Builder templateName(String templateName) {
+        public Builder templateName(final String templateName) {
             this.templateName = templateName;
             return this;
         }
 
-        public Builder response(HttpServletResponse response) {
+        public Builder response(final HttpServletResponse response) {
             this.response = response;
             return this;
         }
 
-        public Builder request(HttpServletRequest request) {
+        public Builder request(final HttpServletRequest request) {
             this.request = request;
             return this;
         }
 
-        public Builder model(Object model) {
+        public Builder model(final Object model) {
             this.model = model;
             return this;
         }
 
-        public Builder soyMapData(Optional<SoyMapData> soyMapData) {
-            this.soyModel = soyMapData;
-            return this;
-        }
-
-        public Builder globalRuntimeModel(Optional<SoyMapData> globalRuntimeModel) {
+        public Builder globalRuntimeModel(final Optional<SoyMapData> globalRuntimeModel) {
             this.globalRuntimeModel = globalRuntimeModel;
             return this;
         }
 
-        public Builder soyMsgBundle(Optional<SoyMsgBundle> soyMsgBundle) {
+        public Builder soyMsgBundle(final Optional<SoyMsgBundle> soyMsgBundle) {
             this.soyMsgBundle = soyMsgBundle;
             return this;
         }

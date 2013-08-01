@@ -1,6 +1,14 @@
 package pl.matisoft.soy.render;
 
-import java.util.List;
+import com.google.common.base.Optional;
+import com.google.template.soy.data.SoyMapData;
+import com.google.template.soy.msgs.SoyMsgBundle;
+import com.google.template.soy.tofu.SoyTofu;
+import pl.matisoft.soy.data.DefaultToSoyDataConverter;
+import pl.matisoft.soy.data.ToSoyDataConverter;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,11 +18,9 @@ import java.util.List;
  */
 public class DefaultTemplateRenderer implements TemplateRenderer {
 
-    protected RenderersProvider renderersProvider = new DefaultRenderersProvider();
+    protected ToSoyDataConverter toSoyDataConverter = new DefaultToSoyDataConverter();
 
-    protected RendererConfigurer rendererConfigurer = new DefaultRendererConfigurer();
-
-    protected RendererResponseWriter rendererResponseWriter = new DefaultRendererResponseWriter();
+    private boolean debugOn = false;
 
     @Override
     public void render(final RenderRequest renderRequest) throws Exception {
@@ -22,24 +28,46 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
             return;
         }
 
-        final List<RendererModelTuple> rendererModelTuples = renderersProvider.renderers(renderRequest);
+        final SoyTofu compiledTemplates = renderRequest.getCompiledTemplates().get();
 
-        for (final RendererModelTuple tuple : rendererModelTuples) {
-            rendererConfigurer.setupRenderer(tuple.getRenderer(), renderRequest, tuple.getModel());
-            rendererResponseWriter.writeResponse(tuple.getRenderer(), renderRequest);
+        final String templateName = renderRequest.getTemplateName();
+        final SoyTofu.Renderer renderer = compiledTemplates.newRenderer(templateName);
+
+        final Optional<SoyMapData> soyModel = toSoyDataConverter.toSoyMap(renderRequest.getModel());
+        setupRenderer(renderer, renderRequest, soyModel);
+        writeResponse(renderer, renderRequest);
+    }
+
+    protected void setupRenderer(final SoyTofu.Renderer renderer, final RenderRequest renderRequest, final Optional<SoyMapData> model) throws Exception {
+        if (model.isPresent()) {
+            renderer.setData(model.get());
+        }
+        final Optional<SoyMapData> globalModel = renderRequest.getGlobalRuntimeModel();
+        if (globalModel.isPresent()) {
+            renderer.setIjData(globalModel.get());
+        }
+        final Optional<SoyMsgBundle> soyMsgBundleOptional = renderRequest.getSoyMsgBundle();
+        if (soyMsgBundleOptional.isPresent()) {
+            renderer.setMsgBundle(soyMsgBundleOptional.get());
+        }
+        if (debugOn) {
+            renderer.setDontAddToCache(true);
         }
     }
 
-    public void setRenderersProvider(final RenderersProvider renderersProvider) {
-        this.renderersProvider = renderersProvider;
+    protected void writeResponse(final SoyTofu.Renderer renderer, final RenderRequest renderRequest) throws IOException {
+        final PrintWriter writer = renderRequest.getResponse().getWriter();
+        writer.append(renderer.render());
+        writer.flush();
+        renderRequest.getResponse().flushBuffer();
     }
 
-    public void setRendererConfigurer(final RendererConfigurer rendererConfigurer) {
-        this.rendererConfigurer = rendererConfigurer;
+    public void setToSoyDataConverter(final ToSoyDataConverter toSoyDataConverter) {
+        this.toSoyDataConverter = toSoyDataConverter;
     }
 
-    public void setRendererResponseWriter(final RendererResponseWriter rendererResponseWriter) {
-        this.rendererResponseWriter = rendererResponseWriter;
+    public void setDebugOn(boolean debugOn) {
+        this.debugOn = debugOn;
     }
 
 }

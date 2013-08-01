@@ -11,8 +11,6 @@ import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.DefaultTofuCompiler;
 import pl.matisoft.soy.compile.TofuCompiler;
-import pl.matisoft.soy.data.EmptyToSoyDataConverter;
-import pl.matisoft.soy.data.ToSoyDataConverter;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
 import pl.matisoft.soy.data.adjust.ModelAdjuster;
 import pl.matisoft.soy.global.EmptyGlobalModelResolver;
@@ -47,8 +45,6 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     protected TofuCompiler tofuCompiler = new DefaultTofuCompiler();
 
     protected ModelAdjuster modelAdjuster = new EmptyModelAdjuster();
-
-    protected ToSoyDataConverter toSoyDataConverter = new EmptyToSoyDataConverter();
 
     protected GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
 
@@ -95,7 +91,6 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         view.setGlobalModelResolver(globalModelResolver);
         view.setLocaleProvider(localeProvider);
         view.setSoyMsgBundleResolver(soyMsgBundleResolver);
-        view.setToSoyDataConverter(toSoyDataConverter);
 
         if (!compiledTemplates.isPresent()) {
             if (!isHtmlView(viewName)) {
@@ -157,23 +152,19 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         this.ignoreHtmlView = ignoreHtmlView;
     }
 
-    public void setModelAdjuster(ModelAdjuster modelAdjuster) {
+    public void setModelAdjuster(final ModelAdjuster modelAdjuster) {
         this.modelAdjuster = modelAdjuster;
     }
 
-    public void setToSoyDataConverter(ToSoyDataConverter toSoyDataConverter) {
-        this.toSoyDataConverter = toSoyDataConverter;
-    }
-
-    public void setGlobalModelResolver(GlobalModelResolver globalModelResolver) {
+    public void setGlobalModelResolver(final GlobalModelResolver globalModelResolver) {
         this.globalModelResolver = globalModelResolver;
     }
 
-    public void setLocaleProvider(LocaleProvider localeProvider) {
+    public void setLocaleProvider(final LocaleProvider localeProvider) {
         this.localeProvider = localeProvider;
     }
 
-    public void setSoyMsgBundleResolver(SoyMsgBundleResolver soyMsgBundleResolver) {
+    public void setSoyMsgBundleResolver(final SoyMsgBundleResolver soyMsgBundleResolver) {
         this.soyMsgBundleResolver = soyMsgBundleResolver;
     }
 
