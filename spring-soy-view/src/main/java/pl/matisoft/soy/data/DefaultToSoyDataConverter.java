@@ -25,10 +25,7 @@ import java.beans.PropertyDescriptor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 /**
  * User: Copyright 2011-2013 PaperCut Software Int. Pty. Ltd. http://www.papercut.com/
@@ -48,7 +45,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return Optional.fromNullable(objectToSoyDataMap(model));
     }
 
-    private Map<String, ?> toSoyCompatibleMap(final Object obj) throws InterruptedException, ExecutionException, TimeoutException {
+    private Map<String, ?> toSoyCompatibleMap(final Object obj) throws Exception {
         Object ret = toSoyCompatibleObjects(obj);
         if (!(ret instanceof Map)) {
             throw new IllegalArgumentException("Input should be a Map or POJO.");
@@ -57,7 +54,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return (Map<String, ?>) ret;
     }
 
-    private Object toSoyCompatibleObjects(Object obj) throws InterruptedException, ExecutionException, TimeoutException {
+    private Object toSoyCompatibleObjects(Object obj) throws Exception {
         if (obj == null) {
             return obj;
         }
@@ -90,6 +87,12 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
             final Future future = (Future) obj;
 
             return toSoyCompatibleObjects(future.get(futureTimeOutInSeconds, TimeUnit.SECONDS));
+        }
+
+        if (obj instanceof Callable) {
+            final Callable callable = (Callable) obj;
+
+            return toSoyCompatibleObjects(callable.call());
         }
 
         if (obj.getClass().isArray()) {
@@ -128,7 +131,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return map;
     }
 
-    private SoyMapData objectToSoyDataMap(Object obj) throws InterruptedException, ExecutionException, TimeoutException {
+    private SoyMapData objectToSoyDataMap(Object obj) throws Exception {
         if (obj == null) {
             return new SoyMapData();
         }

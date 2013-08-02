@@ -90,15 +90,15 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
         }
     }
 
-    public void setInjectRequestParams(boolean injectRequestParams) {
+    public void setInjectRequestParams(final boolean injectRequestParams) {
         this.injectRequestParams = injectRequestParams;
     }
 
-    public void setInjectCookies(boolean injectCookies) {
+    public void setInjectCookies(final boolean injectCookies) {
         this.injectCookies = injectCookies;
     }
 
-    public void setInjectRequestHeaders(boolean injectRequestHeaders) {
+    public void setInjectRequestHeaders(final boolean injectRequestHeaders) {
         this.injectRequestHeaders = injectRequestHeaders;
     }
 
