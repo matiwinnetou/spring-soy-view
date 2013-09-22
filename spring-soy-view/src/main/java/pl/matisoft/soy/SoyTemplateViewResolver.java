@@ -56,6 +56,8 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     private boolean ignoreHtmlView = false;
 
+    private String indexView = "index";
+
     public SoyTemplateViewResolver() {
         super();
         setExposeSpringMacroHelpers(false);
@@ -83,8 +85,8 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         Preconditions.checkNotNull(viewName, "viewName cannot be null!");
         Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null!");
 
-        final SoyView view = (SoyView) super.buildView(viewName);
-        view.setTemplateName(viewName);
+        final SoyView view = (SoyView) super.buildView(orIndexView(normalize(viewName)));
+        view.setTemplateName(view.getUrl());
         view.setContentType(contentType());
         view.setTemplateRenderer(templateRenderer);
         view.setModelAdjuster(modelAdjuster);
@@ -105,6 +107,35 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         }
 
         return view;
+    }
+
+    /**
+     * Map / to a default view name.
+     * @param viewName The view name.
+     * @return The defaulted view name.
+     */
+    private String orIndexView(String viewName) {
+        return viewName == "" ? indexView : viewName;
+    }
+
+    /**
+     * Remove beginning and ending slashes, then replace all occurrences of / with .
+     *
+     * @param viewName The Spring viewName
+     * @return The name of the view, dot separated.
+     */
+    private String normalize(final String viewName) {
+        String normalized = viewName;
+
+        if (normalized.startsWith("/")) {
+            normalized = normalized.substring(0);
+        }
+
+        if (normalized.endsWith("/")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+
+        return normalized.replaceAll("/", ".");
     }
 
     private String contentType() {
@@ -168,4 +199,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         this.soyMsgBundleResolver = soyMsgBundleResolver;
     }
 
+    public void setIndexView(String indexView) {
+        this.indexView = indexView;
+    }
 }
