@@ -1,5 +1,9 @@
 package pl.matisoft.soy;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
@@ -21,10 +25,6 @@ import pl.matisoft.soy.render.EmptyTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -70,7 +70,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
             try {
                 this.compiledTemplates = compileTemplates("<class_init>");
             } catch (IOException ex) {
-                logger.error("Unable to compile template files", ex);
+                throw new IllegalStateException("Unable to compile Soy templates.", ex);
             }
         }
     }
@@ -202,4 +202,5 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     public void setIndexView(String indexView) {
         this.indexView = indexView;
     }
+
 }
