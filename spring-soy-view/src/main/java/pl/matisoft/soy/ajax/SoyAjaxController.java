@@ -1,5 +1,13 @@
 package pl.matisoft.soy.ajax;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.msgs.SoyMsgBundle;
@@ -20,14 +28,6 @@ import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -145,12 +145,12 @@ public class SoyAjaxController {
         final Optional<SoyMsgBundle> soyMsgBundle = soyMsgBundleResolver.resolve(locale);
         final List<String> compiledTemplates = tofuCompiler.compileToJsSrc(templateFile.orNull(), soyMsgBundle.orNull());
 
-        final Iterator it = compiledTemplates.iterator();
+        final Iterator<String> it = compiledTemplates.iterator();
         if (!it.hasNext()) {
             throw notFound("No compiled templates found!");
         }
 
-        return (String) it.next();
+        return it.next();
     }
 
     private HttpClientErrorException notFound(final String file) {
