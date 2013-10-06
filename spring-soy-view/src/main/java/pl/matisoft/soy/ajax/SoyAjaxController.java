@@ -1,13 +1,5 @@
 package pl.matisoft.soy.ajax;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.msgs.SoyMsgBundle;
@@ -24,10 +16,23 @@ import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.EmptyTofuCompiler;
 import pl.matisoft.soy.compile.TofuCompiler;
+import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
+import pl.matisoft.soy.support.OutputProcessor;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -53,79 +58,83 @@ public class SoyAjaxController {
 
     private boolean debugOn = false;
 
-    private String encoding = "utf-8";
+    private String encoding = SoyViewConfig.DEFAULT_ENCODING;
+
+    private List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>();
 
     public SoyAjaxController() {
     }
 
-    @RequestMapping(value="/soy/{hash}/{templateFileName}", method=GET)
-    public ResponseEntity<String> getJsForTemplateFileHash(@PathVariable final String hash,
-                                                           @PathVariable final String templateFileName,
+    @RequestMapping(value="/soy/{hash}/{templateFileNames}", method=GET)
+    public ResponseEntity<String> getJsForTemplateFilesHash(@PathVariable final String hash,
+                                                           @PathVariable final String[] templateFileNames,
                                                            final HttpServletRequest request)
-                                                           throws IOException {
-        return compileJs(templateFileName, hash, request);
+            throws IOException {
+        return compileJs(templateFileNames, hash, request);
     }
 
-    @RequestMapping(value="/soy/{hash}/{templateFileName}.js", method=GET)
-    public ResponseEntity<String> getJsForTemplateFileHashExt(@PathVariable final String hash,
-                                                              @PathVariable final String templateFileName,
+    @RequestMapping(value="/soy/{hash}/{templateFileNames}.js", method=GET)
+    public ResponseEntity<String> getJsForTemplateFilesHashExt(@PathVariable final String hash,
+                                                              @PathVariable final String[] templateFileNames,
                                                               final HttpServletRequest request) throws IOException {
-        return compileJs(templateFileName, hash, request);
+        return compileJs(templateFileNames, hash, request);
     }
 
-    @RequestMapping(value="/soy/{templateFileName}.js", method=GET)
-    public ResponseEntity<String> getJsForTemplateFile(@PathVariable final String templateFileName,
+    @RequestMapping(value="/soy/{templateFileNames}.js", method=GET)
+    public ResponseEntity<String> getJsForTemplateFile(@PathVariable final String templateFileNames,
                                                        final HttpServletRequest request) throws IOException {
-        return compileJs(templateFileName, "", request);
+        return compileJs(new String[]{templateFileNames}, "", request);
     }
 
-    @RequestMapping(value="/soy/{templateFileName}", method=GET)
-    public ResponseEntity<String> getJsForTemplateFileExt(@PathVariable final String templateFileName,
+    @RequestMapping(value="/soy/{templateFileNames}", method=GET)
+    public ResponseEntity<String> getJsForTemplateFileExt(@PathVariable final String templateFileNames,
                                                           final HttpServletRequest request) throws IOException {
-        return compileJs(templateFileName, "", request);
+        return compileJs(new String[]{templateFileNames}, "", request);
     }
 
-    private ResponseEntity<String> compileJs(final String templateFileName,
+    private ResponseEntity<String> compileJs(final String[] templateFileNames,
                                              final String hash,
                                              final HttpServletRequest request) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templateFilesResolver cannot be null");
 
-        final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
+        final StringBuilder allJsTemplates = new StringBuilder();
+        for (final String templateFileName : templateFileNames) {
+            final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
+            if (templateFileNames.length == 1 && !templateUrl.isPresent()) {
+                throw notFound("File not found:" + templateFileName + ".soy");
+            }
 
-        if (!templateUrl.isPresent()) {
-            throw notFound("File not found:" + templateFileName + ".soy");
-        }
-
-        if (!debugOn) {
-            final ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
-            logger.debug("Debug off and returning cached compiled hash:" + hash);
-            if (map != null) {
-                final String template = map.get(templateUrl.get());
-                if (template != null) {
-                    return prepareResponseFor(template);
+            if (isDebugOff()) {
+                final ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
+                logger.debug("Debug off and returning cached compiled hash:" + hash);
+                if (map != null) {
+                    final String template = map.get(templateUrl.get());
+                    if (template != null) {
+                        return prepareResponseFor(template);
+                    }
                 }
             }
-        }
 
-        logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
+            logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
+            final String templateContent = compileTemplateAndAssertSuccess(request, templateUrl);
+            allJsTemplates.append(templateContent);
 
-        final String templateContent = compileTemplateAndAssertSuccess(request, templateUrl);
-
-        if (!debugOn) {
-            logger.debug("Debug off adding to templateUrl to cache:" + templateUrl.get());
-            ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
-            if (map == null) {
-                map = new ConcurrentHashMap<URL, String>();
-            } else {
-                map.putIfAbsent(templateUrl.get(), templateContent);
+            if (isDebugOff()) {
+                //logger.debug("Debug off adding to templateUrl to cache:" + templateUrl.get());
+                ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
+                if (map == null) {
+                    map = new ConcurrentHashMap<URL, String>();
+                } else {
+                    map.put(templateUrl.get(), allJsTemplates.toString());
+                }
+                cachedJsTemplates.putIfAbsent(hash, map);
             }
-            cachedJsTemplates.putIfAbsent(hash, map);
         }
 
-        return prepareResponseFor(templateContent);
+        return prepareResponseFor(allJsTemplates.toString());
     }
 
-    private ResponseEntity<String> prepareResponseFor(final String templateContent) {
+    private ResponseEntity<String> prepareResponseFor(final String templateContent) throws IOException {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/javascript; charset=" + encoding);
         headers.add("Cache-Control", debugOn ? "no-cache" : cacheControl);
@@ -133,7 +142,19 @@ public class SoyAjaxController {
             headers.add("Expires", expiresHeaders);
         }
 
-        return new ResponseEntity<String>(templateContent, headers, OK);
+        String processTemplate = templateContent;
+        try {
+            for (final OutputProcessor outputProcessor : outputProcessors) {
+                final StringWriter writer = new StringWriter();
+                outputProcessor.process(new StringReader(templateContent), writer);
+                processTemplate = writer.getBuffer().toString();
+            }
+
+            return new ResponseEntity<String>(processTemplate, headers, OK);
+        } catch(final Exception ex) {
+            logger.warn("Unable to process template", ex);
+            return new ResponseEntity<String>(templateContent, headers, OK);
+        }
     }
 
     private String compileTemplateAndAssertSuccess(final HttpServletRequest request, final Optional<URL> templateFile) throws IOException {
@@ -151,6 +172,10 @@ public class SoyAjaxController {
         }
 
         return it.next();
+    }
+
+    private boolean isDebugOff() {
+        return !debugOn;
     }
 
     private HttpClientErrorException notFound(final String file) {
@@ -187,6 +212,10 @@ public class SoyAjaxController {
 
     public void setExpiresHeaders(final String expiresHeaders) {
         this.expiresHeaders = expiresHeaders;
+    }
+
+    public void setOutputProcessors(List<OutputProcessor> outputProcessors) {
+        this.outputProcessors = outputProcessors;
     }
 
 }

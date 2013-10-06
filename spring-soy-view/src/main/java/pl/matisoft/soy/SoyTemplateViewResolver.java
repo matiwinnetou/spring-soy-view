@@ -15,6 +15,7 @@ import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.DefaultTofuCompiler;
 import pl.matisoft.soy.compile.TofuCompiler;
+import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
 import pl.matisoft.soy.data.adjust.ModelAdjuster;
 import pl.matisoft.soy.global.EmptyGlobalModelResolver;
@@ -52,7 +53,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     protected SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
-    private String encoding = "utf-8";
+    private String encoding = SoyViewConfig.DEFAULT_ENCODING;
 
     private boolean ignoreHtmlView = false;
 

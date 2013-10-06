@@ -8,6 +8,8 @@ package pl.matisoft.soy.config;
  */
 public class SoyViewConfig {
 
+    public final static String DEFAULT_ENCODING = "utf-8";
+
     private boolean debugOn;
 
     public boolean isDebugOn() {

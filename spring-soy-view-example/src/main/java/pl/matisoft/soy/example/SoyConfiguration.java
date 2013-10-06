@@ -32,6 +32,8 @@ import pl.matisoft.soy.hash.MD5HashFileGenerator;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.*;
+import pl.matisoft.soy.support.GoogleClosureOutputProcessor;
+import pl.matisoft.soy.support.OutputProcessor;
 import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
 import pl.matisoft.soy.url.DefaultTemplateUrlComposer;
 import pl.matisoft.soy.url.TemplateUrlComposer;
@@ -133,6 +135,11 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Bean
+    public OutputProcessor closureCompilerProcessor() {
+        return new GoogleClosureOutputProcessor();
+    }
+
+    @Bean
     public FactoryBean contentNegotiationManagerFactoryBean() {
         final Properties props = new Properties();
         props.put("html", "text/html");
@@ -183,6 +190,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         soyAjaxController.setSoyMsgBundleResolver(soyMsgBundleResolver());
         soyAjaxController.setTemplateFilesResolver(templateFilesResolver());
         soyAjaxController.setTofuCompiler(tofuCompiler());
+        soyAjaxController.setOutputProcessors(Lists.newArrayList(closureCompilerProcessor()));
 
         return soyAjaxController;
     }

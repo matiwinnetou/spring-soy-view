@@ -14,5 +14,11 @@ It is highly customizable via pluggable interfaces, for which a default implemen
 * Ability to provide own template file resolver (TemplateFilesResolver interface)
 * Model transformation available (ModelAdjuster interface)
 
+# Running example (dev)
+* clone the git repository
+* cd spring-soy-view-example
+* invoke mvn jetty:run
+* Navigate to http://localhost:8080/spring-soy-view-example/app/
+
 author: Mateusz Szczap<br>
 <mati@sz.home.pl>
