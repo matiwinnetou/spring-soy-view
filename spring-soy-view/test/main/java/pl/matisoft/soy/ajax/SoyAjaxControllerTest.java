@@ -45,7 +45,7 @@ public class SoyAjaxControllerTest {
         final HttpServletRequest request = mock(HttpServletRequest.class);
         when(templateFilesResolver.resolve("template1")).thenReturn(Optional.<URL>absent());
         try {
-            soyAjaxController.getJsForTemplateFiles(new String[]{"template1.soy"}, request);
+            soyAjaxController.getJsForTemplateFiles(new String[]{"template1.soy"}, "false", request);
             fail("should throw exception");
         } catch(HttpClientErrorException ex) {
         }
@@ -73,6 +73,19 @@ public class SoyAjaxControllerTest {
     public void testStripExtensionsNull() throws Exception {
         final String[] newArr = soyAjaxController.stripExtensions(null);
         assertEquals(0, newArr.length);
+    }
+
+    @Test
+    public void testArrayToPathNullCheck() throws Exception {
+        final String out = soyAjaxController.arrayToPath(null);
+        assertEquals("", out);
+    }
+
+    @Test
+    public void testArrayToPath() throws Exception {
+        final String[] array = new String[]{"abc.soy", "abc"};
+        final String out = soyAjaxController.arrayToPath(array);
+        assertEquals("abc.soy,abc", out);
     }
 
 }

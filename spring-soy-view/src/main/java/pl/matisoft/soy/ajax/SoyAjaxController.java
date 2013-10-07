@@ -1,17 +1,5 @@
 package pl.matisoft.soy.ajax;
 
-import javax.annotation.concurrent.ThreadSafe;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.msgs.SoyMsgBundle;
@@ -36,8 +24,18 @@ import pl.matisoft.soy.process.OutputProcessor;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 @ThreadSafe
@@ -45,11 +43,13 @@ public class SoyAjaxController {
 
     private static final Logger logger = LoggerFactory.getLogger(SoyAjaxController.class);
 
+    private final static int MAX_CACHE_ENTRIES = 10000;
+
     private String cacheControl = "no-cache";
 
     private String expiresHeaders = "";
 
-    private ConcurrentHashMap<String, ConcurrentHashMap> cachedJsTemplates = new ConcurrentHashMap<String, ConcurrentHashMap>();
+    private ConcurrentHashMap<String, Map<String,String>> cachedJsTemplates = new ConcurrentHashMap<String, Map<String,String>>();
 
     private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
@@ -65,13 +65,15 @@ public class SoyAjaxController {
 
     private List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>();
 
+
+
     public SoyAjaxController() {
     }
 
     @RequestMapping(value="/soy/{templateFileNames}", method=GET)
     public ResponseEntity<String> getJsForTemplateFiles(@PathVariable final String[] templateFileNames,
-                                                        final HttpServletRequest request,
-                                                        @RequestParam(required = false, value = "disableProcessors") String disableProcessors)
+                                                        @RequestParam(required = false, value = "disableProcessors") String disableProcessors,
+                                                        final HttpServletRequest request)
             throws IOException {
 
         return compileJs(templateFileNames, "", new Boolean(disableProcessors).booleanValue(), request);
@@ -92,29 +94,40 @@ public class SoyAjaxController {
     ) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templateFilesResolver cannot be null");
 
-//        if (isProdMode()) {
-//            final ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
-//            if (map != null) {
-//                final String[] templates = map.get(templateFileNames);
-//                if (templates != null) {
-//                    return prepareResponseFor(template, disableProcessors);
-//                }
-//            }
-//        }
+        if (isProdMode()) {
+            final Optional<String> template = extractAndCombineAll(hash, templateFileNames);
+            if (template.isPresent()) {
+                return prepareResponseFor(template.get(), disableProcessors);
+            }
+        }
 
         final String allCompiledTemplates = compileAndCombineAll(templateFileNames, request);
 
-//        if (isProdMode()) {
-//                ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
-//                if (map == null) {
-//                    map = new ConcurrentHashMap<String[], String>();
-//                } else {
-//                    map.put(templateFileNames, allJsTemplates.toString());
-//                }
-//                cachedJsTemplates.putIfAbsent(hash, map);
-//        }
+        if (isProdMode()) {
+            Map<String, String> map = cachedJsTemplates.get(hash);
+            if (map == null) {
+                map = new ConcurrentHashMap<String, String>();
+            } else {
+                map.put(arrayToPath(templateFileNames), allCompiledTemplates);
+            }
+            if (this.cachedJsTemplates.size() < MAX_CACHE_ENTRIES) { //silly DDOS check... but how to be more clever?
+                this.cachedJsTemplates.put(hash, map);
+            }
+        }
 
         return prepareResponseFor(allCompiledTemplates, disableProcessors);
+    }
+
+    private Optional<String> extractAndCombineAll(final String hash, final String[] templateFileNames) throws IOException {
+        final Map<String, String> map = cachedJsTemplates.get(hash);
+        if (map != null) {
+            final String template = map.get(arrayToPath(templateFileNames));
+            if (template != null) {
+                return Optional.of(template);
+            }
+        }
+
+        return Optional.absent();
     }
 
     private String compileAndCombineAll(final String[] templateFileNames, final HttpServletRequest request) throws IOException {
@@ -122,7 +135,7 @@ public class SoyAjaxController {
 
         for (final String templateFileName : stripExtensions(templateFileNames)) {
             final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
-            if (templateFileNames.length == 1 && !templateUrl.isPresent()) {
+            if (!templateUrl.isPresent()) {
                 throw notFound("File not found:" + templateFileName + ".soy");
             }
 
@@ -161,6 +174,37 @@ public class SoyAjaxController {
         }
     }
 
+    /**friendly */ String arrayToPath(final String[] array) {
+        if (array == null) {
+            return "";
+        }
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i<array.length; i++) {
+            builder.append(array[i]);
+            if (i < array.length - 1) {
+                builder.append(",");
+            }
+        }
+
+        return builder.toString();
+    }
+
+    /**friendly */ String[] stripExtensions(final String[] exts) {
+        if (exts == null) {
+            return new String[0];
+        }
+        final String[] newStrippedExts = new String[exts.length];
+        for (int i = 0; i<newStrippedExts.length; i++) {
+            if (exts[i].contains(".soy")) {
+                newStrippedExts[i] = exts[i].replace(".soy", "");
+            } else {
+                newStrippedExts[i] = exts[i];
+            }
+        }
+
+        return newStrippedExts;
+    }
+
     private String compileTemplateAndAssertSuccess(final HttpServletRequest request, final Optional<URL> templateFile) throws IOException {
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
@@ -180,22 +224,6 @@ public class SoyAjaxController {
 
     private boolean isProdMode() {
         return !debugOn;
-    }
-
-    /**/ String[] stripExtensions(final String[] exts) {
-        if (exts == null) {
-            return new String[0];
-        }
-        final String[] newStrippedExts = new String[exts.length];
-        for (int i = 0; i<newStrippedExts.length; i++) {
-            if (exts[i].contains(".soy")) {
-                newStrippedExts[i] = exts[i].replace(".soy", "");
-            } else {
-                newStrippedExts[i] = exts[i];
-            }
-        }
-
-        return newStrippedExts;
     }
 
     private HttpClientErrorException notFound(final String file) {
