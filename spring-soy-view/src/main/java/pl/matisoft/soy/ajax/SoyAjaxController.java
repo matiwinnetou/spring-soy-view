@@ -1,5 +1,6 @@
 package pl.matisoft.soy.ajax;
 
+import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringReader;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
@@ -38,6 +40,7 @@ import static org.springframework.http.HttpStatus.*;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Controller
+@ThreadSafe
 public class SoyAjaxController {
 
     private static final Logger logger = LoggerFactory.getLogger(SoyAjaxController.class);
@@ -65,80 +68,82 @@ public class SoyAjaxController {
     public SoyAjaxController() {
     }
 
+    @RequestMapping(value="/soy/{templateFileNames}", method=GET)
+    public ResponseEntity<String> getJsForTemplateFiles(@PathVariable final String[] templateFileNames,
+                                                        final HttpServletRequest request,
+                                                        @RequestParam(required = false, value = "disableProcessors") String disableProcessors)
+            throws IOException {
+
+        return compileJs(templateFileNames, "", new Boolean(disableProcessors).booleanValue(), request);
+    }
+
     @RequestMapping(value="/soy/{hash}/{templateFileNames}", method=GET)
     public ResponseEntity<String> getJsForTemplateFilesHash(@PathVariable final String hash,
-                                                           @PathVariable final String[] templateFileNames,
-                                                           final HttpServletRequest request) throws IOException {
-        return compileJs(templateFileNames, hash, request);
-    }
-
-    @RequestMapping(value="/soy/{hash}/{templateFileNames}.js", method=GET)
-    public ResponseEntity<String> getJsForTemplateFilesHashExt(@PathVariable final String hash,
-                                                              @PathVariable final String[] templateFileNames,
-                                                              final HttpServletRequest request) throws IOException {
-        return compileJs(templateFileNames, hash, request);
-    }
-
-    @RequestMapping(value="/soy/{templateFileNames}.js", method=GET)
-    public ResponseEntity<String> getJsForTemplateFile(@PathVariable final String templateFileNames,
-                                                       final HttpServletRequest request) throws IOException {
-        return compileJs(new String[]{templateFileNames}, "", request);
-    }
-
-    @RequestMapping(value="/soy/{templateFileNames}", method=GET)
-    public ResponseEntity<String> getJsForTemplateFileExt(@PathVariable final String templateFileNames,
-                                                          final HttpServletRequest request) throws IOException {
-        return compileJs(new String[]{templateFileNames}, "", request);
+                                                            @PathVariable final String[] templateFileNames,
+                                                            @RequestParam(required = false, value = "disableProcessors") String disableProcessors,
+                                                            final HttpServletRequest request) throws IOException {
+        return compileJs(templateFileNames, hash, new Boolean(disableProcessors).booleanValue(), request);
     }
 
     private ResponseEntity<String> compileJs(final String[] templateFileNames,
                                              final String hash,
-                                             final HttpServletRequest request) throws IOException {
+                                             final boolean disableProcessors,
+                                             final HttpServletRequest request
+    ) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templateFilesResolver cannot be null");
 
+//        if (isProdMode()) {
+//            final ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
+//            if (map != null) {
+//                final String[] templates = map.get(templateFileNames);
+//                if (templates != null) {
+//                    return prepareResponseFor(template, disableProcessors);
+//                }
+//            }
+//        }
+
+        final String allCompiledTemplates = compileAndCombineAll(templateFileNames, request);
+
+//        if (isProdMode()) {
+//                ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
+//                if (map == null) {
+//                    map = new ConcurrentHashMap<String[], String>();
+//                } else {
+//                    map.put(templateFileNames, allJsTemplates.toString());
+//                }
+//                cachedJsTemplates.putIfAbsent(hash, map);
+//        }
+
+        return prepareResponseFor(allCompiledTemplates, disableProcessors);
+    }
+
+    private String compileAndCombineAll(final String[] templateFileNames, final HttpServletRequest request) throws IOException {
         final StringBuilder allJsTemplates = new StringBuilder();
-        for (final String templateFileName : templateFileNames) {
+
+        for (final String templateFileName : stripExtensions(templateFileNames)) {
             final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
             if (templateFileNames.length == 1 && !templateUrl.isPresent()) {
                 throw notFound("File not found:" + templateFileName + ".soy");
             }
 
-            if (isDebugOff()) {
-                final ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
-                logger.debug("Debug off and returning cached compiled hash:" + hash);
-                if (map != null) {
-                    final String template = map.get(templateUrl.get());
-                    if (template != null) {
-                        return prepareResponseFor(template);
-                    }
-                }
-            }
-
             logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
             final String templateContent = compileTemplateAndAssertSuccess(request, templateUrl);
             allJsTemplates.append(templateContent);
-
-            if (isDebugOff()) {
-                //logger.debug("Debug off adding to templateUrl to cache:" + templateUrl.get());
-                ConcurrentHashMap<URL, String> map = cachedJsTemplates.get(hash);
-                if (map == null) {
-                    map = new ConcurrentHashMap<URL, String>();
-                } else {
-                    map.put(templateUrl.get(), allJsTemplates.toString());
-                }
-                cachedJsTemplates.putIfAbsent(hash, map);
-            }
         }
 
-        return prepareResponseFor(allJsTemplates.toString());
+        return allJsTemplates.toString();
     }
 
-    private ResponseEntity<String> prepareResponseFor(final String templateContent) throws IOException {
+    private ResponseEntity<String> prepareResponseFor(final String templateContent, final boolean disableProcessors) throws IOException {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/javascript; charset=" + encoding);
         headers.add("Cache-Control", debugOn ? "no-cache" : cacheControl);
         if (StringUtils.hasText(expiresHeaders)) {
             headers.add("Expires", expiresHeaders);
+        }
+
+        if (disableProcessors) {
+            return new ResponseEntity<String>(templateContent, headers, OK);
         }
 
         String processTemplate = templateContent;
@@ -173,8 +178,24 @@ public class SoyAjaxController {
         return it.next();
     }
 
-    private boolean isDebugOff() {
+    private boolean isProdMode() {
         return !debugOn;
+    }
+
+    /**/ String[] stripExtensions(final String[] exts) {
+        if (exts == null) {
+            return new String[0];
+        }
+        final String[] newStrippedExts = new String[exts.length];
+        for (int i = 0; i<newStrippedExts.length; i++) {
+            if (exts[i].contains(".soy")) {
+                newStrippedExts[i] = exts[i].replace(".soy", "");
+            } else {
+                newStrippedExts[i] = exts[i];
+            }
+        }
+
+        return newStrippedExts;
     }
 
     private HttpClientErrorException notFound(final String file) {

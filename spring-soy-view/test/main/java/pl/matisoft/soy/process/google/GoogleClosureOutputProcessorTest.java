@@ -4,8 +4,10 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import com.google.javascript.jscomp.CompilationLevel;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
 import pl.matisoft.soy.process.google.GoogleClosureOutputProcessor;
 
 import static junit.framework.Assert.*;
@@ -19,7 +21,12 @@ import static junit.framework.Assert.*;
 public class GoogleClosureOutputProcessorTest {
 
     @InjectMocks
-    private pl.matisoft.soy.process.google.GoogleClosureOutputProcessor googleClosureOutputProcessor = new GoogleClosureOutputProcessor();
+    private GoogleClosureOutputProcessor googleClosureOutputProcessor = new GoogleClosureOutputProcessor();
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void testSimpleJs() throws Exception {
