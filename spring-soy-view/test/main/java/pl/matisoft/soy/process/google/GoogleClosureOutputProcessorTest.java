@@ -1,13 +1,14 @@
-package pl.matisoft.soy.support;
-
-import com.google.javascript.jscomp.CompilationLevel;
-import org.junit.Test;
-import org.mockito.InjectMocks;
+package pl.matisoft.soy.process;
 
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import static junit.framework.Assert.assertEquals;
+import com.google.javascript.jscomp.CompilationLevel;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import pl.matisoft.soy.process.google.GoogleClosureOutputProcessor;
+
+import static junit.framework.Assert.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,7 +19,7 @@ import static junit.framework.Assert.assertEquals;
 public class GoogleClosureOutputProcessorTest {
 
     @InjectMocks
-    private GoogleClosureOutputProcessor googleClosureOutputProcessor = new GoogleClosureOutputProcessor();
+    private pl.matisoft.soy.process.google.GoogleClosureOutputProcessor googleClosureOutputProcessor = new GoogleClosureOutputProcessor();
 
     @Test
     public void testSimpleJs() throws Exception {

@@ -1,5 +1,16 @@
 package pl.matisoft.soy.ajax;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.msgs.SoyMsgBundle;
@@ -19,20 +30,9 @@ import pl.matisoft.soy.compile.TofuCompiler;
 import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
-import pl.matisoft.soy.support.OutputProcessor;
+import pl.matisoft.soy.process.OutputProcessor;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -68,8 +68,7 @@ public class SoyAjaxController {
     @RequestMapping(value="/soy/{hash}/{templateFileNames}", method=GET)
     public ResponseEntity<String> getJsForTemplateFilesHash(@PathVariable final String hash,
                                                            @PathVariable final String[] templateFileNames,
-                                                           final HttpServletRequest request)
-            throws IOException {
+                                                           final HttpServletRequest request) throws IOException {
         return compileJs(templateFileNames, hash, request);
     }
 

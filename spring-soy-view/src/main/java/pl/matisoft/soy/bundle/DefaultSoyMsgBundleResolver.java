@@ -1,5 +1,10 @@
 package pl.matisoft.soy.bundle;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -10,11 +15,6 @@ import com.google.template.soy.msgs.restricted.SoyMsgBundleImpl;
 import com.google.template.soy.xliffmsgplugin.XliffMsgPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -87,9 +87,8 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
         }
 
         final List<SoyMsg> msgs = Lists.newArrayList();
-
         for (final SoyMsgBundle smb : soyMsgBundles) {
-            for (Iterator<SoyMsg> it = smb.iterator(); it.hasNext();) {
+            for (final Iterator<SoyMsg> it = smb.iterator(); it.hasNext();) {
                 msgs.add(it.next());
             }
         }

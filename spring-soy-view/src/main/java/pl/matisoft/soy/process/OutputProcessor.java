@@ -1,4 +1,4 @@
-package pl.matisoft.soy.support;
+package pl.matisoft.soy.process;
 
 import java.io.*;
 

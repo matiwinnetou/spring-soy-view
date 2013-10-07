@@ -1,4 +1,12 @@
-package pl.matisoft.soy.support;
+package pl.matisoft.soy.process.google;
+
+import javax.annotation.concurrent.ThreadSafe;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
 import com.google.common.collect.Lists;
 import com.google.javascript.jscomp.*;
@@ -8,11 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import pl.matisoft.soy.config.SoyViewConfig;
-
-import javax.annotation.concurrent.ThreadSafe;
-import java.io.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
+import pl.matisoft.soy.process.OutputProcessor;
 
 /**
  * Created with IntelliJ IDEA.
