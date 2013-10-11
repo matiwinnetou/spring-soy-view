@@ -1,5 +1,15 @@
 package pl.matisoft.soy.ajax;
 
+import javax.annotation.concurrent.ThreadSafe;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.msgs.SoyMsgBundle;
@@ -24,18 +34,8 @@ import pl.matisoft.soy.process.OutputProcessor;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
-import javax.annotation.concurrent.ThreadSafe;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Controller
 @ThreadSafe
@@ -178,15 +178,9 @@ public class SoyAjaxController {
         if (array == null) {
             return "";
         }
-        final StringBuilder builder = new StringBuilder();
-        for (int i = 0; i<array.length; i++) {
-            builder.append(array[i]);
-            if (i < array.length - 1) {
-                builder.append(",");
-            }
-        }
+        final Joiner joiner = Joiner.on(",").skipNulls();
 
-        return builder.toString();
+        return joiner.join(array);
     }
 
     /**friendly */ String[] stripExtensions(final String[] exts) {
