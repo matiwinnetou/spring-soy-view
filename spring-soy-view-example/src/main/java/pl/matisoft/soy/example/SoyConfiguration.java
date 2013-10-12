@@ -31,6 +31,7 @@ import pl.matisoft.soy.hash.HashFileGenerator;
 import pl.matisoft.soy.hash.MD5HashFileGenerator;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
+import pl.matisoft.soy.process.YahooOutputProcessor;
 import pl.matisoft.soy.render.*;
 import pl.matisoft.soy.process.google.GoogleClosureOutputProcessor;
 import pl.matisoft.soy.process.OutputProcessor;
@@ -136,7 +137,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     public OutputProcessor closureCompilerProcessor() {
-        return new GoogleClosureOutputProcessor();
+        return new YahooOutputProcessor();
     }
 
     @Bean

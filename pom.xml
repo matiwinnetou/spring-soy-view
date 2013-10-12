@@ -113,6 +113,7 @@
     <modules>
         <module>spring-soy-view</module>
         <module>spring-soy-view-min-google</module>
+        <module>spring-soy-view-min-yahoo</module>
         <module>spring-soy-view-example</module>
     </modules>
 
