@@ -1,4 +1,4 @@
-package pl.matisoft.soy.process.google;
+package pl.matisoft.soy.ajax.process.google;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.ByteArrayInputStream;
@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import pl.matisoft.soy.config.SoyViewConfig;
-import pl.matisoft.soy.process.OutputProcessor;
+import pl.matisoft.soy.ajax.process.OutputProcessor;
 
 /**
  * Created with IntelliJ IDEA.

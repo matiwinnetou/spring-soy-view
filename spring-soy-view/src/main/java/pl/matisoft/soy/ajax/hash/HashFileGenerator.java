@@ -1,4 +1,4 @@
-package pl.matisoft.soy.hash;
+package pl.matisoft.soy.ajax.hash;
 
 import com.google.common.base.Optional;
 

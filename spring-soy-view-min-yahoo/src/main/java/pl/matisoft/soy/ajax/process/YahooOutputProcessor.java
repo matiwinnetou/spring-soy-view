@@ -1,4 +1,4 @@
-package pl.matisoft.soy.process;
+package pl.matisoft.soy.ajax.process;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 import org.mozilla.javascript.ErrorReporter;

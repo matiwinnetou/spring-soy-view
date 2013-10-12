@@ -1,4 +1,4 @@
-package pl.matisoft.soy.url;
+package pl.matisoft.soy.ajax.url;
 
 import com.google.common.base.Optional;
 

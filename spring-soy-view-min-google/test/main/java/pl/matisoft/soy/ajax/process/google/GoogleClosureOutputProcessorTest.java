@@ -1,4 +1,4 @@
-package pl.matisoft.soy.process.google;
+package pl.matisoft.soy.ajax.process.google;
 
 import java.io.StringReader;
 import java.io.StringWriter;

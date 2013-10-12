@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
+import pl.matisoft.soy.ajax.auth.AuthManager;
+import pl.matisoft.soy.ajax.auth.PermissableAuthManager;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.EmptyTofuCompiler;
@@ -30,7 +32,7 @@ import pl.matisoft.soy.compile.TofuCompiler;
 import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
-import pl.matisoft.soy.process.OutputProcessor;
+import pl.matisoft.soy.ajax.process.OutputProcessor;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
@@ -64,8 +66,8 @@ public class SoyAjaxController {
     private String encoding = SoyViewConfig.DEFAULT_ENCODING;
 
     private List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>();
-
-
+    
+    private AuthManager authManager = new PermissableAuthManager();
 
     public SoyAjaxController() {
     }
@@ -101,21 +103,27 @@ public class SoyAjaxController {
             }
         }
 
-        final String allCompiledTemplates = compileAndCombineAll(templateFileNames, request);
+        try {
+            final Optional<String> allCompiledTemplates = compileAndCombineAll(templateFileNames, request);
+            if (!allCompiledTemplates.isPresent()) {
+                throw notFound("?");
+            }
+            if (isProdMode()) {
+                Map<String, String> map = cachedJsTemplates.get(hash);
+                if (map == null) {
+                    map = new ConcurrentHashMap<String, String>();
+                } else {
+                    map.put(arrayToPath(templateFileNames), allCompiledTemplates.get());
+                }
+                if (this.cachedJsTemplates.size() < MAX_CACHE_ENTRIES) { //silly DDOS check... but how to be more clever?
+                    this.cachedJsTemplates.put(hash, map);
+                }
+            }
 
-        if (isProdMode()) {
-            Map<String, String> map = cachedJsTemplates.get(hash);
-            if (map == null) {
-                map = new ConcurrentHashMap<String, String>();
-            } else {
-                map.put(arrayToPath(templateFileNames), allCompiledTemplates);
-            }
-            if (this.cachedJsTemplates.size() < MAX_CACHE_ENTRIES) { //silly DDOS check... but how to be more clever?
-                this.cachedJsTemplates.put(hash, map);
-            }
+            return prepareResponseFor(allCompiledTemplates.get(), disableProcessors);
+        } catch (SecurityException ex) {
+            throw notFound("No permissions to compile?");
         }
-
-        return prepareResponseFor(allCompiledTemplates, disableProcessors);
     }
 
     private Optional<String> extractAndCombineAll(final String hash, final String[] templateFileNames) throws IOException {
@@ -130,10 +138,13 @@ public class SoyAjaxController {
         return Optional.absent();
     }
 
-    private String compileAndCombineAll(final String[] templateFileNames, final HttpServletRequest request) throws IOException {
+    private Optional<String> compileAndCombineAll(final String[] templateFileNames, final HttpServletRequest request) throws IOException, SecurityException {
         final StringBuilder allJsTemplates = new StringBuilder();
 
         for (final String templateFileName : stripExtensions(templateFileNames)) {
+            if (!authManager.isAllowed(templateFileName)) {
+                continue;
+            }
             final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
             if (!templateUrl.isPresent()) {
                 throw notFound("File not found:" + templateFileName + ".soy");
@@ -144,7 +155,11 @@ public class SoyAjaxController {
             allJsTemplates.append(templateContent);
         }
 
-        return allJsTemplates.toString();
+        if (StringUtils.isEmpty(allJsTemplates.toString())) {
+            throw new SecurityException("unable to resolve files or no permissions to compile?");
+        }
+
+        return Optional.of(allJsTemplates.toString());
     }
 
     private ResponseEntity<String> prepareResponseFor(final String templateContent, final boolean disableProcessors) throws IOException {
@@ -189,8 +204,9 @@ public class SoyAjaxController {
         }
         final String[] newStrippedExts = new String[exts.length];
         for (int i = 0; i<newStrippedExts.length; i++) {
-            if (exts[i].contains(".soy")) {
+            if (exts[i].contains(".soy") || exts[i].contains(".js")) {
                 newStrippedExts[i] = exts[i].replace(".soy", "");
+                newStrippedExts[i] = exts[i].replace(".js", "");
             } else {
                 newStrippedExts[i] = exts[i];
             }
@@ -258,6 +274,10 @@ public class SoyAjaxController {
 
     public void setOutputProcessors(List<OutputProcessor> outputProcessors) {
         this.outputProcessors = outputProcessors;
+    }
+
+    public void setAuthManager(AuthManager authManager) {
+        this.authManager = authManager;
     }
 
 }

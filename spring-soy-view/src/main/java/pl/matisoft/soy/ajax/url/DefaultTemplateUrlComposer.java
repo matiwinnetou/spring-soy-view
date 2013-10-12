@@ -1,7 +1,7 @@
-package pl.matisoft.soy.url;
+package pl.matisoft.soy.ajax.url;
 
 import com.google.common.base.Optional;
-import pl.matisoft.soy.hash.HashFileGenerator;
+import pl.matisoft.soy.ajax.hash.HashFileGenerator;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
 import java.io.IOException;

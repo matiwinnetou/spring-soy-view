@@ -18,6 +18,8 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 import pl.matisoft.soy.SoyTemplateViewResolver;
 import pl.matisoft.soy.ajax.SoyAjaxController;
+import pl.matisoft.soy.ajax.auth.AuthManager;
+import pl.matisoft.soy.ajax.auth.ConfigurableAuthManager;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.compile.DefaultTofuCompiler;
 import pl.matisoft.soy.compile.TofuCompiler;
@@ -27,17 +29,16 @@ import pl.matisoft.soy.global.DefaultGlobalModelResolver;
 import pl.matisoft.soy.global.GlobalModelResolver;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
-import pl.matisoft.soy.hash.HashFileGenerator;
-import pl.matisoft.soy.hash.MD5HashFileGenerator;
+import pl.matisoft.soy.ajax.hash.HashFileGenerator;
+import pl.matisoft.soy.ajax.hash.MD5HashFileGenerator;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
-import pl.matisoft.soy.process.YahooOutputProcessor;
+import pl.matisoft.soy.ajax.process.YahooOutputProcessor;
 import pl.matisoft.soy.render.*;
-import pl.matisoft.soy.process.google.GoogleClosureOutputProcessor;
-import pl.matisoft.soy.process.OutputProcessor;
+import pl.matisoft.soy.ajax.process.OutputProcessor;
 import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
-import pl.matisoft.soy.url.DefaultTemplateUrlComposer;
-import pl.matisoft.soy.url.TemplateUrlComposer;
+import pl.matisoft.soy.ajax.url.DefaultTemplateUrlComposer;
+import pl.matisoft.soy.ajax.url.TemplateUrlComposer;
 
 import java.util.Properties;
 
@@ -192,8 +193,16 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         soyAjaxController.setTemplateFilesResolver(templateFilesResolver());
         soyAjaxController.setTofuCompiler(tofuCompiler());
         soyAjaxController.setOutputProcessors(Lists.newArrayList(closureCompilerProcessor()));
+        soyAjaxController.setAuthManager(authManager());
 
         return soyAjaxController;
+    }
+
+    private AuthManager authManager() {
+        final ConfigurableAuthManager configurableAuthManager = new ConfigurableAuthManager();
+        configurableAuthManager.setAllowedTemplates(Lists.newArrayList("client-words", "server-time"));
+
+        return configurableAuthManager;
     }
 
 }

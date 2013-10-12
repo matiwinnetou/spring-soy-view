@@ -1,4 +1,4 @@
-package pl.matisoft.soy.process;
+package pl.matisoft.soy.ajax.process;
 
 import java.io.*;
 
