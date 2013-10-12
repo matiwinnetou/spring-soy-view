@@ -17,6 +17,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>4.11</junit.version>
+        <mockito.version>1.9.5</mockito.version>
     </properties>
 
     <licenses>
@@ -110,6 +112,7 @@
 
     <modules>
         <module>spring-soy-view</module>
+        <module>spring-soy-view-min-google</module>
         <module>spring-soy-view-example</module>
     </modules>
 

@@ -1,4 +1,4 @@
-package pl.matisoft.soy.process;
+package pl.matisoft.soy.process.google;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -8,9 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import pl.matisoft.soy.process.google.GoogleClosureOutputProcessor;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created with IntelliJ IDEA.
