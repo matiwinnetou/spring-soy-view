@@ -24,6 +24,15 @@ Possible to extend this and provide own output processors implementations
 * if a template fails to compile, throw an exception and propagate rather than swallow it
 * cosmetic fixes
 
+1.13.1
+* support for yahoo and google closure minimification
+* separated google and yahoo min modules
+
+1.13.2
+* SoyAjaxController can be more secure by injecting AuthManager, which controls which soy files can be compiled to js files
+* It should be possible to pass *.js extension to SoyAjaxController just for convienience, it is still better to use it without extension
+* Moved classes to an existing ajax subpackage as this was incorrectly grouped as a library code, where as it is ajax controller specific code 
+
 # Running example (dev)
 * clone the git repository
 * cd spring-soy-view-example
