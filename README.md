@@ -33,6 +33,10 @@ Possible to extend this and provide own output processors implementations
 * It should be possible to pass *.js extension to SoyAjaxController just for convienience, it is still better to use it without extension
 * Moved classes to an existing ajax subpackage as this was incorrectly grouped as a library code, where as it is ajax controller specific code 
 
+1.13.3
+* Bug fix for GoogleClosureOutputProcessor -> it was not thread safe as promised, which resulted in many ConcurrentModificationExceptions in prod
+* Removed a strange DDOS check, we need to think over how to protect for this type of attack
+
 # Running example (dev)
 * clone the git repository
 * cd spring-soy-view-example
