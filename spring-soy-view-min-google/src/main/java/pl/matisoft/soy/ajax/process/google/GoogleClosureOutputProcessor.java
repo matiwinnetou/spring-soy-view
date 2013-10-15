@@ -1,13 +1,5 @@
 package pl.matisoft.soy.ajax.process.google;
 
-import javax.annotation.concurrent.ThreadSafe;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-
 import com.google.common.collect.Lists;
 import com.google.javascript.jscomp.*;
 import com.google.javascript.jscomp.Compiler;
@@ -15,8 +7,15 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.ajax.process.OutputProcessor;
+import pl.matisoft.soy.config.SoyViewConfig;
+
+import javax.annotation.concurrent.ThreadSafe;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.logging.Level;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,8 +32,6 @@ public class GoogleClosureOutputProcessor implements OutputProcessor {
 
     private CompilationLevel compilationLevel = CompilationLevel.SIMPLE_OPTIMIZATIONS;
 
-    private AtomicReference<CompilerOptions> compilerOptions = new AtomicReference<CompilerOptions>();
-
     private boolean logCompilerErrors = true;
 
     private boolean logCompilerWarnings = false;
@@ -45,14 +42,14 @@ public class GoogleClosureOutputProcessor implements OutputProcessor {
         try {
             Compiler.setLoggingLevel(Level.SEVERE);
             final Compiler compiler = new Compiler();
-            compilerOptions.compareAndSet(null, newCompilerOptions());
-            compilationLevel.setOptionsForCompilationLevel(compilerOptions.get());
+            final CompilerOptions compilerOptions = newCompilerOptions();
+            compilationLevel.setOptionsForCompilationLevel(compilerOptions);
             //make it play nice with GAE
             compiler.disableThreads();
-            compiler.initOptions(compilerOptions.get());
+            compiler.initOptions(compilerOptions);
 
             final SourceFile input = SourceFile.fromInputStream("dummy.js", new ByteArrayInputStream(originalJsSourceCode.getBytes(getEncoding())));
-            final Result result = compiler.compile(Lists.<SourceFile>newArrayList(), Lists.newArrayList(input), compilerOptions.get());
+            final Result result = compiler.compile(Lists.<SourceFile>newArrayList(), Lists.newArrayList(input), compilerOptions);
 
             logWarningsAndErrors(result);
 
@@ -115,10 +112,6 @@ public class GoogleClosureOutputProcessor implements OutputProcessor {
 
     public void setCompilationLevel(String compilationLevel) {
         this.compilationLevel = CompilationLevel.valueOf(compilationLevel);
-    }
-
-    public void setCompilerOptions(CompilerOptions compilerOptions) {
-        this.compilerOptions.set(compilerOptions);
     }
 
     public CompilationLevel getCompilationLevel() {

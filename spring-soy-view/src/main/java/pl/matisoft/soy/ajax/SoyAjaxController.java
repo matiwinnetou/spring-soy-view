@@ -45,13 +45,11 @@ public class SoyAjaxController {
 
     private static final Logger logger = LoggerFactory.getLogger(SoyAjaxController.class);
 
-    private final static int MAX_CACHE_ENTRIES = 10000;
-
     private String cacheControl = "no-cache";
 
     private String expiresHeaders = "";
 
-    private ConcurrentHashMap<String, Map<String,String>> cachedJsTemplates = new ConcurrentHashMap<String, Map<String,String>>();
+    private ConcurrentHashMap<String, Map<String,String>> cachedJsTemplates = new ConcurrentHashMap<String, Map<String,String>>(); //think over ddos check
 
     private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
@@ -115,9 +113,7 @@ public class SoyAjaxController {
                 } else {
                     map.put(arrayToPath(templateFileNames), allCompiledTemplates.get());
                 }
-                if (this.cachedJsTemplates.size() < MAX_CACHE_ENTRIES) { //silly DDOS check... but how to be more clever?
-                    this.cachedJsTemplates.put(hash, map);
-                }
+                this.cachedJsTemplates.put(hash, map);
             }
 
             return prepareResponseFor(allCompiledTemplates.get(), disableProcessors);
