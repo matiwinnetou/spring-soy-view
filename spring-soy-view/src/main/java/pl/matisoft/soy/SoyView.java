@@ -1,5 +1,9 @@
 package pl.matisoft.soy;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
@@ -16,10 +20,6 @@ import pl.matisoft.soy.render.DefaultTemplateRenderer;
 import pl.matisoft.soy.render.RenderRequest;
 import pl.matisoft.soy.render.TemplateRenderer;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-
 /**
  * Created with IntelliJ IDEA.
  * User: mati
@@ -28,8 +28,10 @@ import java.util.Map;
  */
 public class SoyView extends AbstractTemplateView {
 
+    /** Compiled soy binary objects */
     protected Optional<SoyTofu> compiledTemplates = Optional.absent();
 
+    /** name of the template with namespace, .e.g. ajax_macros.show_customer_data */
     protected String templateName;
 
     protected TemplateRenderer templateRenderer = new DefaultTemplateRenderer();
@@ -75,19 +77,19 @@ public class SoyView extends AbstractTemplateView {
         templateRenderer.render(renderRequest);
     }
 
-    public void setTemplateName(final String templateName) {
+    public void setTemplateName(String templateName) {
         this.templateName = templateName;
     }
 
-    public void setCompiledTemplates(final Optional<SoyTofu> compiledTemplates) {
+    public void setCompiledTemplates(Optional<SoyTofu> compiledTemplates) {
         this.compiledTemplates = compiledTemplates;
     }
 
-    public void setTemplateRenderer(final TemplateRenderer templateRenderer) {
+    public void setTemplateRenderer(TemplateRenderer templateRenderer) {
         this.templateRenderer = templateRenderer;
     }
 
-    public void setModelAdjuster(final ModelAdjuster modelAdjuster) {
+    public void setModelAdjuster(ModelAdjuster modelAdjuster) {
         this.modelAdjuster = modelAdjuster;
     }
 

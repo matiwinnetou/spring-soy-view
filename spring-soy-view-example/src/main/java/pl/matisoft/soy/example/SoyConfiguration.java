@@ -1,5 +1,7 @@
 package pl.matisoft.soy.example;
 
+import java.util.Properties;
+
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,12 @@ import pl.matisoft.soy.SoyTemplateViewResolver;
 import pl.matisoft.soy.ajax.SoyAjaxController;
 import pl.matisoft.soy.ajax.auth.AuthManager;
 import pl.matisoft.soy.ajax.auth.ConfigurableAuthManager;
+import pl.matisoft.soy.ajax.hash.HashFileGenerator;
+import pl.matisoft.soy.ajax.hash.MD5HashFileGenerator;
+import pl.matisoft.soy.ajax.process.OutputProcessor;
+import pl.matisoft.soy.ajax.process.google.GoogleClosureOutputProcessor;
+import pl.matisoft.soy.ajax.url.DefaultTemplateUrlComposer;
+import pl.matisoft.soy.ajax.url.TemplateUrlComposer;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.compile.DefaultTofuCompiler;
 import pl.matisoft.soy.compile.TofuCompiler;
@@ -29,18 +37,11 @@ import pl.matisoft.soy.global.DefaultGlobalModelResolver;
 import pl.matisoft.soy.global.GlobalModelResolver;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
-import pl.matisoft.soy.ajax.hash.HashFileGenerator;
-import pl.matisoft.soy.ajax.hash.MD5HashFileGenerator;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
-import pl.matisoft.soy.ajax.process.YahooOutputProcessor;
-import pl.matisoft.soy.render.*;
-import pl.matisoft.soy.ajax.process.OutputProcessor;
+import pl.matisoft.soy.render.DefaultTemplateRenderer;
+import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
-import pl.matisoft.soy.ajax.url.DefaultTemplateUrlComposer;
-import pl.matisoft.soy.ajax.url.TemplateUrlComposer;
-
-import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -138,7 +139,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     public OutputProcessor closureCompilerProcessor() {
-        return new YahooOutputProcessor();
+        return new GoogleClosureOutputProcessor();
     }
 
     @Bean
@@ -198,7 +199,8 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         return soyAjaxController;
     }
 
-    private AuthManager authManager() {
+    @Bean
+    public AuthManager authManager() {
         final ConfigurableAuthManager configurableAuthManager = new ConfigurableAuthManager();
         configurableAuthManager.setAllowedTemplates(Lists.newArrayList("client-words", "server-time"));
 

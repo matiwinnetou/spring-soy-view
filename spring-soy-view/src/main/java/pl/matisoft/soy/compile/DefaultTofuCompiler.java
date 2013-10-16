@@ -1,7 +1,14 @@
 package pl.matisoft.soy.compile;
 
+import javax.annotation.Nullable;
+import java.net.URL;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
@@ -12,12 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
-
-import javax.annotation.Nullable;
-import java.net.URL;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -84,12 +85,26 @@ public class DefaultTofuCompiler implements TofuCompiler {
     }
 
     @Override
-    public final List<String> compileToJsSrc(final URL url, @Nullable final SoyMsgBundle soyMsgBundle) {
+    public final Optional<String> compileToJsSrc(@Nullable final URL url, @Nullable final SoyMsgBundle soyMsgBundle) {
+        if (url == null) {
+            return Optional.absent();
+        }
+
+        final Collection<String> compiledTemplates = compileToJsSrc(Lists.newArrayList(url), soyMsgBundle);
+        if (compiledTemplates.isEmpty()) {
+            return Optional.absent();
+        }
+
+        return Optional.fromNullable(compiledTemplates.iterator().next());
+    }
+
+    @Override
+    public Collection<String> compileToJsSrc(Collection<URL> templates, @Nullable SoyMsgBundle soyMsgBundle) {
         Preconditions.checkNotNull("soyJsSrcOptions", soyJsSrcOptions);
-        logger.debug("SoyJavaScript compilation of template:" + url);
+        logger.debug("SoyJavaScript compilation of template:" + templates);
         final long time1 = System.currentTimeMillis();
 
-        final SoyFileSet soyFileSet = buildSoyFileSetFrom(url);
+        final SoyFileSet soyFileSet = buildSoyFileSetFrom(templates);
 
         final List<String> ret = soyFileSet.compileToJsSrc(soyJsSrcOptions, soyMsgBundle);
 
@@ -100,10 +115,13 @@ public class DefaultTofuCompiler implements TofuCompiler {
         return ret;
     }
 
-    private SoyFileSet buildSoyFileSetFrom(final URL url) {
+    private SoyFileSet buildSoyFileSetFrom(final Collection<URL> urls) {
         final SoyFileSet.Builder builder = new SoyFileSet.Builder();
-        builder.setAllowExternalCalls(true);
-        builder.add(url);
+
+        for (final URL url : urls) {
+            builder.setAllowExternalCalls(true);
+            builder.add(url);
+        }
 
         addRuntimeGlobals(builder);
 

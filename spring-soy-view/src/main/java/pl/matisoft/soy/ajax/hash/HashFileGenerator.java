@@ -1,15 +1,17 @@
 package pl.matisoft.soy.ajax.hash;
 
-import com.google.common.base.Optional;
-
 import java.io.IOException;
 import java.net.URL;
+
+import com.google.common.base.Optional;
 
 /**
  * Created with IntelliJ IDEA.
  * User: mszczap
  * Date: 29.06.13
  * Time: 23:57
+ *
+ * An interface which for a given url calculates a hash checksum
  */
 public interface HashFileGenerator {
 

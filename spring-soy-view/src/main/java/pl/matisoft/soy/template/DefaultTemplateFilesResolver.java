@@ -1,16 +1,8 @@
 package pl.matisoft.soy.template;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.concurrent.ThreadSafe;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -20,23 +12,42 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mati
  * Date: 20/06/2013
  * Time: 19:58
+ *
+ * An implementation that will recursively search (and resolve)
+ * for soy files based on provided templatesLocation path
  */
 @ParametersAreNonnullByDefault
+@ThreadSafe
 public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);
 
+    /** spring resource that points to a root path, in which soy templates are located */
     private Resource templatesLocation;
 
     private boolean recursive = true;
 
+    /**
+     * in case debugOn - the implementation will never cache resolved templates,
+     * otherwise for speed purpouses the resolved templates will be cached.
+     */
     private boolean debugOn = false;
 
+    /** a thread safe cache for resolved templates */
     private CopyOnWriteArrayList<URL> cachedFiles = new CopyOnWriteArrayList<URL>();
 
     public DefaultTemplateFilesResolver() {
@@ -54,11 +65,13 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         }
 
         //no debug
-        if (cachedFiles.isEmpty()) {
-            final List<URL> files = toFiles(templatesLocation);
-            logger.debug("templates location:" + templatesLocation);
-            logger.debug("Using cache resolve, debug off, urls:" + files.size());
-            cachedFiles.addAll(files);
+        synchronized (cachedFiles) {
+            if (cachedFiles.isEmpty()) {
+                final List<URL> files = toFiles(templatesLocation);
+                logger.debug("templates location:" + templatesLocation);
+                logger.debug("Using cache resolve, debug off, urls:" + files.size());
+                cachedFiles.addAll(files);
+            }
         }
 
         return cachedFiles;
@@ -87,7 +100,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
             if (baseDirectory.isDirectory()) {
                 templateFiles.addAll(findSoyFiles(baseDirectory, recursive));
             } else {
-                throw new IllegalArgumentException("Soy template base directory '" + templatesLocation + "' is not a directory");
+                throw new IllegalArgumentException("Soy template base directory:" + templatesLocation + "' is not a directory");
             }
         } catch (final IOException e) {
             throw new IllegalArgumentException("Soy template base directory '" + templatesLocation + "' does not exist", e);
@@ -120,15 +133,15 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         }
     }
 
-    public void setTemplatesLocation(final Resource templatesLocation) {
+    public void setTemplatesLocation(Resource templatesLocation) {
         this.templatesLocation = templatesLocation;
     }
 
-    public void setRecursive(final boolean recursive) {
+    public void setRecursive(boolean recursive) {
         this.recursive = recursive;
     }
 
-    public void setDebugOn(final boolean debugOn) {
+    public void setDebugOn(boolean debugOn) {
         this.debugOn = debugOn;
     }
 

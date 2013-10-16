@@ -1,25 +1,29 @@
 package pl.matisoft.soy.render;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created with IntelliJ IDEA.
  * User: mszczap
  * Date: 12.07.13
  * Time: 09:28
+ *
+ * An objects that wraps parameters needed to render a template
  */
 public class RenderRequest {
 
     private final Optional<SoyTofu> compiledTemplates;
+
     private final String templateName;
 
     private final HttpServletRequest request;
+
     private final HttpServletResponse response;
 
     private final Object model;

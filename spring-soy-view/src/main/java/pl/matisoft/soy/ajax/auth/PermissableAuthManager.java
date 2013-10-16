@@ -5,6 +5,8 @@ package pl.matisoft.soy.ajax.auth;
  * User: mati
  * Date: 12/10/2013
  * Time: 23:39
+ *
+ * An implementation that allows all urls to be compiled from soy source to JavaScript
  */
 public class PermissableAuthManager implements AuthManager {
 
