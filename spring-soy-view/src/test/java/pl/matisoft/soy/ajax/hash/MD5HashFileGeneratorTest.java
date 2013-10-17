@@ -34,22 +34,22 @@ public class MD5HashFileGeneratorTest {
 
     @Test
     public void testDefaultExpireTime() throws Exception {
-        Assert.assertEquals(1, hashFileGenerator.getExpireAfterWrite());
+        Assert.assertEquals("default expire in days is 1 day", 1, hashFileGenerator.getExpireAfterWrite());
     }
 
     @Test
     public void testDefaultMaxEntries() throws Exception {
-        Assert.assertEquals(10000, hashFileGenerator.getCacheMaxSize());
+        Assert.assertEquals("default cache size is 10000", 10000, hashFileGenerator.getCacheMaxSize());
     }
 
     @Test
     public void testAbsentUrlReturnsAbsentHash() throws Exception {
-        Assert.assertFalse(hashFileGenerator.hash(Optional.<URL>absent()).isPresent());
+        Assert.assertFalse("absent url results in absent hash", hashFileGenerator.hash(Optional.<URL>absent()).isPresent());
     }
 
     @Test
     public void testReturnedHashMatchesDebugOff() throws Exception {
-        final URL url = getClass().getClassLoader().getResource("template1.soy");
+        final URL url = getClass().getClassLoader().getResource("templates/template1.soy");
         final Optional<String> hash =  hashFileGenerator.hash(Optional.of(url));
         Assert.assertTrue(hash.isPresent());
         Assert.assertEquals("md5 hash should match", "db9e0c4790bafb99c8c8cb9462279a75", hash.get());
@@ -57,7 +57,7 @@ public class MD5HashFileGeneratorTest {
 
     @Test
     public void testReturnedHashMatchesDebugOffCacheSound() throws Exception {
-        final URL url = getClass().getClassLoader().getResource("template1.soy");
+        final URL url = getClass().getClassLoader().getResource("templates/template1.soy");
         hashFileGenerator.hash(Optional.of(url));
         Assert.assertEquals("a cache size should be 1", 1L, hashFileGenerator.cache.size());
         Assert.assertEquals("cache should contain an entry", "db9e0c4790bafb99c8c8cb9462279a75", hashFileGenerator.cache.getIfPresent(url));
@@ -67,7 +67,7 @@ public class MD5HashFileGeneratorTest {
     public void testReturnedHashMatchesDebugOn() throws Exception {
         hashFileGenerator.setDebugOn(true);
         hashFileGenerator.init();
-        final URL url = getClass().getClassLoader().getResource("template1.soy");
+        final URL url = getClass().getClassLoader().getResource("templates/template1.soy");
         final Optional<String> hash =  hashFileGenerator.hash(Optional.of(url));
         Assert.assertTrue(hash.isPresent());
         Assert.assertEquals("md5 hash should match", "db9e0c4790bafb99c8c8cb9462279a75", hash.get());
@@ -76,19 +76,19 @@ public class MD5HashFileGeneratorTest {
     @Test
     public void testReturnedHashMatchesDebugOnCacheSound() throws Exception {
         hashFileGenerator.setDebugOn(true);
-        final URL url = getClass().getClassLoader().getResource("template1.soy");
+        final URL url = getClass().getClassLoader().getResource("templates/template1.soy");
         hashFileGenerator.hash(Optional.of(url));
-        Assert.assertEquals(0L, hashFileGenerator.cache.size());
+        Assert.assertEquals("debug true, caching should be empty", 0L, hashFileGenerator.cache.size());
     }
 
     @Test
     public void testReturnedHashMatchesDebugOffCacheWillNotExplode() throws Exception {
         hashFileGenerator.setCacheMaxSize(1);
         hashFileGenerator.init();
-        final URL url1 = getClass().getClassLoader().getResource("template1.soy");
+        final URL url1 = getClass().getClassLoader().getResource("templates/template1.soy");
         hashFileGenerator.hash(Optional.of(url1));
 
-        final URL url2 = getClass().getClassLoader().getResource("template2.soy");
+        final URL url2 = getClass().getClassLoader().getResource("templates/template2.soy");
         hashFileGenerator.hash(Optional.of(url2));
 
         Assert.assertEquals("cache size should not extend 1", 1L, hashFileGenerator.cache.size());

@@ -19,6 +19,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
@@ -37,7 +38,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);
 
     /** spring resource that points to a root path, in which soy templates are located */
-    private Resource templatesLocation;
+    private Resource templatesLocation = new ClassPathResource("templates", getClass().getClassLoader());
 
     private boolean recursive = true;
 
@@ -47,8 +48,8 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
      */
     private boolean debugOn = false;
 
-    /** a thread safe cache for resolved templates */
-    private CopyOnWriteArrayList<URL> cachedFiles = new CopyOnWriteArrayList<URL>();
+    /** a thread safe cache for resolved templates, no need to worry of ddos attack */
+    /** friendly */ CopyOnWriteArrayList<URL> cachedFiles = new CopyOnWriteArrayList<URL>();
 
     public DefaultTemplateFilesResolver() {
     }
@@ -143,6 +144,18 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     public void setDebugOn(boolean debugOn) {
         this.debugOn = debugOn;
+    }
+
+    public Resource getTemplatesLocation() {
+        return templatesLocation;
+    }
+
+    public boolean isRecursive() {
+        return recursive;
+    }
+
+    public boolean isDebugOn() {
+        return debugOn;
     }
 
 }
