@@ -43,7 +43,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     /**
      * in case debugOn - the implementation will never cache resolved templates,
-     * otherwise for speed purpouses the resolved templates will be cached.
+     * otherwise for speed purposes the resolved templates will be cached.
      */
     private boolean debugOn = false;
 

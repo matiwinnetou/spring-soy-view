@@ -1,5 +1,6 @@
 package pl.matisoft.soy.ajax;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -118,6 +119,15 @@ public class SoyAjaxController {
     private AuthManager authManager = new PermissableAuthManager();
 
     public SoyAjaxController() {
+    }
+
+    @PostConstruct
+    public void init() {
+        this.cachedJsTemplates = CacheBuilder.newBuilder()
+                .expireAfterWrite(expireAfterWrite, TimeUnit.valueOf(expireAfterWriteUnit))
+                .maximumSize(cacheMaxSize)
+                .concurrencyLevel(1) //look up a constant class, 1 is not very clear
+                .build();
     }
 
     /**

@@ -1,7 +1,8 @@
 package pl.matisoft.soy.ajax.auth;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,10 +36,10 @@ import java.util.List;
  */
 public class ConfigurableAuthManager implements AuthManager {
 
-    private List<String> allowedTemplates = new ArrayList<String>();
+    private ImmutableList<String> allowedTemplates = new ImmutableList.Builder<String>().build();
 
     public void setAllowedTemplates(final List<String> allowedTemplates) {
-        this.allowedTemplates = allowedTemplates;
+        this.allowedTemplates = ImmutableList.copyOf(allowedTemplates);
     }
 
     @Override

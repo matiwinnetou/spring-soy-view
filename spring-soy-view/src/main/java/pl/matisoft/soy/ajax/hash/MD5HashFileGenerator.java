@@ -1,5 +1,6 @@
 package pl.matisoft.soy.ajax.hash;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -46,11 +47,20 @@ public class MD5HashFileGenerator implements HashFileGenerator {
     /** String used to denote a TimeUnit */
     private String expireAfterWriteUnit = DEF_TIME_UNIT;
 
-    private Cache<URL, String> cache = CacheBuilder.newBuilder()
+    /**friendly*/ Cache<URL, String> cache = CacheBuilder.newBuilder()
             .expireAfterWrite(expireAfterWrite, TimeUnit.valueOf(expireAfterWriteUnit))
             .maximumSize(cacheMaxSize)
             .concurrencyLevel(1) //look up a constant class, 1 is not very clear
             .build();
+
+    @PostConstruct
+    public void init() {
+        cache = CacheBuilder.newBuilder()
+                .expireAfterWrite(expireAfterWrite, TimeUnit.valueOf(expireAfterWriteUnit))
+                .maximumSize(cacheMaxSize)
+                .concurrencyLevel(1) //look up a constant class, 1 is not very clear
+                .build();
+    }
 
     /**
      * Calculates a md5 hash for an url
@@ -72,7 +82,9 @@ public class MD5HashFileGenerator implements HashFileGenerator {
 
             logger.debug("md5 hash:{}", md5);
 
-            return Optional.fromNullable(md5);
+            if (md5 != null) {
+                return Optional.of(md5);
+            }
         }
 
         final InputStream is = url.get().openStream();
@@ -140,6 +152,22 @@ public class MD5HashFileGenerator implements HashFileGenerator {
 
     public void setExpireAfterWriteUnit(String expireAfterWriteUnit) {
         this.expireAfterWriteUnit = expireAfterWriteUnit;
+    }
+
+    public boolean isDebugOn() {
+        return debugOn;
+    }
+
+    public int getCacheMaxSize() {
+        return cacheMaxSize;
+    }
+
+    public int getExpireAfterWrite() {
+        return expireAfterWrite;
+    }
+
+    public String getExpireAfterWriteUnit() {
+        return expireAfterWriteUnit;
     }
 
 }
