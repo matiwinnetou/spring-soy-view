@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableList;
  */
 public class ConfigurableAuthManager implements AuthManager {
 
-    private ImmutableList<String> allowedTemplates = new ImmutableList.Builder<String>().build();
+    /**friendly*/ ImmutableList<String> allowedTemplates = new ImmutableList.Builder<String>().build();
 
     public void setAllowedTemplates(final List<String> allowedTemplates) {
         this.allowedTemplates = ImmutableList.copyOf(allowedTemplates);

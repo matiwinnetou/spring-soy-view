@@ -1,5 +1,6 @@
 package pl.matisoft.soy.render;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -74,10 +75,11 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
     }
 
     protected void writeResponse(final SoyTofu.Renderer renderer, final RenderRequest renderRequest) throws IOException {
-        final PrintWriter writer = renderRequest.getResponse().getWriter();
-        writer.append(renderer.render());
+        final HttpServletResponse response = renderRequest.getResponse();
+        final PrintWriter writer = response.getWriter();
+        writer.write(renderer.render());
         writer.flush();
-        renderRequest.getResponse().flushBuffer();
+        response.flushBuffer();
     }
 
     public void setToSoyDataConverter(final ToSoyDataConverter toSoyDataConverter) {
@@ -86,6 +88,10 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
 
     public void setDebugOn(boolean debugOn) {
         this.debugOn = debugOn;
+    }
+
+    public boolean isDebugOn() {
+        return debugOn;
     }
 
 }
