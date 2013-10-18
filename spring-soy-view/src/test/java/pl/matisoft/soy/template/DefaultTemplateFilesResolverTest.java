@@ -25,8 +25,25 @@ public class DefaultTemplateFilesResolverTest {
     }
 
     @Test
+    public void setDebugFlag() throws Exception {
+        defaultTemplateFilesResolver.setDebugOn(true);
+        Assert.assertTrue("debug flag should be on", defaultTemplateFilesResolver.isDebugOn());
+    }
+
+    @Test
     public void defaultRecursive() throws Exception {
         Assert.assertTrue("recursive template file resolution should be on", defaultTemplateFilesResolver.isRecursive());
+    }
+
+    @Test
+    public void setRecursive() throws Exception {
+        defaultTemplateFilesResolver.setRecursive(false);
+        Assert.assertFalse("recursive template file resolution should be off", defaultTemplateFilesResolver.isRecursive());
+    }
+
+    @Test
+    public void cacheShouldBeEmpty() throws Exception {
+        Assert.assertTrue("cache should be empty from beginning", defaultTemplateFilesResolver.cachedFiles.isEmpty());
     }
 
     @Test
@@ -52,7 +69,26 @@ public class DefaultTemplateFilesResolverTest {
         final Optional<URL> url = defaultTemplateFilesResolver.resolve("template1");
         Assert.assertTrue("should not be absent", url.isPresent());
         Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
+    }
 
+    @Test
+    public void cacheDisabledWithDebugOn() throws Exception {
+        defaultTemplateFilesResolver.setDebugOn(true);
+        defaultTemplateFilesResolver.resolve("template1");
+        Assert.assertTrue("cache should be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
+    }
+
+    @Test
+    public void cacheDisabledByDefault() throws Exception {
+        defaultTemplateFilesResolver.resolve("template1");
+        Assert.assertFalse("cache should not be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
+    }
+
+    @Test
+    public void cacheEnabledWithDebugOff() throws Exception {
+        defaultTemplateFilesResolver.resolve("template1");
+        Assert.assertFalse("cache should not be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
+        Assert.assertEquals("cache should not equal 2", 2, defaultTemplateFilesResolver.cachedFiles.size());
     }
 
 }
