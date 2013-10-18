@@ -8,9 +8,15 @@ package pl.matisoft.soy.config;
  */
 public class SoyViewConfig {
 
+    public final static String DEFAULT_TEMPLATE_FILES_PATH = "/WEB-INF/templates";
     public final static String DEFAULT_ENCODING = "utf-8";
+    public final static boolean DEFAULT_DEBUG_ON = false;
+    public final static String DEFAULT_I18N_MESSAGES_PATH = "messages";
+    public final static boolean DEFAULT_I18N_FALLBACK_TO_ENGLISH = true;
+    public final static boolean DEFAULT_RECURSIVE_TEMPLATES_SEARCH = true;
+    public final static String DEFAULT_MODEL_ADJUSTER_KEY = "model";
 
-    private boolean debugOn;
+    private boolean debugOn = DEFAULT_DEBUG_ON;
 
     private String encoding = DEFAULT_ENCODING;
 

@@ -1,6 +1,5 @@
 package pl.matisoft.soy.ajax.hash;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -13,6 +12,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * in dev (debugOn) mode the implementation will not cache md5 hash checksums, conversely
  * in prod mode it will cache it. The cache can be fine tuned via setters.
  */
-public class MD5HashFileGenerator implements HashFileGenerator {
+public class MD5HashFileGenerator implements HashFileGenerator, InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(MD5HashFileGenerator.class);
 
@@ -53,8 +53,7 @@ public class MD5HashFileGenerator implements HashFileGenerator {
             .concurrencyLevel(1) //look up a constant class, 1 is not very clear
             .build();
 
-    @PostConstruct
-    public void init() {
+    public void afterPropertiesSet() {
         cache = CacheBuilder.newBuilder()
                 .expireAfterWrite(expireAfterWrite, TimeUnit.valueOf(expireAfterWriteUnit))
                 .maximumSize(cacheMaxSize)

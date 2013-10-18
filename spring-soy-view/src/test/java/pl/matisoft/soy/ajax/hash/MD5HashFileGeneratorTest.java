@@ -66,7 +66,7 @@ public class MD5HashFileGeneratorTest {
     @Test
     public void testReturnedHashMatchesDebugOn() throws Exception {
         hashFileGenerator.setDebugOn(true);
-        hashFileGenerator.init();
+        hashFileGenerator.afterPropertiesSet();
         final URL url = getClass().getClassLoader().getResource("templates/template1.soy");
         final Optional<String> hash =  hashFileGenerator.hash(Optional.of(url));
         Assert.assertTrue(hash.isPresent());
@@ -84,7 +84,7 @@ public class MD5HashFileGeneratorTest {
     @Test
     public void testReturnedHashMatchesDebugOffCacheWillNotExplode() throws Exception {
         hashFileGenerator.setCacheMaxSize(1);
-        hashFileGenerator.init();
+        hashFileGenerator.afterPropertiesSet();
         final URL url1 = getClass().getClassLoader().getResource("templates/template1.soy");
         hashFileGenerator.hash(Optional.of(url1));
 
