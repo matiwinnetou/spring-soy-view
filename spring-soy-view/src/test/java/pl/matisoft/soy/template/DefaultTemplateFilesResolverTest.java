@@ -56,12 +56,14 @@ public class DefaultTemplateFilesResolverTest {
     @Test
     public void resolveDebugOff() throws Exception {
         final Collection<URL> urls = defaultTemplateFilesResolver.resolve();
-        Assert.assertEquals("should resolve two urls", 2, urls.size());
+        Assert.assertEquals("should resolve urls", 3, urls.size());
         final Iterator<URL> it = urls.iterator();
         final URL template1Url = it.next();
         final URL template2Url = it.next();
+        final URL template3Url = it.next();
         Assert.assertTrue("template1Url file should end with template1.soy", template1Url.getFile().endsWith("template1.soy"));
         Assert.assertTrue("template2Url file should end with template2.soy", template2Url.getFile().endsWith("template2.soy"));
+        Assert.assertTrue("template3Url file should end with template3.soy", template3Url.getFile().endsWith("template3.soy"));
     }
 
     @Test
@@ -88,7 +90,7 @@ public class DefaultTemplateFilesResolverTest {
     public void cacheEnabledWithDebugOff() throws Exception {
         defaultTemplateFilesResolver.resolve("template1");
         Assert.assertFalse("cache should not be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
-        Assert.assertEquals("cache should not equal 2", 2, defaultTemplateFilesResolver.cachedFiles.size());
+        Assert.assertEquals("cache should not equal 3", 3, defaultTemplateFilesResolver.cachedFiles.size());
     }
 
 }

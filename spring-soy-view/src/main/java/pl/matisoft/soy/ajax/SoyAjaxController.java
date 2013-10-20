@@ -98,7 +98,7 @@ public class SoyAjaxController {
      * CacheControl (Http 1.1) and Expires (Http 1.0) http headers
      * will be set to user configured values.
      */
-    private boolean debugOn = false;
+    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
 
     /**
      * character encoding, by default utf-8

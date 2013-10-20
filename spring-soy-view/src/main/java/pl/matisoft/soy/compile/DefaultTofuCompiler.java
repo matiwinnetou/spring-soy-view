@@ -17,6 +17,7 @@ import com.google.template.soy.tofu.SoyTofu;
 import com.google.template.soy.tofu.SoyTofuOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
 
@@ -30,7 +31,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTofuCompiler.class);
 
-    private boolean debugOn = false;
+    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
 
     private CompileTimeGlobalModelResolver compileTimeGlobalModelResolver = new EmptyCompileTimeGlobalModelResolver();
 
@@ -52,7 +53,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
             sfsBuilder.add(url);
         }
 
-        addRuntimeGlobals(sfsBuilder);
+        addCompileTimeGlobalModel(sfsBuilder);
 
         final SoyFileSet soyFileSet = sfsBuilder.build();
 
@@ -66,7 +67,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
         return Optional.fromNullable(soyTofu);
     }
 
-    private void addRuntimeGlobals(final SoyFileSet.Builder sfsBuilder) {
+    private void addCompileTimeGlobalModel(final SoyFileSet.Builder sfsBuilder) {
         final Optional<SoyMapData> soyMapData = compileTimeGlobalModelResolver.resolveData();
         if (soyMapData.isPresent()) {
             final Map<String, ?> mapData = soyMapData.get().asMap();
@@ -79,7 +80,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
     private SoyTofuOptions createSoyTofuOptions() {
         final SoyTofuOptions soyTofuOptions = new SoyTofuOptions();
-        soyTofuOptions.setUseCaching(debugOn);
+        soyTofuOptions.setUseCaching(isDebugOff());
 
         return soyTofuOptions;
     }
@@ -123,7 +124,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
             builder.add(url);
         }
 
-        addRuntimeGlobals(builder);
+        addCompileTimeGlobalModel(builder);
 
         return builder.build();
     }
@@ -138,6 +139,18 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
     public void setSoyJsSrcOptions(final SoyJsSrcOptions soyJsSrcOptions) {
         this.soyJsSrcOptions = soyJsSrcOptions;
+    }
+
+    public boolean isDebugOn() {
+        return debugOn;
+    }
+
+    private boolean isDebugOff() {
+        return !debugOn;
+    }
+
+    public SoyJsSrcOptions getSoyJsSrcOptions() {
+        return soyJsSrcOptions;
     }
 
 }

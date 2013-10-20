@@ -13,6 +13,7 @@ import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import pl.matisoft.soy.config.SoyViewConfig;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,7 +31,7 @@ public class MD5HashFileGenerator implements HashFileGenerator, InitializingBean
 
     private static final Logger logger = LoggerFactory.getLogger(MD5HashFileGenerator.class);
 
-    private boolean debugOn = false;
+    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
 
     private final static int DEF_CACHE_MAX_SIZE = 10000;
 

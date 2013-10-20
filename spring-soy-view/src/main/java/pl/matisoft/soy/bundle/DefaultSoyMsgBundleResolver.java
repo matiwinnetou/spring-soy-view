@@ -15,6 +15,7 @@ import com.google.template.soy.msgs.restricted.SoyMsgBundleImpl;
 import com.google.template.soy.xliffmsgplugin.XliffMsgPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.matisoft.soy.config.SoyViewConfig;
 
 /**
  * Created with IntelliJ IDEA.
@@ -46,7 +47,7 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     /** will cache msgBundles if a debugOn is off, if debug is on,
      *  will compile msg bundles each time it is invoked */
-    private boolean debugOn = false;
+    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
 
     /** in case translation is missing for a passed in locale,
      *  whether the implementation should fallback to English returning

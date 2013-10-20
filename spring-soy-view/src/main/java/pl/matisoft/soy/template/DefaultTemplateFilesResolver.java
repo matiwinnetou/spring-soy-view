@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import pl.matisoft.soy.config.SoyViewConfig;
 
 /**
  * Created with IntelliJ IDEA.
@@ -46,7 +47,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
      * in case debugOn - the implementation will never cache resolved templates,
      * otherwise for speed purposes the resolved templates will be cached.
      */
-    private boolean debugOn = false;
+    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
 
     /** a thread safe cache for resolved templates, no need to worry of ddos attack */
     /** friendly */ CopyOnWriteArrayList<URL> cachedFiles = new CopyOnWriteArrayList<URL>();

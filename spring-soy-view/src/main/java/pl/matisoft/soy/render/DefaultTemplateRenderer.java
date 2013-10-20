@@ -8,6 +8,7 @@ import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
+import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.data.DefaultToSoyDataConverter;
 import pl.matisoft.soy.data.ToSoyDataConverter;
 
@@ -39,7 +40,7 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
     /**
      * whether debug is on, in case it is on - Soy's Renderer Don't Add To Cache will be turned on, which means
      * renderer caching will be disabled */
-    private boolean debugOn = false;
+    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
 
     @Override
     public void render(final RenderRequest renderRequest) throws Exception {
