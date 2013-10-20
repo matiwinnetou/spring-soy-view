@@ -113,4 +113,16 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
         this.injectRequestHeaders = injectRequestHeaders;
     }
 
+    public boolean isInjectRequestParams() {
+        return injectRequestParams;
+    }
+
+    public boolean isInjectRequestHeaders() {
+        return injectRequestHeaders;
+    }
+
+    public boolean isInjectCookies() {
+        return injectCookies;
+    }
+
 }
