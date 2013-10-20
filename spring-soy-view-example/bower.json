@@ -1,0 +1,21 @@
+{
+  "name": "spring-soy-view-example",
+  "version": "0.0.0",
+  "homepage": "https://github.com/mati1979/spring-soy-view",
+  "authors": [
+    "Mateusz Szczap <mszczap@team.mobile.de>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/main/webapp/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "*",
+    "soyutils": "*"
+  }
+}

@@ -7,6 +7,9 @@ import java.io.*;
  * User: mati
  * Date: 06/10/2013
  * Time: 15:55
+ *
+ * An interface that defines a generic processing of compiled JavaScript output, e.g.
+ * to perform JavaScript obfuscation.
  */
 public interface OutputProcessor {
 

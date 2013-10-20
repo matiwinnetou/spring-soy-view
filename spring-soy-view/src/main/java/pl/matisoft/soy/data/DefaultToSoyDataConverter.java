@@ -14,23 +14,37 @@
 
 package pl.matisoft.soy.data;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Primitives;
-import com.google.template.soy.data.SoyMapData;
-
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Primitives;
+import com.google.template.soy.data.SoyMapData;
 
 /**
- * User: Copyright 2011-2013 PaperCut Software Int. Pty. Ltd. http://www.papercut.com/
- * Licensed under the Apache License, Version 2.0 (the "License");
- * https://github.com/codedance/silken
+ * An implementation of ToSoyDataConverter that will recursively inspect
+ * a passed in model and build a nested structure of SoyMapData objects,
+ * which consist only of primitives supported by Soy and thus can be
+ * rendered.
+ *
+ * An implementation supports passing a model object, which is wrapped in Callable or
+ * a Future.
+ *
+ * In case a model wrapped in Callable is passed, the implementation will
+ * get a wrapped model object during invocation of this method.
+ *
+ * In case a model wrapped in Future is passed, the implementation will *synchronously*
+ * get a wrapped model object during invocation of this method, assuming a 2 minutes
+ * timeout by default. If such a behaviour should be altered, developers
+ * are requested to provider their own implementation.
  */
 public class DefaultToSoyDataConverter implements ToSoyDataConverter {
 

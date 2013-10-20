@@ -1,5 +1,6 @@
 package pl.matisoft.soy.ajax;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -8,10 +9,13 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import pl.matisoft.soy.ajax.auth.AuthManager;
 import pl.matisoft.soy.ajax.auth.PermissableAuthManager;
+import pl.matisoft.soy.ajax.process.OutputProcessor;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.EmptyTofuCompiler;
@@ -32,7 +37,6 @@ import pl.matisoft.soy.compile.TofuCompiler;
 import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
-import pl.matisoft.soy.ajax.process.OutputProcessor;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
@@ -43,13 +47,40 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 @ThreadSafe
 public class SoyAjaxController {
 
+    private final static int DEF_CACHE_MAX_SIZE = 10000;
+
+    private final static String DEF_TIME_UNIT = "DAYS";
+
+    private final static int DEF_EXPIRE_AFTER_WRITE = 1;
+
     private static final Logger logger = LoggerFactory.getLogger(SoyAjaxController.class);
 
     private String cacheControl = "no-cache";
 
     private String expiresHeaders = "";
 
-    private ConcurrentHashMap<String, Map<String,String>> cachedJsTemplates = new ConcurrentHashMap<String, Map<String,String>>(); //think over ddos check
+    /** maximum number of entries this cache will hold */
+    private int cacheMaxSize = DEF_CACHE_MAX_SIZE;
+
+    /** number of time units after which once written entries will expire */
+    private int expireAfterWrite = DEF_EXPIRE_AFTER_WRITE;
+
+    /** String used to denote a TimeUnit */
+    private String expireAfterWriteUnit = DEF_TIME_UNIT;
+
+    /**
+     * This is a compiled to javascript cache (compiled soy templates), which consists of key: hash
+     * and as a value we have a Map<String,String>
+     * In this map, a key is an array to path, example: server-time,client-words and value:
+     * is a String with compiled template.
+     * To prevent DDOS attack we model the first cache as a limited cache with maximum number of entries
+     * and also an expire after write to cache
+     */
+    private Cache<String, Map<String,String>> cachedJsTemplates = CacheBuilder.newBuilder()
+            .expireAfterWrite(expireAfterWrite, TimeUnit.valueOf(expireAfterWriteUnit))
+            .maximumSize(cacheMaxSize)
+            .concurrencyLevel(1) //look up a constant class, 1 is not very clear
+            .build();
 
     private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
@@ -59,17 +90,63 @@ public class SoyAjaxController {
 
     private LocaleProvider localeProvider = new EmptyLocaleProvider();
 
-    private boolean debugOn = false;
+    /**
+     * whether debug is on or off, if it is on then caching of entries will not work
+     * to support hot reloading while developing, if it is on, then we assume it is
+     * like production mode and caching of compiled soy to JavaScript templates
+     * will be working. In addition in production mode (debug off)
+     * CacheControl (Http 1.1) and Expires (Http 1.0) http headers
+     * will be set to user configured values.
+     */
+    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
 
+    /**
+     * character encoding, by default utf-8
+     */
     private String encoding = SoyViewConfig.DEFAULT_ENCODING;
 
+    /**
+     * List of output processors, output processors typically perform obfuscation
+     * of generated JavaScript code
+     */
     private List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>();
-    
+
+    /**
+     * By default there is no AuthManager and an external user can compile all templates to JavaScript
+     * This can pose security risk and therefore it is possible to change this and inject
+     * an AuthManager implementation that will only allow to compile those templates that a developer agreed to.
+     */
     private AuthManager authManager = new PermissableAuthManager();
 
     public SoyAjaxController() {
     }
 
+    @PostConstruct
+    public void init() {
+        this.cachedJsTemplates = CacheBuilder.newBuilder()
+                .expireAfterWrite(expireAfterWrite, TimeUnit.valueOf(expireAfterWriteUnit))
+                .maximumSize(cacheMaxSize)
+                .concurrencyLevel(1) //look up a constant class, 1 is not very clear
+                .build();
+    }
+
+    /**
+     * An endpoint to compile an array of soy templates to JavaScript.
+     *
+     * Warning: this endpoint assumes a fake url hash: "" and it should not be used when CacheControl headers and Expire headers are set
+     * to a value which is distant into the future.
+     *
+     * Invocation of this url may throw two types of http exceptions:
+     * 1. notFound -> usually when a TemplateResolver cannot find a template with an associated name
+     * 2. error -> usually when there is a permission error and a user is not allowed to compile a template into a JavaScript
+     *
+     * @param templateFileNames - an array of template names, e.g. client-words,server-time, which may or may not contain extension
+     *                          currently three modes are supported -> soy extension, js extension and no extension, which is preferred
+     * @param disableProcessors - whether the controller should run registered outputProcessors after the compilation is complete.
+     * @param request - HttpServletRequest
+     * @return response entity, which wraps a compiled soy to JavaScript files.
+     * @throws IOException
+     */
     @RequestMapping(value="/soy/{templateFileNames}", method=GET)
     public ResponseEntity<String> getJsForTemplateFiles(@PathVariable final String[] templateFileNames,
                                                         @RequestParam(required = false, value = "disableProcessors") String disableProcessors,
@@ -79,7 +156,25 @@ public class SoyAjaxController {
         return compileJs(templateFileNames, "", new Boolean(disableProcessors).booleanValue(), request);
     }
 
-    @RequestMapping(value="/soy/{hash}/{templateFileNames}", method=GET)
+    /**
+     * An endpoint to compile an array of soy templates to JavaScript.
+     *
+     * This endpoint is a preferred way of compiling soy templates to JavaScript but it requires a user to compose a url
+     * on their own or using a helper class TemplateUrlComposer, which calculates checksum of a file and puts this in url
+     * so that whenever a file changes, after a deployment a JavaScript, url changes and a new hash is appended to url, which enforces
+     * getting of new compiles JavaScript resource.
+     *
+     * Invocation of this url may throw two types of http exceptions:
+     * 1. notFound -> usually when a TemplateResolver cannot find a template with an associated name
+     * 2. error -> usually when there is a permission error and a user is not allowed to compile a template into a JavaScript
+     *
+     * @param templateFileNames - an array of template names, e.g. client-words,server-time, which may or may not contain extension
+     *                          currently three modes are supported -> soy extension, js extension and no extension, which is preferred
+     * @param disableProcessors - whether the controller should run registered outputProcessors after the compilation is complete.
+     * @param request - HttpServletRequest
+     * @return response entity, which wraps a compiled soy to JavaScript files.
+     * @throws IOException
+     */    @RequestMapping(value="/soy/{hash}/{templateFileNames}", method=GET)
     public ResponseEntity<String> getJsForTemplateFilesHash(@PathVariable final String hash,
                                                             @PathVariable final String[] templateFileNames,
                                                             @RequestParam(required = false, value = "disableProcessors") String disableProcessors,
@@ -102,57 +197,77 @@ public class SoyAjaxController {
         }
 
         try {
-            final Optional<String> allCompiledTemplates = compileAndCombineAll(templateFileNames, request);
+            final Map<URL,String> compiledTemplates = compileTemplates(templateFileNames, request);
+            final Optional<String> allCompiledTemplates = concatCompiledTemplates(compiledTemplates);
             if (!allCompiledTemplates.isPresent()) {
-                throw notFound("?");
+                throw notFound("Template file(s) could not be resolved.");
             }
             if (isProdMode()) {
-                Map<String, String> map = cachedJsTemplates.get(hash);
-                if (map == null) {
-                    map = new ConcurrentHashMap<String, String>();
-                } else {
-                    map.put(arrayToPath(templateFileNames), allCompiledTemplates.get());
+                synchronized (cachedJsTemplates) {
+                    Map<String, String> map = cachedJsTemplates.getIfPresent(hash);
+                    if (map == null) {
+                        map = new ConcurrentHashMap<String, String>();
+                    } else {
+                        map.put(arrayToPath(templateFileNames), allCompiledTemplates.get());
+                    }
+                    this.cachedJsTemplates.put(hash, map);
                 }
-                this.cachedJsTemplates.put(hash, map);
             }
 
             return prepareResponseFor(allCompiledTemplates.get(), disableProcessors);
         } catch (SecurityException ex) {
-            throw notFound("No permissions to compile?");
+            throw error("No permissions to compile:" + Arrays.asList(templateFileNames));
         }
     }
 
     private Optional<String> extractAndCombineAll(final String hash, final String[] templateFileNames) throws IOException {
-        final Map<String, String> map = cachedJsTemplates.get(hash);
-        if (map != null) {
-            final String template = map.get(arrayToPath(templateFileNames));
-            if (template != null) {
-                return Optional.of(template);
+        synchronized (cachedJsTemplates) {
+            final Map<String, String> map = cachedJsTemplates.getIfPresent(hash);
+            if (map != null) {
+                final String template = map.get(arrayToPath(templateFileNames));
+
+                return Optional.fromNullable(template);
             }
         }
 
         return Optional.absent();
     }
 
-    private Optional<String> compileAndCombineAll(final String[] templateFileNames, final HttpServletRequest request) throws IOException, SecurityException {
-        final StringBuilder allJsTemplates = new StringBuilder();
-
+    private Map<URL,String> compileTemplates(final String[] templateFileNames, final HttpServletRequest request) {
+        final HashMap<URL,String> map = new HashMap<URL,String>();
         for (final String templateFileName : stripExtensions(templateFileNames)) {
             if (!authManager.isAllowed(templateFileName)) {
-                continue;
+                throw error("no permission to compile:" + templateFileName);
             }
-            final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
-            if (!templateUrl.isPresent()) {
-                throw notFound("File not found:" + templateFileName + ".soy");
-            }
+            try {
+                final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
+                if (!templateUrl.isPresent()) {
+                    throw notFound("File not found:" + templateFileName + ".soy");
+                }
+                logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
+                final Optional<String> templateContent = compileTemplateAndAssertSuccess(request, templateUrl);
+                if (!templateContent.isPresent()) {
+                    throw notFound("file cannot be compiled:" + templateUrl);
+                }
 
-            logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
-            final String templateContent = compileTemplateAndAssertSuccess(request, templateUrl);
-            allJsTemplates.append(templateContent);
+                map.put(templateUrl.get(), templateContent.get());
+            } catch (IOException e) {
+                throw error("Unable to find file:" + templateFileName + ".soy");
+            }
         }
 
-        if (StringUtils.isEmpty(allJsTemplates.toString())) {
-            throw new SecurityException("unable to resolve files or no permissions to compile?");
+        return map;
+    }
+
+    private Optional<String> concatCompiledTemplates(final Map<URL,String> compiledTemplates) throws IOException, SecurityException {
+        if (compiledTemplates.isEmpty()) {
+            return Optional.absent();
+        }
+
+        final StringBuilder allJsTemplates = new StringBuilder();
+
+        for (final String compiledTemplate : compiledTemplates.values()) {
+            allJsTemplates.append(compiledTemplate);
         }
 
         return Optional.of(allJsTemplates.toString());
@@ -185,6 +300,10 @@ public class SoyAjaxController {
         }
     }
 
+    /**
+     * Converts a String array to a String with coma separator
+     * example: String["a.soy", "b.soy"] -> output: a.soy,b.soy
+     */
     /**friendly */ String arrayToPath(final String[] array) {
         if (array == null) {
             return "";
@@ -194,14 +313,16 @@ public class SoyAjaxController {
         return joiner.join(array);
     }
 
+    /** Removes soy and js extensions */
     /**friendly */ String[] stripExtensions(final String[] exts) {
         if (exts == null) {
             return new String[0];
         }
         final String[] newStrippedExts = new String[exts.length];
         for (int i = 0; i<newStrippedExts.length; i++) {
-            if (exts[i].contains(".soy") || exts[i].contains(".js")) {
+            if (exts[i].contains(".soy")) {
                 newStrippedExts[i] = exts[i].replace(".soy", "");
+            } else if (exts[i].contains(".js")) {
                 newStrippedExts[i] = exts[i].replace(".js", "");
             } else {
                 newStrippedExts[i] = exts[i];
@@ -211,21 +332,20 @@ public class SoyAjaxController {
         return newStrippedExts;
     }
 
-    private String compileTemplateAndAssertSuccess(final HttpServletRequest request, final Optional<URL> templateFile) throws IOException {
+    private Optional<String> compileTemplateAndAssertSuccess(final HttpServletRequest request, final Optional<URL> templateFile) throws IOException {
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
         Preconditions.checkNotNull(tofuCompiler, "tofuCompiler cannot be null");
 
-        final Optional<Locale> locale = localeProvider.resolveLocale(request);
-        final Optional<SoyMsgBundle> soyMsgBundle = soyMsgBundleResolver.resolve(locale);
-        final List<String> compiledTemplates = tofuCompiler.compileToJsSrc(templateFile.orNull(), soyMsgBundle.orNull());
-
-        final Iterator<String> it = compiledTemplates.iterator();
-        if (!it.hasNext()) {
-            throw notFound("No compiled templates found!");
+        if (!templateFile.isPresent()) {
+            return Optional.absent();
         }
 
-        return it.next();
+        final Optional<Locale> locale = localeProvider.resolveLocale(request);
+        final Optional<SoyMsgBundle> soyMsgBundle = soyMsgBundleResolver.resolve(locale);
+        final Optional<String> compiledTemplate = tofuCompiler.compileToJsSrc(templateFile.orNull(), soyMsgBundle.orNull());
+
+        return compiledTemplate;
     }
 
     private boolean isProdMode() {
@@ -234,6 +354,10 @@ public class SoyAjaxController {
 
     private HttpClientErrorException notFound(final String file) {
         return new HttpClientErrorException(NOT_FOUND, file);
+    }
+
+    private HttpClientErrorException error(final String file) {
+        return new HttpClientErrorException(INTERNAL_SERVER_ERROR, file);
     }
 
     public void setCacheControl(final String cacheControl) {
@@ -274,6 +398,18 @@ public class SoyAjaxController {
 
     public void setAuthManager(AuthManager authManager) {
         this.authManager = authManager;
+    }
+
+    public void setCacheMaxSize(int cacheMaxSize) {
+        this.cacheMaxSize = cacheMaxSize;
+    }
+
+    public void setExpireAfterWrite(int expireAfterWrite) {
+        this.expireAfterWrite = expireAfterWrite;
+    }
+
+    public void setExpireAfterWriteUnit(String expireAfterWriteUnit) {
+        this.expireAfterWriteUnit = expireAfterWriteUnit;
     }
 
 }

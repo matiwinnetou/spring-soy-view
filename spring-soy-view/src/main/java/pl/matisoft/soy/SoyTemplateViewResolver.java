@@ -9,6 +9,7 @@ import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
@@ -32,6 +33,12 @@ import pl.matisoft.soy.template.TemplateFilesResolver;
  * User: mati
  * Date: 20/06/2013
  * Time: 19:51
+ *
+ * An Soy implementation of Spring's TemplateViewResolver.
+ *
+ * Warning: please read carefully JavaDocs from AbstractTemplateViewResolver
+ * and it the classes from which it inherits as it may be necessary to
+ * set some configuration options for this resolver to work properly for your use case.
  */
 public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
@@ -53,10 +60,10 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     protected SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
+    /** an encoding to use */
     private String encoding = SoyViewConfig.DEFAULT_ENCODING;
 
-    private boolean ignoreHtmlView = false;
-
+    /** a default view */
     private String indexView = "index";
 
     public SoyTemplateViewResolver() {
@@ -70,7 +77,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         if (isCache()) {
             try {
                 this.compiledTemplates = compileTemplates("<class_init>");
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 throw new IllegalStateException("Unable to compile Soy templates.", ex);
             }
         }
@@ -96,9 +103,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         view.setSoyMsgBundleResolver(soyMsgBundleResolver);
 
         if (!compiledTemplates.isPresent()) {
-            if (!isHtmlView(viewName)) {
-                view.setCompiledTemplates(compileTemplates(viewName));
-            }
+            view.setCompiledTemplates(compileTemplates(viewName));
 
             return view;
         }
@@ -115,8 +120,8 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
      * @param viewName The view name.
      * @return The defaulted view name.
      */
-    private String orIndexView(String viewName) {
-        return viewName == "" ? indexView : viewName;
+    private String orIndexView(final String viewName) {
+        return StringUtils.isEmpty(viewName) ? indexView : viewName;
     }
 
     /**
@@ -141,10 +146,6 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     private String contentType() {
         return "text/html; charset=" + encoding;
-    }
-
-    private boolean isHtmlView(final String viewName) {
-        return ignoreHtmlView && viewName.endsWith(".html");
     }
 
     private Optional<SoyTofu> compileTemplates(final String viewName) throws IOException {
@@ -178,10 +179,6 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     public void setDebugOn(final boolean debugOn) {
         setCache(!debugOn);
-    }
-
-    public void setIgnoreHtmlView(final boolean ignoreHtmlView) {
-        this.ignoreHtmlView = ignoreHtmlView;
     }
 
     public void setModelAdjuster(final ModelAdjuster modelAdjuster) {

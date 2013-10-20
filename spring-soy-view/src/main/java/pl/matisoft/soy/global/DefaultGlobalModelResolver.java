@@ -1,20 +1,31 @@
 package pl.matisoft.soy.global;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+
 import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
-
 /**
  * Created with IntelliJ IDEA.
  * User: mati
  * Date: 14/07/2013
  * Time: 16:46
+ *
+ * A default implementation of GlobalModelResolver that contains a support for
+ * automatically injecting as injected data "request parameters", "request headers" and
+ * "cookies".
+ *
+ * Those injected values will automatically map by convention to:
+ * 1. request parameters will map to: $ij.request.parameter.variableName
+ * 2. request headers will map to: $ij.request.header.variableName
+ * 3. cookies will map to: $ij.request.cookie.variableName
+ *
+ * All parameter values will be mapped to strings
  */
 public class DefaultGlobalModelResolver implements GlobalModelResolver {
 
@@ -100,6 +111,18 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
 
     public void setInjectRequestHeaders(final boolean injectRequestHeaders) {
         this.injectRequestHeaders = injectRequestHeaders;
+    }
+
+    public boolean isInjectRequestParams() {
+        return injectRequestParams;
+    }
+
+    public boolean isInjectRequestHeaders() {
+        return injectRequestHeaders;
+    }
+
+    public boolean isInjectCookies() {
+        return injectCookies;
     }
 
 }

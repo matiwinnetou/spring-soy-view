@@ -8,6 +8,8 @@ import com.google.template.soy.data.SoyMapData;
  * User: mati
  * Date: 21/06/2013
  * Time: 22:59
+ *
+ * Null Object Pattern implementation
  */
 public class EmptyCompileTimeGlobalModelResolver implements CompileTimeGlobalModelResolver {
 

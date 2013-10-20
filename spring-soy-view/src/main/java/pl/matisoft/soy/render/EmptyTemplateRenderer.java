@@ -5,6 +5,8 @@ package pl.matisoft.soy.render;
  * User: mati
  * Date: 23/06/2013
  * Time: 12:20
+ *
+ * An empty implementation that implements a Null Object Pattern, it will render nothing.
  */
 public class EmptyTemplateRenderer implements TemplateRenderer {
 
