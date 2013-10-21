@@ -1,7 +1,9 @@
 package pl.matisoft.soy.ajax.url;
 
 import com.google.common.base.Optional;
+import pl.matisoft.soy.ajax.hash.EmptyHashFileGenerator;
 import pl.matisoft.soy.ajax.hash.HashFileGenerator;
+import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
 import java.io.IOException;
@@ -15,11 +17,11 @@ import java.net.URL;
  */
 public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
 
-    private TemplateFilesResolver templateFilesResolver;
+    private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
-    private HashFileGenerator hashFileGenerator;
+    private HashFileGenerator hashFileGenerator = new EmptyHashFileGenerator();
 
-    private String siteUrl;
+    private String siteUrl = "";
 
     public Optional<String> compose(final String soyTemplateFileName) throws IOException {
         final Optional<URL> url = templateFilesResolver.resolve(soyTemplateFileName);
@@ -54,6 +56,10 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
 
     public void setSiteUrl(final String siteUrl) {
         this.siteUrl = siteUrl;
+    }
+
+    public String getSiteUrl() {
+        return siteUrl;
     }
 
 }
