@@ -1,10 +1,5 @@
 package pl.matisoft.soy.bundle;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -16,6 +11,11 @@ import com.google.template.soy.xliffmsgplugin.XliffMsgPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.matisoft.soy.config.SoyViewConfig;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,8 +39,8 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
     /** default filename, which should be visible in classpath which defines compiled soy message bundle file */
     public final static String DEF_MESSAGES_PATH = "messages";
 
-    /** a cache of msgBundles */
-    private static Map<Locale, SoyMsgBundle> msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
+    /** a cache of soy msg bundles */
+    /** friendly */ Map<Locale, SoyMsgBundle> msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
 
     /** a path to a bundle */
     private String messagesPath = DEF_MESSAGES_PATH;
@@ -68,12 +68,12 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
         if (!locale.isPresent()) {
             return Optional.absent();
         }
-        if (debugOn) {
-            logger.debug("Debug is on, clearing all cached msg bundles.");
-            msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
-        }
+
         synchronized (msgBundles) {
-            SoyMsgBundle soyMsgBundle = msgBundles.get(locale.get());
+            SoyMsgBundle soyMsgBundle = null;
+            if (isDebugOff()) {
+                soyMsgBundle = msgBundles.get(locale.get());
+            }
             if (soyMsgBundle == null) {
                 soyMsgBundle = createSoyMsgBundle(locale.get());
                 if (soyMsgBundle == null) {
@@ -88,7 +88,9 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
                     return Optional.absent();
                 }
 
-                msgBundles.put(locale.get(), soyMsgBundle);
+                if (isDebugOff()) {
+                    msgBundles.put(locale.get(), soyMsgBundle);
+                }
             }
 
             return Optional.fromNullable(soyMsgBundle);
@@ -116,7 +118,8 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
         while (e.hasMoreElements()) {
             final URL msgFile = e.nextElement();
-            msgBundles.add(msgBundleHandler.createFromResource(msgFile));
+            final SoyMsgBundle soyMsgBundle = msgBundleHandler.createFromResource(msgFile);
+            msgBundles.add(soyMsgBundle);
         }
 
         return mergeMsgBundles(locale, msgBundles).orNull();
@@ -154,6 +157,22 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     public void setFallbackToEnglish(boolean fallbackToEnglish) {
         this.fallbackToEnglish = fallbackToEnglish;
+    }
+
+    public String getMessagesPath() {
+        return messagesPath;
+    }
+
+    public boolean isDebugOn() {
+        return debugOn;
+    }
+
+    private boolean isDebugOff() {
+        return !debugOn;
+    }
+
+    public boolean isFallbackToEnglish() {
+        return fallbackToEnglish;
     }
 
 }
