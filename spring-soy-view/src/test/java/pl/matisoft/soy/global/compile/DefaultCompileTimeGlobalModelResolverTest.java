@@ -32,8 +32,21 @@ public class DefaultCompileTimeGlobalModelResolverTest {
     }
 
     @Test
+    public void emptyCheck() throws Exception {
+        defaultCompileTimeGlobalModelResolver.setData(new HashMap());
+        Assert.assertNotNull("by default not null", defaultCompileTimeGlobalModelResolver.resolveData());
+    }
+
+    @Test
     public void defaultAbsent() throws Exception {
         Assert.assertFalse("by default there is no data - returns absent", defaultCompileTimeGlobalModelResolver.resolveData().isPresent());
+    }
+
+    @Test
+    public void absentCheckEmptyMap() throws Exception {
+        defaultCompileTimeGlobalModelResolver.setData(new HashMap());
+        defaultCompileTimeGlobalModelResolver.setData(new HashMap());
+        Assert.assertNotNull("by default not null", defaultCompileTimeGlobalModelResolver.resolveData());
     }
 
     @Test
