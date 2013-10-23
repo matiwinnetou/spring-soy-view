@@ -1,14 +1,14 @@
 package pl.matisoft.soy.global.compile;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
