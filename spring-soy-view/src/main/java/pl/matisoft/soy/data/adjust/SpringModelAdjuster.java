@@ -38,4 +38,8 @@ public class SpringModelAdjuster implements ModelAdjuster {
         this.modelKey = modelKey;
     }
 
+    public String getModelKey() {
+        return modelKey;
+    }
+
 }
