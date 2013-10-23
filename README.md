@@ -25,8 +25,8 @@ Possible to extend this and provide own output processors implementations
 * cosmetic fixes
 
 1.13.1
-* support for yahoo and google closure minimification
-* separated google and yahoo min modules
+* support for yahoo and google closure obfuscation
+* separated google and yahoo obfuscation as optional maven modules
 
 1.13.2
 * SoyAjaxController can be more secure by injecting AuthManager, which controls which soy files can be compiled to js files
@@ -36,6 +36,16 @@ Possible to extend this and provide own output processors implementations
 1.13.3
 * Bug fix for GoogleClosureOutputProcessor -> it was not thread safe as promised, which resulted in many ConcurrentModificationExceptions in prod
 * Removed a strange DDOS check, we need to think over how to protect for this type of attack
+
+Next version (master)
+* Many unit tests + tweaks and small bugs detected as part of unit test coverage
+* Added JavaDocs
+* Remove strange check in SoyTemplateViewResolver if a view is a html view
+* Introduced Guava cache instead of ConcurrentHashMap in number of classes to prevent DDOS attack (Guava cache was added only in those classes in which data could leak due to DDOS)
+* Added PrependAppendOutputProcessor and unit test for it. This class allows an arbitrary text to be added before and after the compiled JavaScript soy template, e.g. defining require js module
+* Added cobertura maven plugin to produce code coverage reports
+* Updated example project to use bower package manager
+* Tweaks in DefaultSoyMsgBundleResolver to get rid of static variable for a static cache
 
 # Running example (dev)
 * clone the git repository
