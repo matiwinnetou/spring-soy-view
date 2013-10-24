@@ -1,0 +1,23 @@
+{
+  "name": "soyutils",
+  "main": "soyutils.js",
+  "version": "1.0.0",
+  "authors": [
+    "Mateusz Szczap <mateusz.szczap@gmail.com>"
+  ],
+  "description": "soy utils (part of google closure)",
+  "keywords": [
+    "soy",
+    "google",
+    "closure"
+  ],
+  "license": "Apache 2.0",
+  "homepage": "http://www.github.com/mati1979/soyutils",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

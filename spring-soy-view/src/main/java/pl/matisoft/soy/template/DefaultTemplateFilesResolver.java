@@ -1,8 +1,8 @@
 package pl.matisoft.soy.template;
 
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,8 +19,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.context.support.ServletContextResource;
 import pl.matisoft.soy.config.SoyViewConfig;
 
 /**
@@ -34,12 +36,12 @@ import pl.matisoft.soy.config.SoyViewConfig;
  */
 @ParametersAreNonnullByDefault
 @ThreadSafe
-public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
+public class DefaultTemplateFilesResolver implements TemplateFilesResolver, ServletContextAware, InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);
 
     /** spring resource that points to a root path, in which soy templates are located */
-    private Resource templatesLocation = new ClassPathResource("templates", getClass().getClassLoader());
+    private Resource templatesLocation = null;
 
     private boolean recursive = true;
 
@@ -52,7 +54,18 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
     /** a thread safe cache for resolved templates, no need to worry of ddos attack */
     /** friendly */ CopyOnWriteArrayList<URL> cachedFiles = new CopyOnWriteArrayList<URL>();
 
+    private String filesExtension = SoyViewConfig.DEFAULT_FILES_EXTENSION;
+
+    private ServletContext servletContext;
+
     public DefaultTemplateFilesResolver() {
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (templatesLocation == null) {
+            templatesLocation = new ServletContextResource(servletContext, SoyViewConfig.DEFAULT_TEMPLATE_FILES_PATH);
+        }
     }
 
     @Override
@@ -84,18 +97,21 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         final Collection<URL> files = resolve();
 
         final URL templateFile = Iterables.find(files, new Predicate<URL>() {
+
             @Override
             public boolean apply(final URL url) {
                 final String fileName = url.getFile();
                 final File file = new File(fileName);
-                return file.getName().equalsIgnoreCase(templateFileName + ".soy");
+
+                return file.toPath().endsWith(templateFileName + dotWithExtension());
             }
+
         }, null);
 
         return Optional.fromNullable(templateFile);
     }
 
-    private @Nonnull List<URL> toFiles(final Resource templatesLocation) {
+    private List<URL> toFiles(final Resource templatesLocation) {
         final List<URL> templateFiles = Lists.newArrayList();
         try {
             File baseDirectory = templatesLocation.getFile();
@@ -111,7 +127,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         return templateFiles;
     }
 
-    protected @Nonnull List<URL> findSoyFiles(final File baseDirectory, final boolean recursive) throws MalformedURLException {
+    protected List<URL> findSoyFiles(final File baseDirectory, final boolean recursive) throws MalformedURLException {
         final List<URL> soyFiles = new ArrayList<URL>();
         findSoyFiles(soyFiles, baseDirectory, recursive);
 
@@ -123,7 +139,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         if (files != null) {
             for (final File file : files) {
                 if (file.isFile()) {
-                    if (file.getName().endsWith(".soy")) {
+                    if (file.getName().endsWith(dotWithExtension())) {
                         soyFiles.add(file.toURI().toURL());
                     }
                 } else if (file.isDirectory() && recursive) {
@@ -133,6 +149,10 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
         } else {
             throw new IllegalArgumentException("Unable to retrieve contents of:" + baseDirectory);
         }
+    }
+
+    private String dotWithExtension() {
+        return "." + filesExtension;
     }
 
     public void setTemplatesLocation(Resource templatesLocation) {
@@ -157,6 +177,11 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver {
 
     public boolean isDebugOn() {
         return debugOn;
+    }
+
+    @Override
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
 }

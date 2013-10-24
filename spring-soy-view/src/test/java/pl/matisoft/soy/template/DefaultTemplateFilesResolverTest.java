@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import com.google.common.base.Optional;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -48,13 +49,19 @@ public class DefaultTemplateFilesResolverTest {
 
     @Test
     public void defaultTemplateLocation() throws Exception {
-        Assert.assertNotNull("template file location should have a default", defaultTemplateFilesResolver.getTemplatesLocation());
-        Assert.assertEquals("template file location should be 'templates'", "templates", defaultTemplateFilesResolver.getTemplatesLocation().getFilename());
-        Assert.assertTrue("template file location should be 'ClassPathResource'", defaultTemplateFilesResolver.getTemplatesLocation() instanceof ClassPathResource);
+        Assert.assertNull("template file location should be null", defaultTemplateFilesResolver.getTemplatesLocation());
     }
+
+//    @Test
+//    public void defaultTemplateLocation() throws Exception {
+//        Assert.assertNotNull("template file location should have a default", defaultTemplateFilesResolver.getTemplatesLocation());
+//        Assert.assertEquals("template file location should be 'templates'", "templates", defaultTemplateFilesResolver.getTemplatesLocation().getFilename());
+//        Assert.assertTrue("template file location should be 'ClassPathResource'", defaultTemplateFilesResolver.getTemplatesLocation() instanceof ClassPathResource);
+//    }
 
     @Test
     public void resolveDebugOff() throws Exception {
+        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
         final Collection<URL> urls = defaultTemplateFilesResolver.resolve();
         Assert.assertEquals("should resolve urls", 3, urls.size());
         final Iterator<URL> it = urls.iterator();
@@ -68,13 +75,15 @@ public class DefaultTemplateFilesResolverTest {
 
     @Test
     public void resolveWithTemplateNameDebugOff() throws Exception {
-        final Optional<URL> url = defaultTemplateFilesResolver.resolve("template1");
-        Assert.assertTrue("should not be absent", url.isPresent());
+        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
+        final Optional<URL> url = defaultTemplateFilesResolver.resolve("templates/template1");
+        Assert.assertTrue("should be present", url.isPresent());
         Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
     }
 
     @Test
     public void cacheDisabledWithDebugOn() throws Exception {
+        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
         defaultTemplateFilesResolver.setDebugOn(true);
         defaultTemplateFilesResolver.resolve("template1");
         Assert.assertTrue("cache should be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
@@ -82,12 +91,14 @@ public class DefaultTemplateFilesResolverTest {
 
     @Test
     public void cacheDisabledByDefault() throws Exception {
+        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
         defaultTemplateFilesResolver.resolve("template1");
         Assert.assertFalse("cache should not be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
     }
 
     @Test
     public void cacheEnabledWithDebugOff() throws Exception {
+        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
         defaultTemplateFilesResolver.resolve("template1");
         Assert.assertFalse("cache should not be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
         Assert.assertEquals("cache should not equal 3", 3, defaultTemplateFilesResolver.cachedFiles.size());

@@ -1,0 +1,31 @@
+{
+  "name": "soyutils",
+  "main": "soyutils.js",
+  "authors": [
+    "Mateusz Szczap <mateusz.szczap@gmail.com>"
+  ],
+  "description": "soy utils (part of google closure)",
+  "keywords": [
+    "soy",
+    "google",
+    "closure"
+  ],
+  "license": "Apache 2.0",
+  "homepage": "http://www.github.com/mati1979/soyutils",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "8820a85366",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "8820a853665486320eaf63edda3394943934540a"
+  },
+  "_source": "git://github.com/mati1979/soyutils.git",
+  "_target": "*",
+  "_originalSource": "soyutils"
+}
