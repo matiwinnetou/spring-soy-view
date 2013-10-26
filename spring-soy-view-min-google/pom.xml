@@ -23,6 +23,12 @@
         </dependency>
 
         <dependency>
+            <groupId>pl.matisoft</groupId>
+            <artifactId>spring-soy-view-ajax-compiler</artifactId>
+            <version>1.13.4-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
             <version>v20130411</version>

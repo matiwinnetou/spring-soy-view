@@ -14,22 +14,6 @@ import static junit.framework.Assert.assertEquals;
 public class PathUtilsTest {
 
     @Test
-    public void testStripExtensions() throws Exception {
-        final String[] arr = new String[] {"abc.soy", "abc"};
-        final String[] newArr = PathUtils.stripExtensions(arr, ".soy");
-
-        assertEquals(2, newArr.length);
-        assertEquals("abc", newArr[0]);
-        assertEquals("abc", newArr[1]);
-    }
-
-    @Test
-    public void testStripExtensionsNull() throws Exception {
-        final String[] newArr = PathUtils.stripExtensions(null, ".soy");
-        assertEquals(0, newArr.length);
-    }
-
-    @Test
     public void testArrayToPathNullCheck() throws Exception {
         final String out = PathUtils.arrayToPath(null);
         assertEquals("", out);
