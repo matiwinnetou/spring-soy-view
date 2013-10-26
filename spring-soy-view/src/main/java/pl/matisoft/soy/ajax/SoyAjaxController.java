@@ -1,16 +1,5 @@
 package pl.matisoft.soy.ajax;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.concurrent.ThreadSafe;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
@@ -23,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,8 +33,19 @@ import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 @ThreadSafe
@@ -195,24 +194,7 @@ public class SoyAjaxController {
         return compileJs(templateFileNames, hash, new Boolean(disableProcessors).booleanValue(), request, locale);
     }
 
-    @RequestMapping(value="/soy/{hash}/{templateFileNames}", method=GET)
-    @Deprecated
-    public ResponseEntity<String> compile2(@PathVariable final String hash,
-                                                            @PathVariable final String[] templateFileNames,
-                                                            @RequestParam(required = false, value = "disableProcessors") String disableProcessors,
-                                                            final HttpServletRequest request) throws IOException {
-        return compile(hash, templateFileNames, disableProcessors, null, request);
-    }
-
-    @RequestMapping(value="/soy/{templateFileNames}", method=GET)
-    @Deprecated
-    public ResponseEntity<String> compile3(@PathVariable final String[] templateFileNames,
-                                             @RequestParam(required = false, value = "disableProcessors") String disableProcessors,
-                                             final HttpServletRequest request) throws IOException {
-        return compile("", templateFileNames, disableProcessors, null, request);
-    }
-
-    private ResponseEntity<String> compileJs(final String[] templateFileNames,
+     private ResponseEntity<String> compileJs(final String[] templateFileNames,
                                              final String hash,
                                              final boolean disableProcessors,
                                              final HttpServletRequest request,
@@ -246,9 +228,9 @@ public class SoyAjaxController {
             }
 
             return prepareResponseFor(allCompiledTemplates.get(), disableProcessors);
-        } catch (SecurityException ex) {
-            throw error("No permissions to compile:" + Arrays.asList(templateFileNames));
-        } catch (HttpClientErrorException ex) {
+        } catch (final SecurityException ex) {
+            return new ResponseEntity<String>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (final HttpClientErrorException ex) {
             return new ResponseEntity<String>(ex.getMessage(), ex.getStatusCode());
         }
     }
@@ -284,7 +266,7 @@ public class SoyAjaxController {
                 }
 
                 map.put(templateUrl.get(), templateContent.get());
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw error("Unable to find file:" + templateFileName + ".soy");
             }
         }
