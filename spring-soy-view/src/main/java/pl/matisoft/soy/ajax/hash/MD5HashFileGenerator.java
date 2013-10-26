@@ -2,18 +2,27 @@ package pl.matisoft.soy.ajax.hash;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.FluentIterable;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import pl.matisoft.soy.config.SoyViewConfig;
+
+import javax.annotation.Nullable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -97,6 +106,31 @@ public class MD5HashFileGenerator implements HashFileGenerator, InitializingBean
         }
 
         return Optional.fromNullable(md5);
+    }
+
+    @Override
+    public Optional<String> hashMulti(final Collection<URL> urls) throws IOException {
+        if (urls.isEmpty()) {
+            return Optional.absent();
+        }
+        if (urls.size() == 1) {
+            return hash(Optional.of(urls.iterator().next()));
+        }
+
+        final List<String> hashes = new ArrayList<String>();
+        for (final URL url : urls) {
+            final Optional<String> hash = hash(Optional.of(url));
+            if (hash.isPresent()) {
+                hashes.add(hash.get());
+            }
+        }
+
+        final StringBuilder builder = new StringBuilder();
+        for (final String hash : hashes) {
+            builder.append(hash);
+        }
+
+        return Optional.fromNullable(getMD5Checksum(new ReaderInputStream(new StringReader(builder.toString()))));
     }
 
     public static byte[] createChecksum(final InputStream is) throws IOException {

@@ -3,6 +3,7 @@ package pl.matisoft.soy.ajax.hash;
 import java.net.URL;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,6 +93,18 @@ public class MD5HashFileGeneratorTest {
         hashFileGenerator.hash(Optional.of(url2));
 
         Assert.assertEquals("cache size should not extend 1", 1L, hashFileGenerator.cache.size());
+    }
+
+    @Test
+    public void testMultiHash() throws Exception {
+        hashFileGenerator.setCacheMaxSize(1);
+        hashFileGenerator.afterPropertiesSet();
+        final URL url1 = getClass().getClassLoader().getResource("templates/template1.soy");
+        final URL url2 = getClass().getClassLoader().getResource("templates/template2.soy");
+
+        final Optional<String> hash = hashFileGenerator.hashMulti(Lists.newArrayList(url1, url2));
+        Assert.assertTrue("should be present", hash.isPresent());
+        Assert.assertEquals("should be equal to hash val", "00e9cae5d45fcd7010bac74086d678a8", hash.get());
     }
 
 }

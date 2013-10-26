@@ -19,6 +19,7 @@ import com.google.template.soy.msgs.SoyMsgBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -136,30 +137,33 @@ public class SoyAjaxController {
                 .build();
     }
 
-    @RequestMapping(value="/soy/hashes", method=GET)
+    @RequestMapping(value="/soy/hash", method=GET)
     @ResponseBody
-    public Map<String,String> soyFileHashes(@RequestParam(required = true, value = "file") final String[] templateFilenames) throws IOException, HttpClientErrorException {
-        final Map<String,String> hashes = new HashMap<String,String>();
+    public ResponseEntity<String> hash(@RequestParam(required = true, value = "file") final String[] templateFilenames) throws IOException {
+        try {
+            final List<URL> urls = new ArrayList<URL>();
+            for (final String templateFilename : templateFilenames) {
+                final Optional<URL> urlOptional = templateFilesResolver.resolve(templateFilename);
+                if (!urlOptional.isPresent()) {
+                    throw notFound(templateFilename);
+                }
 
-        for (final String templateFilename : templateFilenames) {
-            final Optional<URL> urlOptional = templateFilesResolver.resolve(templateFilename);
-            if (!urlOptional.isPresent()) {
-                throw notFound(templateFilename);
+                if (!authManager.isAllowed(templateFilename)) {
+                    throw error("no permissions to access:" + templateFilename);
+                }
+
+                urls.add(urlOptional.get());
             }
 
-            if (!authManager.isAllowed(templateFilename)) {
-                throw error("no permissions to access:" + templateFilename);
-            }
-
-            final Optional<String> hash = hashFileGenerator.hash(urlOptional);
+            final Optional<String> hash = hashFileGenerator.hashMulti(urls);
             if (!hash.isPresent()) {
-                throw error("unable to get file hash sum, file:" + templateFilename);
+                throw error("unable to get file(s) hash sum.");
             }
 
-            hashes.put(templateFilename, hash.get());
+            return new ResponseEntity<String>(hash.get(), HttpStatus.OK);
+        } catch (final HttpClientErrorException ex) {
+            return new ResponseEntity<String>(ex.getMessage(), ex.getStatusCode());
         }
-
-        return hashes;
     }
 
     /**
@@ -244,6 +248,8 @@ public class SoyAjaxController {
             return prepareResponseFor(allCompiledTemplates.get(), disableProcessors);
         } catch (SecurityException ex) {
             throw error("No permissions to compile:" + Arrays.asList(templateFileNames));
+        } catch (HttpClientErrorException ex) {
+            return new ResponseEntity<String>(ex.getMessage(), ex.getStatusCode());
         }
     }
 
@@ -263,13 +269,13 @@ public class SoyAjaxController {
     private Map<URL,String> compileTemplates(final String[] templateFileNames, final HttpServletRequest request, final String locale) {
         final HashMap<URL,String> map = new HashMap<URL,String>();
         for (final String templateFileName : templateFileNames) {
-            if (!authManager.isAllowed(templateFileName)) {
-                throw error("no permission to compile:" + templateFileName);
-            }
             try {
                 final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
                 if (!templateUrl.isPresent()) {
                     throw notFound("File not found:" + templateFileName);
+                }
+                if (!authManager.isAllowed(templateFileName)) {
+                    throw error("no permission to compile:" + templateFileName);
                 }
                 logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
                 final Optional<String> templateContent = compileTemplateAndAssertSuccess(request, templateUrl, locale);

@@ -1,6 +1,8 @@
 package pl.matisoft.soy.ajax.url;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import pl.matisoft.soy.ajax.hash.EmptyHashFileGenerator;
 import pl.matisoft.soy.ajax.hash.HashFileGenerator;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
@@ -8,6 +10,9 @@ import pl.matisoft.soy.template.TemplateFilesResolver;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,27 +28,42 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
 
     private String siteUrl = "";
 
-    public Optional<String> compose(final String soyTemplateFileName) throws IOException {
-        final Optional<URL> url = templateFilesResolver.resolve(soyTemplateFileName);
-
-        if (!url.isPresent()) {
-            return Optional.absent();
-        }
-
-        final Optional<String> md5 = hashFileGenerator.hash(url);
+    public Optional<String> compose(final Collection<String> soyTemplateFileNames) throws IOException {
+        final Optional<String> md5 = hashHelper(soyTemplateFileNames);
         if (!md5.isPresent()) {
             return Optional.absent();
         }
 
-        final String newUrl = new StringBuilder()
-                .append(siteUrl)
-                .append("/soy/")
-                .append(md5.get())
-                .append("/")
-                .append(soyTemplateFileName)
-                .toString();
+        final StringBuilder builder = new StringBuilder();
+        builder.append(siteUrl);
+        builder.append("/soy/compileJs?");
+        builder.append("hash=");
+        builder.append(md5.get());
 
-        return Optional.of(newUrl);
+        for (final String soyTemplateFileName : soyTemplateFileNames) {
+            builder.append("&");
+            builder.append("file=");
+            builder.append(soyTemplateFileName);
+        }
+
+        return Optional.of(builder.toString());
+    }
+
+    @Override
+    public Optional<String> compose(String soyTemplateFileName) throws IOException {
+        return compose(Lists.newArrayList(soyTemplateFileName));
+    }
+
+    private Optional<String> hashHelper(final Collection<String> soyTemplateFileNames) throws IOException {
+        final List<URL> urls = new ArrayList<URL>();
+        for (final String file : soyTemplateFileNames) {
+            final Optional<URL> url = templateFilesResolver.resolve(file);
+            if (url.isPresent()) {
+                urls.add(url.get());
+            }
+        }
+
+        return hashFileGenerator.hashMulti(urls);
     }
 
     public void setTemplateFilesResolver(final TemplateFilesResolver templateFilesResolver) {

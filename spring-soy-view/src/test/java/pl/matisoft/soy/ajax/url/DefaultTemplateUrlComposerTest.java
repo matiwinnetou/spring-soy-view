@@ -11,6 +11,7 @@ import pl.matisoft.soy.template.TemplateFilesResolver;
 
 import java.net.URL;
 
+import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,9 +62,10 @@ public class DefaultTemplateUrlComposerTest {
 
         when(templateFilesResolver.resolve(url)).thenReturn(Optional.of(urlURL));
         when(hashFileGenerator.hash(Optional.<URL>of(urlURL))).thenReturn(Optional.of("md5"));
+        when(hashFileGenerator.hashMulti(anyCollection())).thenReturn(Optional.of("md5"));
 
         Assert.assertTrue("should return value", defaultTemplateUrlComposer.compose(url).isPresent());
-        Assert.assertEquals("should equal to value", "/soy/md5/templates/template1.soy", defaultTemplateUrlComposer.compose(url).get());
+        Assert.assertEquals("should equal to value", "/soy/compileJs?hash=md5&file=templates/template1.soy", defaultTemplateUrlComposer.compose(url).get());
     }
 
     @Test
@@ -78,9 +80,10 @@ public class DefaultTemplateUrlComposerTest {
 
         when(templateFilesResolver.resolve(url)).thenReturn(Optional.of(urlURL));
         when(hashFileGenerator.hash(Optional.<URL>of(urlURL))).thenReturn(Optional.of("md5"));
+        when(hashFileGenerator.hashMulti(anyCollection())).thenReturn(Optional.of("md5"));
 
         Assert.assertTrue("should return value", defaultTemplateUrlComposer.compose(url).isPresent());
-        Assert.assertEquals("should equal to value", "http://www.somesiteurl.com/soy/md5/templates/template1.soy", defaultTemplateUrlComposer.compose(url).get());
+        Assert.assertEquals("should equal to value", "http://www.somesiteurl.com/soy/compileJs?hash=md5&file=templates/template1.soy", defaultTemplateUrlComposer.compose(url).get());
     }
 
 }

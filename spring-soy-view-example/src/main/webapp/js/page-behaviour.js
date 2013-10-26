@@ -11,10 +11,10 @@ APP.pushNewWord = function() {
 $(document).ready(function() {
 	$('#getServerTimeLink').click(function() {
         var templateName = "templates/server-time.soy";
-        var url = '/spring-soy-view-example/app/soy/hashes?file=' + templateName;
+        var url = '/spring-soy-view-example/app/soy/hash?file=' + templateName;
         $.get(url, function(hash) {
-            //we could use hash files from a window object, imagine a vector with a key as a filename and value as a hash
-            var url = '/spring-soy-view-example/app/soy/compileJs?hash=' + hash['templates/server-time.soy'] + '&file=templates/server-time.soy'
+            console.log(hash);
+            var url = '/spring-soy-view-example/app/soy/compileJs?hash=' + hash + '&file=templates/server-time.soy'
             $.ajaxSetup({
                 cache: true
             });
@@ -31,7 +31,7 @@ $(document).ready(function() {
             })
         });
 	});
-	
+
 	$('#submitButton').click(APP.pushNewWord);
 	
 	$('#wordsForm').submit(function() {

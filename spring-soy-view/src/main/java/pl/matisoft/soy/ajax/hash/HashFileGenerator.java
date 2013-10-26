@@ -2,6 +2,7 @@ package pl.matisoft.soy.ajax.hash;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 
 import com.google.common.base.Optional;
 
@@ -16,5 +17,7 @@ import com.google.common.base.Optional;
 public interface HashFileGenerator {
 
    Optional<String> hash(Optional<URL> url) throws IOException;
+
+   Optional<String> hashMulti(Collection<URL> urls) throws IOException;
 
 }
