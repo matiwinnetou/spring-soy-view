@@ -1,18 +1,28 @@
 package pl.matisoft.soy.ajax;
 
+import com.google.common.base.Optional;
+import com.google.template.soy.msgs.SoyMsgBundle;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
+import pl.matisoft.soy.compile.TofuCompiler;
+import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URL;
+import java.util.Locale;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,18 +39,35 @@ public class SoyAjaxControllerTest {
     @Mock
     private TemplateFilesResolver templateFilesResolver;
 
+    @Mock
+    private SoyMsgBundleResolver soyMsgBundleResolver;
+
+    @Mock
+    private LocaleProvider localeProvider;
+
+    @Mock
+    private TofuCompiler tofuCompiler;
+
     @Before
     public void setUp() throws Exception {
         soyAjaxController.setTemplateFilesResolver(templateFilesResolver);
     }
 
     @Test
-    @Ignore
     public void testCompileJs() throws Exception {
+        final String templateName = "templates/template1.soy";
+        final String jsData = "jsData";
+
         final HttpServletRequest request = mock(HttpServletRequest.class);
-        final URL url1 = getClass().getClassLoader().getResource("template1.soy");
-        //when(templateFilesResolver.resolve(anyString())).thenReturn(Optional.of(url1));
-        //soyAjaxController.getJsForTemplateFilesHash(new String[]{"template1.soy"}, "true", request);
+        when(localeProvider.resolveLocale(request)).thenReturn(Optional.<Locale>absent());
+        when(soyMsgBundleResolver.resolve(any(Optional.class))).thenReturn(Optional.<SoyMsgBundle>absent());
+        final URL url1 = getClass().getClassLoader().getResource(templateName);
+        when(templateFilesResolver.resolve(templateName)).thenReturn(Optional.of(url1));
+        when(tofuCompiler.compileToJsSrc(url1, null)).thenReturn(Optional.of(jsData));
+
+        final ResponseEntity<String> responseEntity = soyAjaxController.compile("", new String[]{templateName}, null, "true", request);
+        Assert.assertEquals("data should be equal", jsData, responseEntity.getBody());
+        Assert.assertTrue("http status should be equal", (responseEntity.getStatusCode() == HttpStatus.OK));
     }
 
 }

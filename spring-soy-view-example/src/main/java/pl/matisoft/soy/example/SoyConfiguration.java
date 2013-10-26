@@ -172,7 +172,6 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         soyAjaxController.setTofuCompiler(tofuCompiler());
         soyAjaxController.setOutputProcessors(Lists.newArrayList(closureCompilerProcessor()));
         soyAjaxController.setAuthManager(authManager());
-        soyAjaxController.setHashFileGenerator(hashFileGenerator());
 
         return soyAjaxController;
     }

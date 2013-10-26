@@ -115,8 +115,6 @@ public class SoyAjaxController {
      */
     private List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>();
 
-    private HashFileGenerator hashFileGenerator = new EmptyHashFileGenerator();
-
     /**
      * By default there is no AuthManager and an external user can compile all templates to JavaScript
      * This can pose security risk and therefore it is possible to change this and inject
@@ -134,35 +132,6 @@ public class SoyAjaxController {
                 .maximumSize(cacheMaxSize)
                 .concurrencyLevel(1) //look up a constant class, 1 is not very clear
                 .build();
-    }
-
-    @RequestMapping(value="/soy/hash", method=GET)
-    @ResponseBody
-    public ResponseEntity<String> hash(@RequestParam(required = true, value = "file") final String[] templateFilenames) throws IOException {
-        try {
-            final List<URL> urls = new ArrayList<URL>();
-            for (final String templateFilename : templateFilenames) {
-                final Optional<URL> urlOptional = templateFilesResolver.resolve(templateFilename);
-                if (!urlOptional.isPresent()) {
-                    throw notFound(templateFilename);
-                }
-
-                if (!authManager.isAllowed(templateFilename)) {
-                    throw error("no permissions to access:" + templateFilename);
-                }
-
-                urls.add(urlOptional.get());
-            }
-
-            final Optional<String> hash = hashFileGenerator.hashMulti(urls);
-            if (!hash.isPresent()) {
-                throw error("unable to get file(s) hash sum.");
-            }
-
-            return new ResponseEntity<String>(hash.get(), HttpStatus.OK);
-        } catch (final HttpClientErrorException ex) {
-            return new ResponseEntity<String>(ex.getMessage(), ex.getStatusCode());
-        }
     }
 
     /**
@@ -385,10 +354,6 @@ public class SoyAjaxController {
 
     public void setAuthManager(AuthManager authManager) {
         this.authManager = authManager;
-    }
-
-    public void setHashFileGenerator(HashFileGenerator hashFileGenerator) {
-        this.hashFileGenerator = hashFileGenerator;
     }
 
     public void setCacheMaxSize(int cacheMaxSize) {
