@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.accept.ContentNegotiationManagerFactoryBean;
 import org.springframework.web.context.support.ServletContextResource;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
@@ -59,24 +60,14 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
 
     private boolean debugOn = true;
 
-    @Override
-    public void configureContentNegotiation(final ContentNegotiationConfigurer configurer) {
-        configurer
-                .defaultContentType(MediaType.TEXT_HTML)
-                .favorPathExtension(true)
-                .favorParameter(true)
-                .ignoreAcceptHeader(true)
-                .mediaType("html", MediaType.TEXT_HTML)
-                .mediaType("json", MediaType.APPLICATION_JSON)
-                .mediaType("xml", MediaType.APPLICATION_XML);
-    }
-
     @Bean
-    public DefaultTemplateFilesResolver templateFilesResolver() {
+    public DefaultTemplateFilesResolver templateFilesResolver() throws Exception {
         final DefaultTemplateFilesResolver defaultTemplateFilesResolver = new DefaultTemplateFilesResolver();
         defaultTemplateFilesResolver.setDebugOn(debugOn);
         defaultTemplateFilesResolver.setRecursive(true);
-        defaultTemplateFilesResolver.setTemplatesLocation(new ServletContextResource(context, "/WEB-INF/templates"));
+        defaultTemplateFilesResolver.setServletContext(context);
+        //defaultTemplateFilesResolver.setTemplatesLocation(new ServletContextResource(context, "/WEB-INF/templates"));
+        defaultTemplateFilesResolver.afterPropertiesSet();
 
         return defaultTemplateFilesResolver;
     }
@@ -124,8 +115,9 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public ViewResolver viewResolver() {
+    public ViewResolver viewResolver() throws Exception {
         final SoyTemplateViewResolver soyTemplateViewResolver = new SoyTemplateViewResolver();
+        soyTemplateViewResolver.setServletContext(context);
         soyTemplateViewResolver.setDebugOn(debugOn);
         soyTemplateViewResolver.setTemplateFilesResolver(templateFilesResolver());
         soyTemplateViewResolver.setTemplateRenderer(templateRenderer());
@@ -143,23 +135,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public FactoryBean contentNegotiationManagerFactoryBean() {
-        final Properties props = new Properties();
-        props.put("html", "text/html");
-        props.put("json", "application/json");
-        props.put("xml", "application/xml");
-
-        final ContentNegotiationManagerFactoryBean contentNegotiationManagerFactoryBean = new ContentNegotiationManagerFactoryBean();
-        contentNegotiationManagerFactoryBean.setFavorPathExtension(true);
-        contentNegotiationManagerFactoryBean.setFavorParameter(true);
-        contentNegotiationManagerFactoryBean.setMediaTypes(props);
-        contentNegotiationManagerFactoryBean.setIgnoreAcceptHeader(true);
-
-        return contentNegotiationManagerFactoryBean;
-    }
-
-    @Bean
-    public ViewResolver contentNegotiatingViewResolver() {
+    public ViewResolver contentNegotiatingViewResolver() throws Exception {
         final ContentNegotiatingViewResolver contentNegotiatingViewResolver = new ContentNegotiatingViewResolver();
         contentNegotiatingViewResolver.setViewResolvers(Lists.newArrayList(viewResolver()));
         contentNegotiatingViewResolver.setDefaultViews(Lists.<View>newArrayList(new MappingJacksonJsonView()));
@@ -168,7 +144,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public TemplateUrlComposer templateUrlComposer() {
+    public TemplateUrlComposer templateUrlComposer() throws Exception {
         final DefaultTemplateUrlComposer urlComposer = new DefaultTemplateUrlComposer();
         urlComposer.setSiteUrl("http://localhost:8080/spring-soy-view-example/app");
         urlComposer.setTemplateFilesResolver(templateFilesResolver());
@@ -180,13 +156,14 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     @Bean
     public HashFileGenerator hashFileGenerator() {
         final MD5HashFileGenerator md5HashFileGenerator = new MD5HashFileGenerator();
-        md5HashFileGenerator.setDebugOn(true);
+        md5HashFileGenerator.setDebugOn(debugOn);
+        md5HashFileGenerator.afterPropertiesSet();
 
         return md5HashFileGenerator;
     }
 
     @Bean
-    public SoyAjaxController soyAjaxController() {
+    public SoyAjaxController soyAjaxController() throws Exception {
         final SoyAjaxController soyAjaxController = new SoyAjaxController();
         soyAjaxController.setDebugOn(debugOn);
         soyAjaxController.setLocaleProvider(localeProvider());
@@ -195,6 +172,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         soyAjaxController.setTofuCompiler(tofuCompiler());
         soyAjaxController.setOutputProcessors(Lists.newArrayList(closureCompilerProcessor()));
         soyAjaxController.setAuthManager(authManager());
+        soyAjaxController.setHashFileGenerator(hashFileGenerator());
 
         return soyAjaxController;
     }
@@ -202,7 +180,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     @Bean
     public AuthManager authManager() {
         final ConfigurableAuthManager configurableAuthManager = new ConfigurableAuthManager();
-        configurableAuthManager.setAllowedTemplates(Lists.newArrayList("client-words", "server-time"));
+        configurableAuthManager.setAllowedTemplates(Lists.newArrayList("templates/client-words.soy", "templates/server-time.soy"));
 
         return configurableAuthManager;
     }

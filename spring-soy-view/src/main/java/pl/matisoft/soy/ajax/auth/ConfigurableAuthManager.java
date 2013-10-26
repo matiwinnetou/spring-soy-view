@@ -1,8 +1,9 @@
 package pl.matisoft.soy.ajax.auth;
 
-import java.util.List;
-
 import com.google.common.collect.ImmutableList;
+import pl.matisoft.soy.config.SoyViewConfig;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,7 +29,7 @@ import com.google.common.collect.ImmutableList;
  *  @Bean
  *  public AuthManager authManager() {
  *     final ConfigurableAuthManager configurableAuthManager = new ConfigurableAuthManager();
- *     configurableAuthManager.setAllowedTemplates(Lists.newArrayList("client-words", "server-time"));
+ *     configurableAuthManager.setAllowedTemplates(Lists.newArrayList("templates/client-words.soy", "templates/server-time.soy"));
  *
  *     return configurableAuthManager;
  *  }

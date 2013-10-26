@@ -1,5 +1,6 @@
 package pl.matisoft.soy.template;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.ServletContext;
@@ -93,7 +94,11 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
     }
 
     @Override
-    public Optional<URL> resolve(final String templateFileName) throws IOException {
+    public Optional<URL> resolve(final @Nullable String templateFileName) throws IOException {
+        if (templateFileName == null) {
+            return Optional.absent();
+        }
+
         final Collection<URL> files = resolve();
 
         final URL templateFile = Iterables.find(files, new Predicate<URL>() {
@@ -103,12 +108,21 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
                 final String fileName = url.getFile();
                 final File file = new File(fileName);
 
-                return file.toPath().endsWith(templateFileName + dotWithExtension());
+                return file.toPath().endsWith(normalizeTemplateName(templateFileName));
             }
 
         }, null);
 
         return Optional.fromNullable(templateFile);
+    }
+
+    private String normalizeTemplateName(String templateFileName) {
+        String normalizedTemplateName = templateFileName;
+        if (!templateFileName.endsWith(dotWithExtension())) {
+            normalizedTemplateName = templateFileName + dotWithExtension();
+        }
+
+        return normalizedTemplateName;
     }
 
     private List<URL> toFiles(final Resource templatesLocation) {
@@ -177,6 +191,14 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
 
     public boolean isDebugOn() {
         return debugOn;
+    }
+
+    public String getFilesExtension() {
+        return filesExtension;
+    }
+
+    public void setFilesExtension(String filesExtension) {
+        this.filesExtension = filesExtension;
     }
 
     @Override

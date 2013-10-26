@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import com.google.common.base.Optional;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -52,13 +51,6 @@ public class DefaultTemplateFilesResolverTest {
         Assert.assertNull("template file location should be null", defaultTemplateFilesResolver.getTemplatesLocation());
     }
 
-//    @Test
-//    public void defaultTemplateLocation() throws Exception {
-//        Assert.assertNotNull("template file location should have a default", defaultTemplateFilesResolver.getTemplatesLocation());
-//        Assert.assertEquals("template file location should be 'templates'", "templates", defaultTemplateFilesResolver.getTemplatesLocation().getFilename());
-//        Assert.assertTrue("template file location should be 'ClassPathResource'", defaultTemplateFilesResolver.getTemplatesLocation() instanceof ClassPathResource);
-//    }
-
     @Test
     public void resolveDebugOff() throws Exception {
         defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
@@ -74,11 +66,42 @@ public class DefaultTemplateFilesResolverTest {
     }
 
     @Test
-    public void resolveWithTemplateNameDebugOff() throws Exception {
+    public void resolveWithFullTemplateNameDebugOff() throws Exception {
         defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
         final Optional<URL> url = defaultTemplateFilesResolver.resolve("templates/template1");
         Assert.assertTrue("should be present", url.isPresent());
         Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
+    }
+
+    @Test
+    public void resolveWithTemplateNameDebugOff() throws Exception {
+        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
+        final Optional<URL> url = defaultTemplateFilesResolver.resolve("template1");
+        Assert.assertTrue("should be present", url.isPresent());
+        Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
+    }
+
+    @Test
+    public void resolveWithFullTemplateNameExtDebugOff() throws Exception {
+        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
+        final Optional<URL> url = defaultTemplateFilesResolver.resolve("templates/template1.soy");
+        Assert.assertTrue("should be present", url.isPresent());
+        Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
+    }
+
+    @Test
+    public void resolveWithTemplateNameExtDebugOff() throws Exception {
+        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
+        final Optional<URL> url = defaultTemplateFilesResolver.resolve("template1.soy");
+        Assert.assertTrue("should be present", url.isPresent());
+        Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
+    }
+
+    @Test
+    public void resolveWithFullTemplateNameExtDebugOffShouldNotWork() throws Exception {
+        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
+        final Optional<URL> url = defaultTemplateFilesResolver.resolve("tmpl/template1.soy");
+        Assert.assertFalse("should be absent", url.isPresent());
     }
 
     @Test

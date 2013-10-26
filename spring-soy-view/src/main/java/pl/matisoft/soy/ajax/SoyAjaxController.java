@@ -11,7 +11,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
@@ -26,10 +25,15 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 import pl.matisoft.soy.ajax.auth.AuthManager;
 import pl.matisoft.soy.ajax.auth.PermissableAuthManager;
+import pl.matisoft.soy.ajax.hash.EmptyHashFileGenerator;
+import pl.matisoft.soy.ajax.hash.HashFileGenerator;
 import pl.matisoft.soy.ajax.process.OutputProcessor;
+import pl.matisoft.soy.ajax.utils.I18nUtils;
+import pl.matisoft.soy.ajax.utils.PathUtils;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.EmptyTofuCompiler;
@@ -111,6 +115,8 @@ public class SoyAjaxController {
      */
     private List<OutputProcessor> outputProcessors = new ArrayList<OutputProcessor>();
 
+    private HashFileGenerator hashFileGenerator = new EmptyHashFileGenerator();
+
     /**
      * By default there is no AuthManager and an external user can compile all templates to JavaScript
      * This can pose security risk and therefore it is possible to change this and inject
@@ -130,30 +136,30 @@ public class SoyAjaxController {
                 .build();
     }
 
-    /**
-     * An endpoint to compile an array of soy templates to JavaScript.
-     *
-     * Warning: this endpoint assumes a fake url hash: "" and it should not be used when CacheControl headers and Expire headers are set
-     * to a value which is distant into the future.
-     *
-     * Invocation of this url may throw two types of http exceptions:
-     * 1. notFound -> usually when a TemplateResolver cannot find a template with an associated name
-     * 2. error -> usually when there is a permission error and a user is not allowed to compile a template into a JavaScript
-     *
-     * @param templateFileNames - an array of template names, e.g. client-words,server-time, which may or may not contain extension
-     *                          currently three modes are supported -> soy extension, js extension and no extension, which is preferred
-     * @param disableProcessors - whether the controller should run registered outputProcessors after the compilation is complete.
-     * @param request - HttpServletRequest
-     * @return response entity, which wraps a compiled soy to JavaScript files.
-     * @throws IOException
-     */
-    @RequestMapping(value="/soy/{templateFileNames}", method=GET)
-    public ResponseEntity<String> getJsForTemplateFiles(@PathVariable final String[] templateFileNames,
-                                                        @RequestParam(required = false, value = "disableProcessors") String disableProcessors,
-                                                        final HttpServletRequest request)
-            throws IOException {
+    @RequestMapping(value="/soy/hashes", method=GET)
+    @ResponseBody
+    public Map<String,String> soyFileHashes(@RequestParam(required = true, value = "file") final String[] templateFilenames) throws IOException, HttpClientErrorException {
+        final Map<String,String> hashes = new HashMap<String,String>();
 
-        return compileJs(templateFileNames, "", new Boolean(disableProcessors).booleanValue(), request);
+        for (final String templateFilename : templateFilenames) {
+            final Optional<URL> urlOptional = templateFilesResolver.resolve(templateFilename);
+            if (!urlOptional.isPresent()) {
+                throw notFound(templateFilename);
+            }
+
+            if (!authManager.isAllowed(templateFilename)) {
+                throw error("no permissions to access:" + templateFilename);
+            }
+
+            final Optional<String> hash = hashFileGenerator.hash(urlOptional);
+            if (!hash.isPresent()) {
+                throw error("unable to get file hash sum, file:" + templateFilename);
+            }
+
+            hashes.put(templateFilename, hash.get());
+        }
+
+        return hashes;
     }
 
     /**
@@ -168,24 +174,45 @@ public class SoyAjaxController {
      * 1. notFound -> usually when a TemplateResolver cannot find a template with an associated name
      * 2. error -> usually when there is a permission error and a user is not allowed to compile a template into a JavaScript
      *
+     * @param hash = some unique number that should be used when we are caching this resource in a browser and we use http cache headers
      * @param templateFileNames - an array of template names, e.g. client-words,server-time, which may or may not contain extension
      *                          currently three modes are supported -> soy extension, js extension and no extension, which is preferred
      * @param disableProcessors - whether the controller should run registered outputProcessors after the compilation is complete.
      * @param request - HttpServletRequest
      * @return response entity, which wraps a compiled soy to JavaScript files.
      * @throws IOException
-     */    @RequestMapping(value="/soy/{hash}/{templateFileNames}", method=GET)
-    public ResponseEntity<String> getJsForTemplateFilesHash(@PathVariable final String hash,
+     */
+    @RequestMapping(value="/soy/compileJs", method=GET)
+    public ResponseEntity<String> compile(@RequestParam(required = false, value="hash", defaultValue = "") final String hash,
+                                                            @RequestParam(required = true, value = "file") final String[] templateFileNames,
+                                                            @RequestParam(required = false, value = "locale") String locale,
+                                                            @RequestParam(required = false, value = "disableProcessors", defaultValue = "false") String disableProcessors,
+                                                            final HttpServletRequest request) throws IOException {
+        return compileJs(templateFileNames, hash, new Boolean(disableProcessors).booleanValue(), request, locale);
+    }
+
+    @RequestMapping(value="/soy/{hash}/{templateFileNames}", method=GET)
+    @Deprecated
+    public ResponseEntity<String> compile2(@PathVariable final String hash,
                                                             @PathVariable final String[] templateFileNames,
                                                             @RequestParam(required = false, value = "disableProcessors") String disableProcessors,
                                                             final HttpServletRequest request) throws IOException {
-        return compileJs(templateFileNames, hash, new Boolean(disableProcessors).booleanValue(), request);
+        return compile(hash, templateFileNames, disableProcessors, null, request);
+    }
+
+    @RequestMapping(value="/soy/{templateFileNames}", method=GET)
+    @Deprecated
+    public ResponseEntity<String> compile3(@PathVariable final String[] templateFileNames,
+                                             @RequestParam(required = false, value = "disableProcessors") String disableProcessors,
+                                             final HttpServletRequest request) throws IOException {
+        return compile("", templateFileNames, disableProcessors, null, request);
     }
 
     private ResponseEntity<String> compileJs(final String[] templateFileNames,
                                              final String hash,
                                              final boolean disableProcessors,
-                                             final HttpServletRequest request
+                                             final HttpServletRequest request,
+                                             final String locale
     ) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templateFilesResolver cannot be null");
 
@@ -197,7 +224,7 @@ public class SoyAjaxController {
         }
 
         try {
-            final Map<URL,String> compiledTemplates = compileTemplates(templateFileNames, request);
+            final Map<URL,String> compiledTemplates = compileTemplates(templateFileNames, request, locale);
             final Optional<String> allCompiledTemplates = concatCompiledTemplates(compiledTemplates);
             if (!allCompiledTemplates.isPresent()) {
                 throw notFound("Template file(s) could not be resolved.");
@@ -208,7 +235,7 @@ public class SoyAjaxController {
                     if (map == null) {
                         map = new ConcurrentHashMap<String, String>();
                     } else {
-                        map.put(arrayToPath(templateFileNames), allCompiledTemplates.get());
+                        map.put(PathUtils.arrayToPath(templateFileNames), allCompiledTemplates.get());
                     }
                     this.cachedJsTemplates.put(hash, map);
                 }
@@ -224,7 +251,7 @@ public class SoyAjaxController {
         synchronized (cachedJsTemplates) {
             final Map<String, String> map = cachedJsTemplates.getIfPresent(hash);
             if (map != null) {
-                final String template = map.get(arrayToPath(templateFileNames));
+                final String template = map.get(PathUtils.arrayToPath(templateFileNames));
 
                 return Optional.fromNullable(template);
             }
@@ -233,19 +260,19 @@ public class SoyAjaxController {
         return Optional.absent();
     }
 
-    private Map<URL,String> compileTemplates(final String[] templateFileNames, final HttpServletRequest request) {
+    private Map<URL,String> compileTemplates(final String[] templateFileNames, final HttpServletRequest request, final String locale) {
         final HashMap<URL,String> map = new HashMap<URL,String>();
-        for (final String templateFileName : stripExtensions(templateFileNames)) {
+        for (final String templateFileName : templateFileNames) {
             if (!authManager.isAllowed(templateFileName)) {
                 throw error("no permission to compile:" + templateFileName);
             }
             try {
                 final Optional<URL> templateUrl = templateFilesResolver.resolve(templateFileName);
                 if (!templateUrl.isPresent()) {
-                    throw notFound("File not found:" + templateFileName + ".soy");
+                    throw notFound("File not found:" + templateFileName);
                 }
                 logger.debug("Compiling JavaScript template:" + templateUrl.orNull());
-                final Optional<String> templateContent = compileTemplateAndAssertSuccess(request, templateUrl);
+                final Optional<String> templateContent = compileTemplateAndAssertSuccess(request, templateUrl, locale);
                 if (!templateContent.isPresent()) {
                     throw notFound("file cannot be compiled:" + templateUrl);
                 }
@@ -300,39 +327,7 @@ public class SoyAjaxController {
         }
     }
 
-    /**
-     * Converts a String array to a String with coma separator
-     * example: String["a.soy", "b.soy"] -> output: a.soy,b.soy
-     */
-    /**friendly */ String arrayToPath(final String[] array) {
-        if (array == null) {
-            return "";
-        }
-        final Joiner joiner = Joiner.on(",").skipNulls();
-
-        return joiner.join(array);
-    }
-
-    /** Removes soy and js extensions */
-    /**friendly */ String[] stripExtensions(final String[] exts) {
-        if (exts == null) {
-            return new String[0];
-        }
-        final String[] newStrippedExts = new String[exts.length];
-        for (int i = 0; i<newStrippedExts.length; i++) {
-            if (exts[i].contains(".soy")) {
-                newStrippedExts[i] = exts[i].replace(".soy", "");
-            } else if (exts[i].contains(".js")) {
-                newStrippedExts[i] = exts[i].replace(".js", "");
-            } else {
-                newStrippedExts[i] = exts[i];
-            }
-        }
-
-        return newStrippedExts;
-    }
-
-    private Optional<String> compileTemplateAndAssertSuccess(final HttpServletRequest request, final Optional<URL> templateFile) throws IOException {
+    private Optional<String> compileTemplateAndAssertSuccess(final HttpServletRequest request, final Optional<URL> templateFile, final String locale) throws IOException {
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
         Preconditions.checkNotNull(tofuCompiler, "tofuCompiler cannot be null");
@@ -341,8 +336,12 @@ public class SoyAjaxController {
             return Optional.absent();
         }
 
-        final Optional<Locale> locale = localeProvider.resolveLocale(request);
-        final Optional<SoyMsgBundle> soyMsgBundle = soyMsgBundleResolver.resolve(locale);
+        Optional<Locale> localeOptional = Optional.fromNullable(I18nUtils.getLocaleFromString(locale));
+        if (!localeOptional.isPresent()) {
+            localeOptional = localeProvider.resolveLocale(request);
+        }
+
+        final Optional<SoyMsgBundle> soyMsgBundle = soyMsgBundleResolver.resolve(localeOptional);
         final Optional<String> compiledTemplate = tofuCompiler.compileToJsSrc(templateFile.orNull(), soyMsgBundle.orNull());
 
         return compiledTemplate;
@@ -398,6 +397,10 @@ public class SoyAjaxController {
 
     public void setAuthManager(AuthManager authManager) {
         this.authManager = authManager;
+    }
+
+    public void setHashFileGenerator(HashFileGenerator hashFileGenerator) {
+        this.hashFileGenerator = hashFileGenerator;
     }
 
     public void setCacheMaxSize(int cacheMaxSize) {

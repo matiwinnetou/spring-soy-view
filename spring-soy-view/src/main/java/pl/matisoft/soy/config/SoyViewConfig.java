@@ -23,7 +23,6 @@ public class SoyViewConfig {
     public final static String DEFAULT_CACHE_CONTROL = "public, max-age=86400";
     public final static String DEFAULT_EXPIRE_HEADERS = expireYearHeader();
     public final static String DEFAULT_FILES_EXTENSION = "soy";
-    public final static String DEFAULT_TEMPLATE_FILES_ROOT = "/WEB-INF/templates";
 
     private boolean debugOn = DEFAULT_DEBUG_ON;
 
