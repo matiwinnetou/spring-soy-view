@@ -1,9 +1,9 @@
 package pl.matisoft.soy.ajax.url;
 
-import com.google.common.base.Optional;
-
 import java.io.IOException;
 import java.util.Collection;
+
+import com.google.common.base.Optional;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,8 +13,8 @@ import java.util.Collection;
  */
 public interface TemplateUrlComposer {
 
-    Optional<String> compose(final String soyTemplateFileName) throws IOException;
+    Optional<String> compose(String soyTemplateFileName) throws IOException;
 
-    Optional<String> compose(final Collection<String> soyTemplateFileNames) throws IOException;
+    Optional<String> compose(Collection<String> soyTemplateFileNames) throws IOException;
 
 }
