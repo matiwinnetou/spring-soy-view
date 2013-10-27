@@ -70,4 +70,26 @@ public class SoyAjaxControllerTest {
         Assert.assertTrue("http status should be equal", (responseEntity.getStatusCode() == HttpStatus.OK));
     }
 
+    @Test
+    public void testCompileJs2() throws Exception {
+        final String templateName1 = "templates/template1.soy";
+        final String templateName2 = "templates/template2.soy";
+        final String jsData1 = "jsData1";
+        final String jsData2 = "jsData2";
+
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        when(localeProvider.resolveLocale(request)).thenReturn(Optional.<Locale>absent());
+        when(soyMsgBundleResolver.resolve(any(Optional.class))).thenReturn(Optional.<SoyMsgBundle>absent());
+        final URL url1 = getClass().getClassLoader().getResource(templateName1);
+        final URL url2 = getClass().getClassLoader().getResource(templateName2);
+        when(templateFilesResolver.resolve(templateName1)).thenReturn(Optional.of(url1));
+        when(templateFilesResolver.resolve(templateName2)).thenReturn(Optional.of(url2));
+        when(tofuCompiler.compileToJsSrc(url1, null)).thenReturn(Optional.of(jsData1));
+        when(tofuCompiler.compileToJsSrc(url2, null)).thenReturn(Optional.of(jsData2));
+
+        final ResponseEntity<String> responseEntity = soyAjaxController.compile("", new String[]{templateName1, templateName2}, null, "true", request);
+        Assert.assertEquals("data should be equal", jsData2 + jsData1, responseEntity.getBody());
+        Assert.assertTrue("http status should be equal", (responseEntity.getStatusCode() == HttpStatus.OK));
+    }
+
 }
