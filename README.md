@@ -37,7 +37,7 @@ Possible to extend this and provide own output processors implementations
 * Bug fix for GoogleClosureOutputProcessor -> it was not thread safe as promised, which resulted in many ConcurrentModificationExceptions in prod
 * Removed a strange DDOS check, we need to think over how to protect for this type of attack
 
-1.14.0 (master)
+1.14.0
 * Many unit tests + tweaks and small bugs detected as part of unit test coverage
 * Added JavaDocs
 * Remove strange check in SoyTemplateViewResolver if a view is a html view
