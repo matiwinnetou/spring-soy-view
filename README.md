@@ -37,21 +37,19 @@ Possible to extend this and provide own output processors implementations
 * Bug fix for GoogleClosureOutputProcessor -> it was not thread safe as promised, which resulted in many ConcurrentModificationExceptions in prod
 * Removed a strange DDOS check, we need to think over how to protect for this type of attack
 
-Next version (master)
+1.14.0 (master)
 * Many unit tests + tweaks and small bugs detected as part of unit test coverage
 * Added JavaDocs
 * Remove strange check in SoyTemplateViewResolver if a view is a html view
 * Introduced Guava cache instead of ConcurrentHashMap in number of classes to prevent DDOS attack (Guava cache was added only in those classes in which data could leak due to DDOS)
 * Added PrependAppendOutputProcessor and unit test for it. This class allows an arbitrary text to be added before and after the compiled JavaScript soy template, e.g. defining require js module
 * Added cobertura maven plugin to produce code coverage reports
-* Updated example project to use bower package manager
 * Tweaks in DefaultSoyMsgBundleResolver to get rid of static variable for a static cache
-
-# Running example (dev)
-* clone the git repository
-* cd spring-soy-view-example
-* invoke: mvn jetty:run
-* Navigate to http://localhost:8080/spring-soy-view-example/app/
+* Removed example project and will be moving this to another project
+* Extracted ajax-compiler as a separate project as some people may not need to use this but may want to use the core library
+* Changed the interface of SoyAjaxController, now it will be /soy/compileJs?hash=xxx&file=templates/abc.soy&file=templates/abc2.soy
+* DefaultTemplateFilesResolver supports full paths
+* SoyAjaxController supports now many files to be compiled, support for .js and without extension has been dropped to simplify code
 
 author: Mateusz Szczap<br>
 <mati@sz.home.pl>
