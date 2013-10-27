@@ -56,7 +56,9 @@ Possible to extend this and provide own output processors implementations
 
 Known issues:
 * SoyAjaxController may not work under windows server, i.e. it may only work with windows file paths
-* Example project removed, new project on github needs to be created and migrated
+
+* Example project:
+* https://github.com/mati1979/spring-soy-view-example
 
 author: Mateusz Szczap<br>
 <mati@sz.home.pl>
