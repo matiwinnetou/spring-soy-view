@@ -54,10 +54,10 @@ Possible to extend this and provide own output processors implementations
 * Ability to provide a locale as a request parameter to SoyAjaxController other then the one resolved by LocaleProvider
 * Ability to disable minimification via request parameter: ?disableProcessors=true parameter as a compileJs url
 
-Known issues:
+#### Known issues:
 * SoyAjaxController may not work under windows server, i.e. it may only work with windows file paths
 
-* Example project:
+#### Example project:
 * https://github.com/mati1979/spring-soy-view-example
 
 author: Mateusz Szczap<br>
