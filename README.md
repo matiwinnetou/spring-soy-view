@@ -8,11 +8,14 @@ It is highly customizable via pluggable interfaces, for which a default implemen
 * POJO rendering and flat structure rendering (ToSoyDataConverter interface)
 * I18N - SoyMsgBundle based on resolvable locale (SoyMsgBundleResolver interface)
 * JavaScript compilation via AJAX endpoint using a Spring Controller (SoyAjaxController)
+* JavaScript compilation which supports browser caching (hash url part)
+* JavaScript onfuscation (via either google closure or yahoo js obfuscator) and combination of generated urls via Ajax
 * Soy Global variables supported (GlobalModelResolver interface)
 * Soy Compile time global variables supported (CompileTimeGlobalModelResolver interface)
 * Debug flag support
 * Ability to provide own template file resolver (TemplateFilesResolver interface)
 * Model transformation available (ModelAdjuster interface)
+* Default implementation that serializes request parameters, cookies and headers to Soy's $ij (Ijected Data - Runtime parameters) data.
 
 #### ChangeLog
 1.13.0
@@ -52,7 +55,7 @@ Possible to extend this and provide own output processors implementations
 * SoyAjaxController has been greatly improved, support for .js and without extension has been dropped to simplify code
 * SoyAjaxController will now not show stacktraces but http error codes and messages (it was a security loop hole)
 * Ability to provide a locale as a request parameter to SoyAjaxController other then the one resolved by LocaleProvider
-* Ability to disable minimification via request parameter: ?disableProcessors=true parameter as a compileJs url
+* Ability to disable obfuscation via request parameter: ?disableProcessors=true parameter passed as a param to compileJs endpoint
 
 #### Known issues:
 * SoyAjaxController may not work under windows server, i.e. it may only work with windows file paths

@@ -1,6 +1,5 @@
 package pl.matisoft.soy.ajax.url;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import pl.matisoft.soy.ajax.hash.EmptyHashFileGenerator;
