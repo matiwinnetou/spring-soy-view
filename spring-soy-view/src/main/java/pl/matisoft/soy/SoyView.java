@@ -7,7 +7,7 @@ import java.util.Map;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
-import org.springframework.web.servlet.view.AbstractTemplateView;
+import org.springframework.web.servlet.view.AbstractView;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
@@ -26,7 +26,7 @@ import pl.matisoft.soy.render.TemplateRenderer;
  * Date: 19/06/2013
  * Time: 23:32
  */
-public class SoyView extends AbstractTemplateView {
+public class SoyView extends AbstractView {
 
     /** Compiled soy binary objects */
     protected Optional<SoyTofu> compiledTemplates = Optional.absent();
@@ -44,37 +44,9 @@ public class SoyView extends AbstractTemplateView {
 
     protected SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
+    private String contentType = "text/html; charset=utf-8";
+
     public SoyView() {
-    }
-
-    @Override
-    protected void renderMergedTemplateModel(final Map<String, Object> model,
-                                             final HttpServletRequest request,
-                                             final HttpServletResponse response) throws Exception {
-        Preconditions.checkNotNull(templateName, "templateName cannot be null");
-        Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null");
-        Preconditions.checkNotNull(modelAdjuster, "modelAdjuster cannot be null");
-        Preconditions.checkNotNull(globalModelResolver, "globalModelResolver cannot be null");
-        Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
-        Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
-
-        if (!compiledTemplates.isPresent()) {
-            throw new RuntimeException("Unable to render - compiled templates are empty!");
-        }
-
-        final Object adjustedModel = modelAdjuster.adjust(model);
-
-        final RenderRequest renderRequest = new RenderRequest.Builder()
-                .compiledTemplates(compiledTemplates)
-                .templateName(templateName)
-                .model(adjustedModel)
-                .request(request)
-                .response(response)
-                .globalRuntimeModel(globalModelResolver.resolveData(request))
-                .soyMsgBundle(soyMsgBundleResolver.resolve(localeProvider.resolveLocale(request)))
-                .build();
-
-        templateRenderer.render(renderRequest);
     }
 
     public void setTemplateName(String templateName) {
@@ -103,6 +75,43 @@ public class SoyView extends AbstractTemplateView {
 
     public void setSoyMsgBundleResolver(SoyMsgBundleResolver soyMsgBundleResolver) {
         this.soyMsgBundleResolver = soyMsgBundleResolver;
+    }
+
+    @Override
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    @Override
+    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Preconditions.checkNotNull(templateName, "templateName cannot be null");
+        Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null");
+        Preconditions.checkNotNull(modelAdjuster, "modelAdjuster cannot be null");
+        Preconditions.checkNotNull(globalModelResolver, "globalModelResolver cannot be null");
+        Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
+        Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
+
+        if (!compiledTemplates.isPresent()) {
+            throw new RuntimeException("Unable to render - compiled templates are empty!");
+        }
+
+        final Object adjustedModel = modelAdjuster.adjust(model);
+
+        final RenderRequest renderRequest = new RenderRequest.Builder()
+                .compiledTemplates(compiledTemplates)
+                .templateName(templateName)
+                .model(adjustedModel)
+                .request(request)
+                .response(response)
+                .globalRuntimeModel(globalModelResolver.resolveData(request))
+                .soyMsgBundle(soyMsgBundleResolver.resolve(localeProvider.resolveLocale(request)))
+                .build();
+
+        templateRenderer.render(renderRequest);
     }
 
 }

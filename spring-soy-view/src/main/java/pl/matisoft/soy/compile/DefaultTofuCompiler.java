@@ -1,6 +1,7 @@
 package pl.matisoft.soy.compile;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
@@ -17,9 +18,12 @@ import com.google.template.soy.tofu.SoyTofu;
 import com.google.template.soy.tofu.SoyTofuOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
+import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
+import pl.matisoft.soy.template.TemplateFilesResolver;
 
 /**
  * Created with IntelliJ IDEA.

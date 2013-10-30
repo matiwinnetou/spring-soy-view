@@ -1,17 +1,14 @@
 package pl.matisoft.soy;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collection;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
-import org.springframework.web.servlet.view.AbstractUrlBasedView;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.ViewResolver;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.DefaultTofuCompiler;
@@ -28,6 +25,11 @@ import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Locale;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mati
@@ -40,7 +42,7 @@ import pl.matisoft.soy.template.TemplateFilesResolver;
  * and it the classes from which it inherits as it may be necessary to
  * set some configuration options for this resolver to work properly for your use case.
  */
-public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
+public class SoyTemplateViewResolver implements ViewResolver, InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(SoyTemplateViewResolver.class);
 
@@ -66,35 +68,19 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     /** a default view */
     private String indexView = "index";
 
-    public SoyTemplateViewResolver() {
-        super();
-        setExposeSpringMacroHelpers(false);
-    }
+    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
 
-    @Override
-    protected void initApplicationContext() {
-        super.initApplicationContext();
-        if (isCache()) {
-            try {
-                this.compiledTemplates = compileTemplates("<class_init>");
-            } catch (final IOException ex) {
-                throw new IllegalStateException("Unable to compile Soy templates.", ex);
-            }
-        }
-    }
-
-    @Override
-    protected Class<?> getViewClass() {
-        return SoyView.class;
-    }
-
-    @Override
-    protected AbstractUrlBasedView buildView(final String viewName) throws Exception {
+    protected View loadView(String viewName, Locale locale) throws Exception {
         Preconditions.checkNotNull(viewName, "viewName cannot be null!");
         Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null!");
 
-        final SoyView view = (SoyView) super.buildView(orIndexView(normalize(viewName)));
-        view.setTemplateName(view.getUrl());
+        final String newViewName = orIndexView(normalize(viewName));
+
+        System.out.println("orgViewName:" + viewName);
+        System.out.println("newViewName:" + newViewName);
+
+        final SoyView view = new SoyView();
+        view.setTemplateName(newViewName);
         view.setContentType(contentType());
         view.setTemplateRenderer(templateRenderer);
         view.setModelAdjuster(modelAdjuster);
@@ -102,18 +88,41 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
         view.setLocaleProvider(localeProvider);
         view.setSoyMsgBundleResolver(soyMsgBundleResolver);
 
-        if (!compiledTemplates.isPresent()) {
+        if (debugOn) {
             view.setCompiledTemplates(compileTemplates(viewName));
 
             return view;
         }
 
-        if (isCache() && compiledTemplates.isPresent()) { //extra sanity check if compiled templates are available
+        if (compiledTemplates.isPresent()) { //extra sanity check if compiled templates are available
             view.setCompiledTemplates(compiledTemplates);
         }
 
         return view;
     }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        try {
+            this.compiledTemplates = compileTemplates("<class_init>");
+        } catch (final IOException ex) {
+            throw new IllegalStateException("Unable to compile Soy templates.", ex);
+        }
+    }
+
+
+
+//    @Override
+//    protected void initApplicationContext() {
+//        super.initApplicationContext();
+//        if (isCache()) {
+//            try {
+//                this.compiledTemplates = compileTemplates("<class_init>");
+//            } catch (final IOException ex) {
+//                throw new IllegalStateException("Unable to compile Soy templates.", ex);
+//            }
+//        }
+//    }
 
     /**
      * Map / to a default view name.
@@ -178,7 +187,7 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
     }
 
     public void setDebugOn(final boolean debugOn) {
-        setCache(!debugOn);
+        this.debugOn = debugOn;
     }
 
     public void setModelAdjuster(final ModelAdjuster modelAdjuster) {
@@ -199,6 +208,11 @@ public class SoyTemplateViewResolver extends AbstractTemplateViewResolver {
 
     public void setIndexView(String indexView) {
         this.indexView = indexView;
+    }
+
+    @Override
+    public View resolveViewName(String viewName, Locale locale) throws Exception {
+        return loadView(viewName, locale);
     }
 
 }
