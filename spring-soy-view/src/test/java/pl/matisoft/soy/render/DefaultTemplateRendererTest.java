@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import pl.matisoft.soy.SoyView;
 import pl.matisoft.soy.data.ToSoyDataConverter;
 
 import static org.junit.Assert.*;
@@ -81,6 +82,7 @@ public class DefaultTemplateRendererTest {
         final String templateName = "soy.example.clientWords";
         final SoyTofu.Renderer renderer = mock(SoyTofu.Renderer.class);
         final SoyMapData modelData = new SoyMapData();
+        final SoyView soyView = mock(SoyView.class);
 
         when(renderRequest.getCompiledTemplates()).thenReturn(Optional.of(soyTofu));
         when(toSoyDataConverter.toSoyMap(domainMock)).thenReturn(Optional.<SoyMapData>absent());
@@ -91,6 +93,7 @@ public class DefaultTemplateRendererTest {
         when(soyTofu.newRenderer(templateName)).thenReturn(renderer);
         when(renderRequest.getGlobalRuntimeModel()).thenReturn(Optional.<SoyMapData>absent());
         when(renderRequest.getSoyMsgBundle()).thenReturn(Optional.<SoyMsgBundle>absent());
+        when(renderRequest.getSoyView()).thenReturn(soyView);
         when(response.getWriter()).thenReturn(printWriter);
 
         defaultTemplateRenderer.render(renderRequest);
@@ -119,6 +122,7 @@ public class DefaultTemplateRendererTest {
         final SoyMapData modelData = new SoyMapData();
         final SoyMsgBundle soyMsgBundle = mock(SoyMsgBundle.class);
         final SoyMapData runtimeModel = new SoyMapData();
+        final SoyView soyView = mock(SoyView.class);
 
         when(renderRequest.getCompiledTemplates()).thenReturn(Optional.of(soyTofu));
         when(toSoyDataConverter.toSoyMap(domainMock)).thenReturn(Optional.of(modelData));
@@ -130,6 +134,7 @@ public class DefaultTemplateRendererTest {
         when(renderRequest.getGlobalRuntimeModel()).thenReturn(Optional.of(runtimeModel));
         when(renderRequest.getSoyMsgBundle()).thenReturn(Optional.of(soyMsgBundle));
         when(response.getWriter()).thenReturn(printWriter);
+        when(renderRequest.getSoyView()).thenReturn(soyView);
 
         defaultTemplateRenderer.render(renderRequest);
 

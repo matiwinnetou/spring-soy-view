@@ -109,6 +109,7 @@ public class SoyView extends AbstractView {
                 .response(response)
                 .globalRuntimeModel(globalModelResolver.resolveData(request))
                 .soyMsgBundle(soyMsgBundleResolver.resolve(localeProvider.resolveLocale(request)))
+                .soyView(this)
                 .build();
 
         templateRenderer.render(renderRequest);

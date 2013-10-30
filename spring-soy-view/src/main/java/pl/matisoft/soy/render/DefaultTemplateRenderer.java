@@ -8,6 +8,7 @@ import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
+import pl.matisoft.soy.SoyView;
 import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.data.DefaultToSoyDataConverter;
 import pl.matisoft.soy.data.ToSoyDataConverter;
@@ -77,6 +78,10 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
 
     protected void writeResponse(final SoyTofu.Renderer renderer, final RenderRequest renderRequest) throws IOException {
         final HttpServletResponse response = renderRequest.getResponse();
+        final SoyView soyView = renderRequest.getSoyView();
+
+        response.setContentType(soyView.getContentType());
+
         final PrintWriter writer = response.getWriter();
         writer.write(renderer.render());
         writer.flush();

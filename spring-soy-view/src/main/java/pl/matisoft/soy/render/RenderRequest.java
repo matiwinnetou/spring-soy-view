@@ -7,6 +7,7 @@ import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
+import pl.matisoft.soy.SoyView;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,6 +29,8 @@ public class RenderRequest {
 
     private final Object model;
 
+    private final SoyView soyView;
+
     private final Optional<SoyMapData> globalRuntimeModel;
     private final Optional<SoyMsgBundle> soyMsgBundle;
 
@@ -39,6 +42,11 @@ public class RenderRequest {
         this.model = builder.model;
         this.globalRuntimeModel = builder.globalRuntimeModel;
         this.soyMsgBundle = builder.soyMsgBundle;
+        this.soyView = builder.soyView;
+    }
+
+    public SoyView getSoyView() {
+        return soyView;
     }
 
     public Object getModel() {
@@ -76,8 +84,15 @@ public class RenderRequest {
         private HttpServletRequest request;
         private HttpServletResponse response;
         private Object model;
+        private SoyView soyView;
         private Optional<SoyMapData> globalRuntimeModel = Optional.absent();
         private Optional<SoyMsgBundle> soyMsgBundle = Optional.absent();
+
+        public Builder soyView(final SoyView soyView) {
+            this.soyView = soyView;
+
+            return this;
+        }
 
         public Builder compiledTemplates(final Optional<SoyTofu> compiledTemplates) {
             this.compiledTemplates = compiledTemplates;
