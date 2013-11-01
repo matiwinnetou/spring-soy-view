@@ -5,6 +5,8 @@ import com.google.template.soy.data.SoyMapData;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -15,13 +17,39 @@ import java.util.Map;
  */
 public class HttpSessionResolver implements RuntimeResolver {
 
+    private String prefix = "_http.session.";
+
     @Override
-    public void resolveData(HttpServletRequest request, HttpServletResponse response, Map<String, ? extends Object> model, SoyMapData root) {
-//        final HttpSession session = request.getSession(false);
-//        if (session != null) {
-//            session.get
-//        }
+    public void resolveData(final HttpServletRequest request, final HttpServletResponse response, final Map<String, ? extends Object> model, final SoyMapData root) {
+        final HttpSession session = request.getSession(false);
+        if (session == null) {
+            return;
+        }
+
+        appendId(root, session);
+        appendCreationTime(root, session);
+        appendLastAccessedTime(root, session);
+        appendMaxInactiveInterval(root, session);
+    }
+
+    private void appendMaxInactiveInterval(final SoyMapData root, final HttpSession session) {
+        root.put(prefix + "maxInactiveInterval", session.getMaxInactiveInterval());
+    }
+
+    private void appendLastAccessedTime(final SoyMapData root, final HttpSession session) {
+        root.put(prefix + "lastAccessedTime", session.getLastAccessedTime());
+        root.put(prefix + "lastAccessedTimeFormatted", DateFormat.getDateTimeInstance().format(new Date(session.getLastAccessedTime())));
+    }
+
+    private void appendCreationTime(final SoyMapData root, final HttpSession session) {
+        root.put(prefix + "creationTime", session.getCreationTime());
+        root.put(prefix + "creationTimeFormatted", DateFormat.getDateTimeInstance().format(new Date(session.getCreationTime())));
+    }
+
+    private void appendId(final SoyMapData root, final HttpSession session) {
+        if (session.getId() != null) {
+            root.put(prefix + "id", session.getId());
+        }
     }
 
 }
-
