@@ -41,6 +41,7 @@ Possible to extend this and provide own output processors implementations
 * Removed a strange DDOS check, we need to think over how to protect for this type of attack
 
 1.14.0
+* some changes are not backwards compatible, migration easy.
 * Many unit tests + tweaks and small bugs detected as part of unit test coverage - still many more to come soon
 * Added JavaDocs
 * Remove strange check in SoyTemplateViewResolver if a view is a html view
@@ -57,8 +58,18 @@ Possible to extend this and provide own output processors implementations
 * Ability to provide a locale as a request parameter to SoyAjaxController other then the one resolved by LocaleProvider
 * Ability to disable obfuscation via request parameter: ?disableProcessors=true parameter passed as a param to compileJs endpoint
 
+master - will be part of (1.20.0) release
+* some changes are not backwards compatible, migration easy though
+* it will be necessary to append soy: prefix for templates to be rendered, e.g. "soy:soy.example.serverTime" instead of just "soy.example.serverTime", a Soy template resolver needed to be changed
+and now if it won't be able to match on soy template, it will delegate to other template resolvers in the chain
+* Moved some implementation from upper classes and simplified inheritance hierarchy, since soy does not allow to pass parameters from views to methods, a lot of implemnentation is no longer valid for us
+* moved some of the implementation from upper classes of Spring's TemplateFileResolver and AbstractTemplateView to RuntimeResolvers, basically now one can use number of RuntimeResolvers to provide global runtime data
+* Modified interface of GlobalModelResolver that is now more generic, takes HttpServletRequest, HttpServletResponse and Map<String,Object> model
+* SoyTemplateViewResolver now extends from spring's AbstractCachingViewResolver, which means we were able to get rid of two upper classes in inheritance hierarchy, in which some abstractions did not apply to us
+* SoyView now doesn't extend from spring's abstract classes but needless to say implements spring's view interface
+
 #### Known issues:
-* SoyAjaxController may not work under windows server, i.e. it may only work with windows file paths
+* SoyAjaxController may not work under windows server, i.e. it may only work with linux style file paths
 
 #### Example project:
 * https://github.com/mati1979/spring-soy-view-example
