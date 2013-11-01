@@ -5,6 +5,8 @@ import java.util.Collection;
 
 import com.google.common.base.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mszczap
@@ -13,8 +15,8 @@ import com.google.common.base.Optional;
  */
 public interface TemplateUrlComposer {
 
-    Optional<String> compose(String soyTemplateFileName) throws IOException;
+    Optional<String> compose(HttpServletRequest request, String soyTemplateFileName) throws IOException;
 
-    Optional<String> compose(Collection<String> soyTemplateFileNames) throws IOException;
+    Optional<String> compose(HttpServletRequest request, Collection<String> soyTemplateFileNames) throws IOException;
 
 }

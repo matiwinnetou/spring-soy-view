@@ -17,6 +17,13 @@ public class DefaultLocaleProvider implements LocaleProvider {
 
     private Locale locale = Locale.US;
 
+    public DefaultLocaleProvider(Locale locale) {
+        this.locale = locale;
+    }
+
+    public DefaultLocaleProvider() {
+    }
+
     @Override
     public Optional<Locale> resolveLocale(final HttpServletRequest request) {
         return Optional.fromNullable(locale);

@@ -39,6 +39,13 @@ public class ConfigurableAuthManager implements AuthManager {
 
     /**friendly*/ ImmutableList<String> allowedTemplates = new ImmutableList.Builder<String>().build();
 
+    public ConfigurableAuthManager(List<String> allowedTemplates) {
+        this.allowedTemplates = ImmutableList.copyOf(allowedTemplates);
+    }
+
+    public ConfigurableAuthManager() {
+    }
+
     public void setAllowedTemplates(final List<String> allowedTemplates) {
         this.allowedTemplates = ImmutableList.copyOf(allowedTemplates);
     }

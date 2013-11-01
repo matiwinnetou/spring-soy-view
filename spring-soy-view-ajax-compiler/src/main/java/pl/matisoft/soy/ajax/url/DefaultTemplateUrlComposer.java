@@ -7,6 +7,7 @@ import pl.matisoft.soy.ajax.hash.HashFileGenerator;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,17 +26,15 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
 
     private HashFileGenerator hashFileGenerator = new EmptyHashFileGenerator();
 
-    private String siteUrl = "";
-
-    public Optional<String> compose(final Collection<String> soyTemplateFileNames) throws IOException {
+    public Optional<String> compose(final HttpServletRequest request, final Collection<String> soyTemplateFileNames) throws IOException {
         final Optional<String> md5 = hashHelper(soyTemplateFileNames);
         if (!md5.isPresent()) {
             return Optional.absent();
         }
 
         final StringBuilder builder = new StringBuilder();
-        builder.append(siteUrl);
-        builder.append("/soy/compileJs?");
+        builder.append(request.getRequestURL());
+        builder.append("soy/compileJs?");
         builder.append("hash=");
         builder.append(md5.get());
 
@@ -49,8 +48,8 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
     }
 
     @Override
-    public Optional<String> compose(String soyTemplateFileName) throws IOException {
-        return compose(Lists.newArrayList(soyTemplateFileName));
+    public Optional<String> compose(final HttpServletRequest request, String soyTemplateFileName) throws IOException {
+        return compose(request, Lists.newArrayList(soyTemplateFileName));
     }
 
     private Optional<String> hashHelper(final Collection<String> soyTemplateFileNames) throws IOException {
@@ -65,20 +64,12 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
         return hashFileGenerator.hashMulti(urls);
     }
 
-    public void setTemplateFilesResolver(final TemplateFilesResolver templateFilesResolver) {
+    public void setTemplateFilesResolver(TemplateFilesResolver templateFilesResolver) {
         this.templateFilesResolver = templateFilesResolver;
     }
 
-    public void setHashFileGenerator(final HashFileGenerator hashFileGenerator) {
+    public void setHashFileGenerator(HashFileGenerator hashFileGenerator) {
         this.hashFileGenerator = hashFileGenerator;
-    }
-
-    public void setSiteUrl(final String siteUrl) {
-        this.siteUrl = siteUrl;
-    }
-
-    public String getSiteUrl() {
-        return siteUrl;
     }
 
 }
