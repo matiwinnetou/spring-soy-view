@@ -1,6 +1,7 @@
 package pl.matisoft.soy.compile;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 
@@ -22,10 +23,11 @@ public interface TofuCompiler {
     /**
      * Obtains a binary compiled version based on a set of input urls
      *
+     *
      * @param files
      * @return
      */
-    Optional<SoyTofu> compile(Collection<URL> files);
+    SoyTofu compile(Collection<URL> files) throws IOException;
 
     /**
      * Obtains a compiled template to JavaScript as a String based on a template url

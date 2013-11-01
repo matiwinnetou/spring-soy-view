@@ -18,12 +18,9 @@ import com.google.template.soy.tofu.SoyTofu;
 import com.google.template.soy.tofu.SoyTofuOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
-import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
-import pl.matisoft.soy.template.TemplateFilesResolver;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,12 +39,13 @@ public class DefaultTofuCompiler implements TofuCompiler {
     private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();
 
     @Override
-    public Optional<SoyTofu> compile(@Nullable final Collection<URL> urls) {
+    public SoyTofu compile(@Nullable final Collection<URL> urls) throws IOException {
         Preconditions.checkNotNull("compileTimeGlobalModelResolver", compileTimeGlobalModelResolver);
 
         if (urls == null || urls.isEmpty()) {
-            return Optional.absent();
+            throw new IOException("Unable to compile, no urls found");
         }
+
         logger.debug("SoyTofu compilation of templates:" + urls.size());
         final long time1 = System.currentTimeMillis();
 
@@ -68,7 +66,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
         logger.debug("SoyTofu compilation complete." + (time2 - time1) + " ms");
 
-        return Optional.fromNullable(soyTofu);
+        return soyTofu;
     }
 
     private void addCompileTimeGlobalModel(final SoyFileSet.Builder sfsBuilder) {

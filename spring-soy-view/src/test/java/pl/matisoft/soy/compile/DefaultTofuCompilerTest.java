@@ -69,9 +69,8 @@ public class DefaultTofuCompilerTest {
     public void testCompileSoyToBinaryWithEmptyCompileTimeModel() throws Exception {
         when(compileTimeGlobalModelResolver.resolveData()).thenReturn(Optional.<SoyMapData>absent());
         final URL template1 = getClass().getClassLoader().getResource("templates/template1.soy");
-        final Optional<SoyTofu> tofu = defaultTofuCompiler.compile(Lists.newArrayList(template1));
-        Assert.assertTrue(tofu.isPresent());
-        Assert.assertNotNull(tofu.get());
+        final SoyTofu tofu = defaultTofuCompiler.compile(Lists.newArrayList(template1));
+        Assert.assertNotNull(tofu);
     }
 
     @Test
@@ -80,9 +79,8 @@ public class DefaultTofuCompilerTest {
         soyMapData.put("test1", "test2");
         when(compileTimeGlobalModelResolver.resolveData()).thenReturn(Optional.of(soyMapData));
         final URL template1 = getClass().getClassLoader().getResource("templates/template1.soy");
-        final Optional<SoyTofu> tofu = defaultTofuCompiler.compile(Lists.newArrayList(template1));
-        Assert.assertTrue("tofu value should be present", tofu.isPresent());
-        Assert.assertNotNull("tofu object should not be null", tofu.get());
+        final SoyTofu tofu = defaultTofuCompiler.compile(Lists.newArrayList(template1));
+        Assert.assertNotNull("tofu object should not be null", tofu);
     }
 
     @Test

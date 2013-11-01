@@ -21,8 +21,8 @@ import com.google.template.soy.tofu.SoyTofu;
 public class EmptyTofuCompiler implements TofuCompiler {
 
     @Override
-    public Optional<SoyTofu> compile(final Collection<URL> urls) {
-        return Optional.absent();
+    public SoyTofu compile(final Collection<URL> urls) {
+        return null;
     }
 
     @Override

@@ -8,6 +8,8 @@ import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.matisoft.soy.SoyView;
 import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.data.DefaultToSoyDataConverter;
@@ -36,6 +38,8 @@ import pl.matisoft.soy.data.ToSoyDataConverter;
  */
 public class DefaultTemplateRenderer implements TemplateRenderer {
 
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateRenderer.class);
+
     protected ToSoyDataConverter toSoyDataConverter = new DefaultToSoyDataConverter();
 
     /**
@@ -46,6 +50,7 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
     @Override
     public void render(final RenderRequest renderRequest) throws Exception {
         if (!renderRequest.getCompiledTemplates().isPresent()) {
+            logger.warn("compiled templates are not present, nothing to render!");
             return;
         }
 
@@ -70,8 +75,13 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
         final Optional<SoyMsgBundle> soyMsgBundleOptional = renderRequest.getSoyMsgBundle();
         if (soyMsgBundleOptional.isPresent()) {
             renderer.setMsgBundle(soyMsgBundleOptional.get());
+            if (!isDebugOn()) {
+                if (renderRequest.getCompiledTemplates().isPresent()) {
+                    renderRequest.getCompiledTemplates().get().addToCache(soyMsgBundleOptional.get(), null);
+                }
+            }
         }
-        if (debugOn) {
+        if (isDebugOn()) {
             renderer.setDontAddToCache(true);
         }
     }
@@ -98,6 +108,10 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
 
     public boolean isDebugOn() {
         return debugOn;
+    }
+
+    public boolean isDebugOff() {
+        return !debugOn;
     }
 
 }

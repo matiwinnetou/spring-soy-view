@@ -1,13 +1,12 @@
 package pl.matisoft.soy;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
-import org.springframework.web.servlet.view.AbstractView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.web.servlet.View;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
@@ -20,13 +19,20 @@ import pl.matisoft.soy.render.DefaultTemplateRenderer;
 import pl.matisoft.soy.render.RenderRequest;
 import pl.matisoft.soy.render.TemplateRenderer;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mati
  * Date: 19/06/2013
  * Time: 23:32
  */
-public class SoyView extends AbstractView {
+public class SoyView implements View, BeanNameAware {
+
+    private static final Logger logger = LoggerFactory.getLogger(SoyView.class);
 
     /** Compiled soy binary objects */
     protected Optional<SoyTofu> compiledTemplates = Optional.absent();
@@ -45,6 +51,8 @@ public class SoyView extends AbstractView {
     protected SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
     private String contentType = "text/html; charset=utf-8";
+
+    private String beanName = "";
 
     public SoyView() {
     }
@@ -82,12 +90,8 @@ public class SoyView extends AbstractView {
         return contentType;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
     @Override
-    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Preconditions.checkNotNull(templateName, "templateName cannot be null");
         Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null");
         Preconditions.checkNotNull(modelAdjuster, "modelAdjuster cannot be null");
@@ -95,8 +99,10 @@ public class SoyView extends AbstractView {
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
 
+        logger.debug("SoyView rendering with beanName:{} and model:{}", beanName, model);
+
         if (!compiledTemplates.isPresent()) {
-            throw new RuntimeException("Unable to render - compiled templates are empty!");
+            throw new IOException("Unable to render - compiled templates are empty!");
         }
 
         final Object adjustedModel = modelAdjuster.adjust(model);
@@ -113,6 +119,19 @@ public class SoyView extends AbstractView {
                 .build();
 
         templateRenderer.render(renderRequest);
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    @Override
+    public void setBeanName(String beanName) {
+        this.beanName = beanName;
+    }
+
+    public String getBeanName() {
+        return beanName;
     }
 
 }
