@@ -37,13 +37,11 @@ public class HttpSessionResolver implements RuntimeResolver {
     }
 
     private void appendLastAccessedTime(final SoyMapData root, final HttpSession session) {
-        root.put(prefix + "lastAccessedTime", session.getLastAccessedTime());
-        root.put(prefix + "lastAccessedTimeFormatted", DateFormat.getDateTimeInstance().format(new Date(session.getLastAccessedTime())));
+        root.put(prefix + "lastAccessedTime", DateFormat.getDateTimeInstance().format(new Date(session.getLastAccessedTime())));
     }
 
     private void appendCreationTime(final SoyMapData root, final HttpSession session) {
-        root.put(prefix + "creationTime", session.getCreationTime());
-        root.put(prefix + "creationTimeFormatted", DateFormat.getDateTimeInstance().format(new Date(session.getCreationTime())));
+        root.put(prefix + "creationTime", DateFormat.getDateTimeInstance().format(new Date(session.getCreationTime())));
     }
 
     private void appendId(final SoyMapData root, final HttpSession session) {

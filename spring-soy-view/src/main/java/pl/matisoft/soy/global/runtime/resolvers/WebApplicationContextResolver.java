@@ -2,6 +2,7 @@ package pl.matisoft.soy.global.runtime.resolvers;
 
 import com.google.template.soy.data.SoyMapData;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,19 +17,14 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 18:36
  */
-public class WebApplicationContextResolver implements RuntimeResolver {
+public class WebApplicationContextResolver extends WebApplicationObjectSupport implements RuntimeResolver {
 
     private String prefix = "_web.app.context.";
 
     @Override
     public void resolveData(final HttpServletRequest request, final HttpServletResponse response, final Map<String, ? extends Object> model, final SoyMapData root) {
-        final RequestContext requestContext = new RequestContext(request, response, null, (Map<String, Object>) model);
-        if (requestContext.getWebApplicationContext() == null) {
-            return;
-        }
-
-        final WebApplicationContext context = requestContext.getWebApplicationContext();
-        if (requestContext.getWebApplicationContext().getApplicationName() != null) {
+        final WebApplicationContext context = getWebApplicationContext();
+        if (context.getApplicationName() != null) {
             root.put(prefix + "applicationName", context.getApplicationName());
         }
         if (context.getDisplayName() != null) {
