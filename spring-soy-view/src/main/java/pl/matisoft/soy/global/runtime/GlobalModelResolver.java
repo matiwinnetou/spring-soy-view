@@ -1,9 +1,12 @@
-package pl.matisoft.soy.global;
+package pl.matisoft.soy.global.runtime;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
+
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +22,6 @@ import com.google.template.soy.data.SoyMapData;
  */
 public interface GlobalModelResolver {
 
-    Optional<SoyMapData> resolveData(HttpServletRequest request);
+    Optional<SoyMapData> resolveData(HttpServletRequest request, HttpServletResponse response, Map<String, ? extends Object> model);
 
 }
