@@ -60,7 +60,7 @@ Possible to extend this and provide own output processors implementations
 
 master - will be part of (1.20.0) release
 * some changes are not backwards compatible, migration easy though
-* it will be necessary to append soy: prefix for templates to be rendered, e.g. "soy:soy.example.serverTime" instead of just "soy.example.serverTime", a Soy template resolver needed to be changed
+* it will be necessary to append soy: prefix for templates to be resolver properly, e.g. "soy:soy.example.serverTime" instead of just "soy.example.serverTime", a Soy template resolver needed to be changed
 and now if it won't be able to match on soy template, it will delegate to other template resolvers in the chain
 * Moved some implementation from upper classes and simplified inheritance hierarchy, since soy does not allow to pass parameters from views to methods, a lot of implementation is no longer valid for us
 * moved some of the implementation from upper classes of Spring's TemplateFileResolver and AbstractTemplateView to RuntimeResolvers, basically now one can use number of RuntimeResolvers to provide global runtime data
