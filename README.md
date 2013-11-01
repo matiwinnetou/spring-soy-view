@@ -9,17 +9,17 @@ It is highly customizable via pluggable interfaces, for which a default implemen
 * I18N - SoyMsgBundle based on resolvable locale (SoyMsgBundleResolver interface)
 * JavaScript compilation via AJAX endpoint using a Spring Controller (SoyAjaxController)
 * JavaScript compilation which supports browser caching (hash url part)
-* JavaScript onfuscation (via either google closure or yahoo js obfuscator) and combination of generated urls via Ajax
+* JavaScript obfuscation (via either google closure or yahoo js obfuscator) and combination of generated urls via Ajax
 * Soy Global variables supported (GlobalModelResolver interface)
 * Soy Compile time global variables supported (CompileTimeGlobalModelResolver interface)
 * Debug flag support
 * Ability to provide own template file resolver (TemplateFilesResolver interface)
 * Model transformation available (ModelAdjuster interface)
-* Default implementation that serializes request parameters, cookies and headers to Soy's $ij (Ijected Data - Runtime parameters) data.
+* Default implementation that serializes request parameters, cookies and headers to Soy's $ij (Injected Data - Runtime parameters) data.
 
 #### ChangeLog
 1.13.0
-* support for js minimification and combination in SoyAjaxController using Google Closure Library, e.g. via:
+* support for js obfuscation and combination in SoyAjaxController using Google Closure Library, e.g. via:
 http://localhost:8080/spring-soy-view-example/app/soy/server-time.soy,client-words.soy
 Possible to extend this and provide own output processors implementations
 * normalize slashes to dots, remove starting and ending slashes, and provide default view name.
@@ -33,7 +33,7 @@ Possible to extend this and provide own output processors implementations
 
 1.13.2
 * SoyAjaxController can be more secure by injecting AuthManager, which controls which soy files can be compiled to js files
-* It should be possible to pass *.js extension to SoyAjaxController just for convienience, it is still better to use it without extension
+* It should be possible to pass *.js extension to SoyAjaxController just for convenience, it is still better to use it without extension
 * Moved classes to an existing ajax subpackage as this was incorrectly grouped as a library code, where as it is ajax controller specific code 
 
 1.13.3
@@ -54,7 +54,7 @@ Possible to extend this and provide own output processors implementations
 * Changed the interface of SoyAjaxController, now the endpoint will be e.g. /soy/compileJs?hash=xxx&file=templates/abc.soy&file=templates/abc2.soy
 * DefaultTemplateFilesResolver supports full paths, e.g. templates/abc.soy rather than relaying on an unique file name (may not work under windows yet)
 * SoyAjaxController has been greatly improved, support for .js and without extension has been dropped to simplify code
-* SoyAjaxController will now not show stacktraces but http error codes and messages (it was a security loop hole)
+* SoyAjaxController will now not show stack traces but http error codes and messages (it was a security loop hole)
 * Ability to provide a locale as a request parameter to SoyAjaxController other then the one resolved by LocaleProvider
 * Ability to disable obfuscation via request parameter: ?disableProcessors=true parameter passed as a param to compileJs endpoint
 
@@ -62,11 +62,11 @@ master - will be part of (1.20.0) release
 * some changes are not backwards compatible, migration easy though
 * it will be necessary to append soy: prefix for templates to be rendered, e.g. "soy:soy.example.serverTime" instead of just "soy.example.serverTime", a Soy template resolver needed to be changed
 and now if it won't be able to match on soy template, it will delegate to other template resolvers in the chain
-* Moved some implementation from upper classes and simplified inheritance hierarchy, since soy does not allow to pass parameters from views to methods, a lot of implemnentation is no longer valid for us
+* Moved some implementation from upper classes and simplified inheritance hierarchy, since soy does not allow to pass parameters from views to methods, a lot of implementation is no longer valid for us
 * moved some of the implementation from upper classes of Spring's TemplateFileResolver and AbstractTemplateView to RuntimeResolvers, basically now one can use number of RuntimeResolvers to provide global runtime data
 * Modified interface of GlobalModelResolver that is now more generic, takes HttpServletRequest, HttpServletResponse and Map<String,Object> model
-* SoyTemplateViewResolver now extends from spring's AbstractCachingViewResolver, which means we were able to get rid of two upper classes in inheritance hierarchy, in which some abstractions did not apply to us
-* SoyView now doesn't extend from spring's abstract classes but needless to say implements spring's view interface
+* SoyTemplateViewResolver now extends from Spring's AbstractCachingViewResolver, which means we were able to get rid of two upper classes in inheritance hierarchy, in which some abstractions did not apply to us
+* SoyView now doesn't extend from Spring's abstract classes but needless to say implements Spring's view interface
 
 #### Known issues:
 * SoyAjaxController may not work under windows server, i.e. it may only work with linux style file paths
