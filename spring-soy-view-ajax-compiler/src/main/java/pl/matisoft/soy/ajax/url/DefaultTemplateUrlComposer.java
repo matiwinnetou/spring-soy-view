@@ -26,6 +26,8 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
 
     private HashFileGenerator hashFileGenerator = new EmptyHashFileGenerator();
 
+    private String siteUrl = "";
+
     public Optional<String> compose(final HttpServletRequest request, final Collection<String> soyTemplateFileNames) throws IOException {
         final Optional<String> md5 = hashHelper(soyTemplateFileNames);
         if (!md5.isPresent()) {
@@ -33,8 +35,8 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
         }
 
         final StringBuilder builder = new StringBuilder();
-        builder.append(request.getRequestURL());
-        builder.append("soy/compileJs?");
+        builder.append(siteUrl);
+        builder.append("/soy/compileJs?");
         builder.append("hash=");
         builder.append(md5.get());
 
@@ -48,7 +50,7 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
     }
 
     @Override
-    public Optional<String> compose(final HttpServletRequest request, String soyTemplateFileName) throws IOException {
+    public Optional<String> compose(final HttpServletRequest request, final String soyTemplateFileName) throws IOException {
         return compose(request, Lists.newArrayList(soyTemplateFileName));
     }
 
@@ -64,12 +66,20 @@ public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
         return hashFileGenerator.hashMulti(urls);
     }
 
-    public void setTemplateFilesResolver(TemplateFilesResolver templateFilesResolver) {
+    public void setTemplateFilesResolver(final TemplateFilesResolver templateFilesResolver) {
         this.templateFilesResolver = templateFilesResolver;
     }
 
-    public void setHashFileGenerator(HashFileGenerator hashFileGenerator) {
+    public void setHashFileGenerator(final HashFileGenerator hashFileGenerator) {
         this.hashFileGenerator = hashFileGenerator;
+    }
+
+    public void setSiteUrl(final String siteUrl) {
+        this.siteUrl = siteUrl;
+    }
+
+    public String getSiteUrl() {
+        return siteUrl;
     }
 
 }

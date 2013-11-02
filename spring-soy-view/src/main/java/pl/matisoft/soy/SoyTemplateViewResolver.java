@@ -1,8 +1,6 @@
 package pl.matisoft.soy;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.template.soy.tofu.SoyTofu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -14,8 +12,8 @@ import org.springframework.web.servlet.view.InternalResourceView;
 import org.springframework.web.servlet.view.RedirectView;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
-import pl.matisoft.soy.compile.DefaultTofuCompiler;
-import pl.matisoft.soy.compile.TofuCompiler;
+import pl.matisoft.soy.holder.CompiledTemplatesHolder;
+import pl.matisoft.soy.holder.EmptyCompiledTemplatesHolder;
 import pl.matisoft.soy.config.SoyViewConfig;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
 import pl.matisoft.soy.data.adjust.ModelAdjuster;
@@ -25,13 +23,7 @@ import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.EmptyTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
-import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
-import pl.matisoft.soy.template.TemplateFilesResolver;
 
-import javax.servlet.ServletContext;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collection;
 import java.util.Locale;
 
 /**
@@ -71,13 +63,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
     private static final Logger logger = LoggerFactory.getLogger(SoyTemplateViewResolver.class);
 
-    protected Optional<SoyTofu> compiledTemplates = Optional.absent();
-
     protected TemplateRenderer templateRenderer = new EmptyTemplateRenderer();
-
-    protected TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
-
-    protected TofuCompiler tofuCompiler = new DefaultTofuCompiler();
 
     protected ModelAdjuster modelAdjuster = new EmptyModelAdjuster();
 
@@ -98,6 +84,8 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
     private boolean redirectHttp10Compatible = true;
 
     private int order = Integer.MAX_VALUE;
+
+    private CompiledTemplatesHolder compiledTemplatesHolder = new EmptyCompiledTemplatesHolder();
 
     protected View loadView(final String viewName, final Locale locale) throws Exception {
         Preconditions.checkNotNull(viewName, "viewName cannot be null!");
@@ -124,16 +112,6 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
             return null;
         }
 
-        if (!isCache()) {
-            logger.debug("debug mode on, compiling templates...");
-            this.compiledTemplates = Optional.of(compileTemplates());
-        }
-
-        if (!this.compiledTemplates.isPresent()) {
-            logger.error("Unable to loadView, empty compiled templates, viewName:{}", stripPrefix(viewName));
-            return null;
-        }
-
         final SoyView view = new SoyView();
         view.setTemplateName(stripPrefix(newViewName));
         view.setContentType(contentType());
@@ -142,18 +120,9 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
         view.setGlobalModelResolver(globalModelResolver);
         view.setLocaleProvider(localeProvider);
         view.setSoyMsgBundleResolver(soyMsgBundleResolver);
-        view.setCompiledTemplates(compiledTemplates);
+        view.setCompiledTemplates(compiledTemplatesHolder.compiledTemplates());
 
         return view;
-    }
-
-    @Override
-    protected void initServletContext(final ServletContext servletContext) {
-        try {
-            this.compiledTemplates = Optional.fromNullable(compileTemplates());
-        } catch (final IOException ex) {
-            throw new IllegalStateException("Unable to compile Soy templates.", ex);
-        }
     }
 
     private boolean canHandle(final String templateName) {
@@ -205,32 +174,12 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
         return "text/html; charset=" + encoding;
     }
 
-    private SoyTofu compileTemplates() throws IOException {
-        Preconditions.checkNotNull(templateFilesResolver, "templatesRenderer cannot be null!");
-        Preconditions.checkNotNull(tofuCompiler, "tofuCompiler cannot be null!");
-
-        final Collection<URL> templateFiles = templateFilesResolver.resolve();
-        if (templateFiles != null && templateFiles.size() > 0) {
-            return tofuCompiler.compile(templateFiles);
-        }
-
-        throw new IOException("0 template files have been found, check your templateFilesResolver!");
-    }
-
     public void setTemplateRenderer(final TemplateRenderer templateRenderer) {
         this.templateRenderer = templateRenderer;
     }
 
     public void setEncoding(final String encoding) {
         this.encoding = encoding;
-    }
-
-    public void setTemplateFilesResolver(final TemplateFilesResolver templateFilesResolver) {
-        this.templateFilesResolver = templateFilesResolver;
-    }
-
-    public void setTofuCompiler(final TofuCompiler tofuCompiler) {
-        this.tofuCompiler = tofuCompiler;
     }
 
     public void setDebugOn(final boolean debugOn) {
@@ -271,6 +220,10 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
     public boolean isRedirectHttp10Compatible() {
         return redirectHttp10Compatible;
+    }
+
+    public void setCompiledTemplatesHolder(CompiledTemplatesHolder compiledTemplatesHolder) {
+        this.compiledTemplatesHolder = compiledTemplatesHolder;
     }
 
     @Override

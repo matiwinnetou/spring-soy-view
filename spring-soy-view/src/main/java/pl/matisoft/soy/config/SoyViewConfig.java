@@ -12,6 +12,7 @@ public class SoyViewConfig {
     public final static String DEFAULT_ENCODING = "utf-8";
     public final static boolean DEFAULT_DEBUG_ON = false;
     public final static String DEFAULT_FILES_EXTENSION = "soy";
+    public final static boolean DEFAULT_PRECOMPILE_TEMPLATES = false;
 
     private boolean debugOn = DEFAULT_DEBUG_ON;
 
