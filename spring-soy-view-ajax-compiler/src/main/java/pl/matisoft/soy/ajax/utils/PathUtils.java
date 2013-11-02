@@ -11,6 +11,10 @@ import com.google.common.base.Optional;
  */
 public class PathUtils {
 
+    private PathUtils() {
+        // protects from instantiation
+    }
+
     /**
      * Converts a String array to a String with coma separator
      * example: String["a.soy", "b.soy"] -> output: a.soy,b.soy
