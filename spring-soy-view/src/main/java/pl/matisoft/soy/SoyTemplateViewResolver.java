@@ -56,11 +56,6 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
      */
     public static final String FORWARD_URL_PREFIX = "forward:";
 
-    /**
-     * Special soy prefix to indicate that this template if meant to be rendered by soy template renderer
-     */
-    public static final String SOY_PREFIX = "soy:";
-
     private static final Logger logger = LoggerFactory.getLogger(SoyTemplateViewResolver.class);
 
     protected TemplateRenderer templateRenderer = new EmptyTemplateRenderer();
@@ -72,6 +67,8 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
     protected LocaleProvider localeProvider = new EmptyLocaleProvider();
 
     protected SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
+
+    private CompiledTemplatesHolder compiledTemplatesHolder = new EmptyCompiledTemplatesHolder();
 
     /** an encoding to use */
     private String encoding = SoyViewConfig.DEFAULT_ENCODING;
@@ -85,7 +82,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
     private int order = Integer.MAX_VALUE;
 
-    private CompiledTemplatesHolder compiledTemplatesHolder = new EmptyCompiledTemplatesHolder();
+    private String prefix = SoyViewConfig.DEFAULT_SOY_PREFIX;
 
     protected View loadView(final String viewName, final Locale locale) throws Exception {
         Preconditions.checkNotNull(viewName, "viewName cannot be null!");
@@ -126,12 +123,12 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
     }
 
     private boolean canHandle(final String templateName) {
-        return templateName.startsWith(SOY_PREFIX);
+        return templateName.startsWith(prefix);
     }
 
     private String stripPrefix(final String templateName) {
         if (canHandle(templateName)) {
-            return templateName.replace(SOY_PREFIX, "");
+            return templateName.replace(prefix, "");
         }
 
         return templateName;
@@ -176,14 +173,6 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
     public void setTemplateRenderer(final TemplateRenderer templateRenderer) {
         this.templateRenderer = templateRenderer;
-    }
-
-    public void setEncoding(final String encoding) {
-        this.encoding = encoding;
-    }
-
-    public void setDebugOn(final boolean debugOn) {
-        setCache(!debugOn);
     }
 
     public void setModelAdjuster(final ModelAdjuster modelAdjuster) {
@@ -233,6 +222,30 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public String getIndexView() {
+        return indexView;
+    }
+
+    public void setEncoding(final String encoding) {
+        this.encoding = encoding;
+    }
+
+    public void setDebugOn(final boolean debugOn) {
+        setCache(!debugOn);
     }
 
 }
