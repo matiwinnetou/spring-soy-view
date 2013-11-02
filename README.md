@@ -58,7 +58,7 @@ Possible to extend this and provide own output processors implementations
 * Ability to provide a locale as a request parameter to SoyAjaxController other then the one resolved by LocaleProvider
 * Ability to disable obfuscation via request parameter: ?disableProcessors=true parameter passed as a param to compileJs endpoint
 
-master - will be part of (1.20.0) release
+1.20.0
 * some changes are not backwards compatible, migration easy though
 * it will be necessary to append soy: prefix for templates to be resolver properly, e.g. "soy:soy.example.serverTime" instead of just "soy.example.serverTime", a Soy template resolver needed to be changed
 and now if it won't be able to match on soy template, it will delegate to other template resolvers in the chain
