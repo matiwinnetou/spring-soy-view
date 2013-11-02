@@ -67,6 +67,7 @@ and now if it won't be able to match on soy template, it will delegate to other 
 * Modified interface of GlobalModelResolver that is now more generic, takes HttpServletRequest, HttpServletResponse and Map<String,Object> model
 * SoyTemplateViewResolver now extends from Spring's AbstractCachingViewResolver, which means we were able to get rid of two upper classes in inheritance hierarchy, in which some abstractions did not apply to us
 * SoyView now doesn't extend from Spring's abstract classes but needless to say implements Spring's view interface
+* Introduced a new concept of CompiledTemplatesHolder, this way we can prevent compilation of all templates to take place multiple times per site, i.e. as many as there are pages (SoyView instances)
 
 #### Known issues:
 * SoyAjaxController may not work under windows server, i.e. it may only work with linux style file paths
