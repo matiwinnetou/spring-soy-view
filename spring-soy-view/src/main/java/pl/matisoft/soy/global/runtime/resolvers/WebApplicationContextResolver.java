@@ -30,8 +30,7 @@ public class WebApplicationContextResolver extends WebApplicationObjectSupport i
         if (context.getDisplayName() != null) {
             root.put(prefix + "displayName", context.getDisplayName());
         }
-        root.put(prefix + "startUp", context.getStartupDate());
-        root.put(prefix + "startUpFormatted", DateFormat.getDateTimeInstance().format(new Date(context.getStartupDate())));
+        root.put(prefix + "startUp", DateFormat.getDateTimeInstance().format(new Date(context.getStartupDate())));
         if (context.getId() != null) {
             root.put(prefix + "id", context.getId());
         }

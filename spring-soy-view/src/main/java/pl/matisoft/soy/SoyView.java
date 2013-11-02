@@ -58,39 +58,6 @@ public class SoyView implements View, BeanNameAware {
     public SoyView() {
     }
 
-    public void setTemplateName(String templateName) {
-        this.templateName = templateName;
-    }
-
-    public void setCompiledTemplates(Optional<SoyTofu> compiledTemplates) {
-        this.compiledTemplates = compiledTemplates;
-    }
-
-    public void setTemplateRenderer(TemplateRenderer templateRenderer) {
-        this.templateRenderer = templateRenderer;
-    }
-
-    public void setModelAdjuster(ModelAdjuster modelAdjuster) {
-        this.modelAdjuster = modelAdjuster;
-    }
-
-    public void setGlobalModelResolver(GlobalModelResolver globalModelResolver) {
-        this.globalModelResolver = globalModelResolver;
-    }
-
-    public void setLocaleProvider(LocaleProvider localeProvider) {
-        this.localeProvider = localeProvider;
-    }
-
-    public void setSoyMsgBundleResolver(SoyMsgBundleResolver soyMsgBundleResolver) {
-        this.soyMsgBundleResolver = soyMsgBundleResolver;
-    }
-
-    @Override
-    public String getContentType() {
-        return contentType;
-    }
-
     @Override
     public void render(Map<String, ? extends Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Preconditions.checkNotNull(templateName, "templateName cannot be null");
@@ -122,6 +89,11 @@ public class SoyView implements View, BeanNameAware {
         templateRenderer.render(renderRequest);
     }
 
+    @Override
+    public String getContentType() {
+        return contentType;
+    }
+
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
@@ -133,6 +105,34 @@ public class SoyView implements View, BeanNameAware {
 
     public String getBeanName() {
         return beanName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
+
+    public void setCompiledTemplates(Optional<SoyTofu> compiledTemplates) {
+        this.compiledTemplates = compiledTemplates;
+    }
+
+    public void setTemplateRenderer(TemplateRenderer templateRenderer) {
+        this.templateRenderer = templateRenderer;
+    }
+
+    public void setModelAdjuster(ModelAdjuster modelAdjuster) {
+        this.modelAdjuster = modelAdjuster;
+    }
+
+    public void setGlobalModelResolver(GlobalModelResolver globalModelResolver) {
+        this.globalModelResolver = globalModelResolver;
+    }
+
+    public void setLocaleProvider(LocaleProvider localeProvider) {
+        this.localeProvider = localeProvider;
+    }
+
+    public void setSoyMsgBundleResolver(SoyMsgBundleResolver soyMsgBundleResolver) {
+        this.soyMsgBundleResolver = soyMsgBundleResolver;
     }
 
 }
