@@ -443,6 +443,25 @@ As indicated in the above example, this will yield rendering of a template defin
 
 In Spring MVC, templates resolvers can be chained in a sense of __Chain of Responsibility__ pattern (GoF), this is the reason a "soy:" prefix was introduced, when __SoyTemplateViewResolver__ cannot sees the template name does not have this prefix, it is passing to next handlers in the chain (ie. other template view resolvers).
 
+### Compile Time Global Parameters
+There are parameters that are static in nature and they can be only changed upon restarts of the application. An example of such parameters could be: project directory, dev mode, google analytics token, etc. Normally these values are available via Spring's application properties. What you may notice is that from time to time you would like to reference this globally available data from your soy files, those parameters then are available in soy files in the form:
+{parameter.name}, note lack of $ sign.
+
+e.g.
+
+```xml
+    <bean id="globalCompileVariablesProvider" class="pl.matisoft.soy.global.compile.DefaultCompileTimeGlobalModelResolver">
+        <property name="data">
+            <map>
+                <entry key="app.global.siteUrl" value="http://www.mysite.com" />
+            </map>
+        </property>
+    </bean>
+```
+
+Please note it is also possible to inject all spring properties via properties property. The data can be referenced in soy files in the following manner: __{app.global.siteUrl}__
+
+
 ### Runtime Global Parameters
 Google's Soy Templates support a notion of globally injected parameters, which are available under a special namespace: ${ij}, contrary to other spring's view resolver library this library makes use of this and that way this allows us to keep SoyVIew implementation clean. By default an implementation delegates to a __DefaultGlobalModelResolver__, which in turn contains a list of RuntimeResolvers Out of the box the library provides a resolution for the following runtime information:
 
@@ -458,6 +477,13 @@ Note that since by design a Soy __does not__ allow any code from the templates t
 
 It is expected that if you need your own domain specific runtime data resolver, you simply write a new class and implement the interface __pl.matisoft.soy.global.runtime.resolvers.RuntimeResolver__, once done wire this via configuration of __DefaultGlobalModelResolver__
 
+```java
+public interface RuntimeResolver {
+
+    void resolveData(HttpServletRequest request, HttpServletResponse response, Map model, SoyMapData root);
+
+}
+```
 
 ### Ajax JavaScript compilation
 
@@ -504,7 +530,7 @@ To use an ajax compiler it is necessary to wire or include SoyAjaxController in 
 * outputProcessors - a list of processors that should be applied after js compilation takes place. Out of the box three implementations are provided: __GoogleClosureOutputProcessor__, __YahooOutputProcessor__ and __PrependAppendOutputProcessor__, which allows to append and prepend an arbitrary JavaScript code, which could be useful if one uses __requirejs__.
 * authManager - an implementation that allows to specify a list of allowedTemplates to be compiled, this is a security measure so that only certain templates are allowed to be compiled to JavaScript.
 
-An example from an html document:
+An example from a html document:
 
 ```html
 <script type="text/javascript" src="../bower_components/soyutils/soyutils.js"></script>

@@ -47,7 +47,7 @@ public class DefaultCompileTimeGlobalModelResolver implements CompileTimeGlobalM
 
     public void setProperties(final Properties properties) {
         data = new HashMap();
-        for (String propertyName : properties.stringPropertyNames()) {
+        for (final String propertyName : properties.stringPropertyNames()) {
             data.put(propertyName, properties.getProperty(propertyName));
         }
     }
