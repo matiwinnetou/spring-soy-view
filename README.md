@@ -20,11 +20,53 @@ It is highly customizable via pluggable interfaces, for which a default implemen
 
 In order to use spring-soy-view one has to wire beans. Since the library allows to adjust and plug an implementation for almost any internal function the configuration may seem to be verbose. It is recommended to keep spring-soy-view configuration in either separate XML file or Java Class, so that it does not obscure your internal application with it's wiring classes. Since most user's will want to adjust and possibly plug an own implementation of a certain function (seems to be the case for complex projects) the typical xml file is not part of jar distribution.
 
-### XML Example
+### Available modules
+- __spring-soy-view__ - this module is the core of the library, contains the main functionality including SoyTemplateFilesResolver 
+- __spring-soy-view-ajax-compiler__ - this module contains ajax compiler, it makes sense to use this modue only if you want to compile soy files to JavaScript
+- __spring-soy-view-min-google__ - this module allows minimification of soy to javascript code using google closure library. It makes sense to use this module only together with ajax-compiler module.
+- __spring-soy-view-min-yahoo__ - this module allows minimification of soy to javascript code using yahoo library. It makes sense to use this module only together with ajax-compiler module. Both google and yahoo libraries are mutually exclusive, it doesn't makse sense to use both at the same time
+
+### Maven configuration
+
+All artefacts have been pushed to maven central repository:
+
+### pom.xml
+
+<code>
+
+        <dependency>
+            <groupId>pl.matisoft</groupId>
+            <artifactId>spring-soy-view</artifactId>
+            <version>1.20.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.matisoft</groupId>
+            <artifactId>spring-soy-view-ajax-compiler</artifactId>
+            <version>1.20.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.matisoft</groupId>
+            <artifactId>spring-soy-view-min-google</artifactId>
+            <version>1.20.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.matisoft</groupId>
+            <artifactId>spring-soy-view-min-yahoo</artifactId>
+            <version>1.20.0</version>
+        </dependency>
+
+</code>
+
+### XML Configuration Example
 To use spring-soy-view via XML in Spring it is recommended to take this template as an example and adjust it accordingly. This example is taken from a real project and adjusted for the purpouses of this guide.
 
-###spring-soy-view.xml
+### spring-soy-view.xml
+
 <code>
+
     <bean id="soyViewConfig" class="pl.matisoft.soy.config.SoyViewConfig">
         <property name="debugOn" value="${myapp.dev.mode.on}" />
     </bean>
@@ -162,11 +204,12 @@ To use spring-soy-view via XML in Spring it is recommended to take this template
             </bean>
         </property>
     </bean>
+
 </code>
 
 ### Java Bean Config
-<code>
-<pre>
+```
+
 package pl.matisoft.soy.example;
 
 import com.google.common.collect.Lists;
@@ -371,11 +414,9 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     public AuthManager authManager() {
         return new ConfigurableAuthManager(Lists.newArrayList("templates/client-words.soy", "templates/server-time.soy"));
     }
-
 }
-</pre>
-</code>
 
+```
 
 ## ChangeLog
 
