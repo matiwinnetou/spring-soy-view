@@ -156,7 +156,7 @@ At the moment the library does not contain a maven-plugin that would extract i18
 The library contains a class: __DefaultSoyMsgBundleResolver__, which reads a xliff messages from classpath and makes it accessible to spring-soy-view library. By default a class will read messages
 stores in the classpath under: __messages.xlf__ file, this can be configured to reflect project settings.
 
-The library needs to lookup a locale and for this it uses an interface LocaleProvider, which comes with number of implementations. What is suggested and recommended is to use SpringLocaleProvider, which
+The library needs to lookup a locale and for this it uses an interface __LocaleProvider__, which comes with number of implementations. What is suggested and recommended is to use __SpringLocaleProvider__, which
 using spring resolver will lookup a current locale and load locale's xliff messages to be displayed for a user.
 
 ### Developer and Production mode
