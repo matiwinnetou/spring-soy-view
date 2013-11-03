@@ -136,6 +136,24 @@ e.g.
 
 Please note it is also possible to inject all spring properties via properties property. The data can be referenced in soy files in the following manner: __{app.global.siteUrl}__
 
+### Internationalization (i18n)
+The library supports templates to be in many languages, all you need to do is to reference your language specific messages inside a soy file with a special {msg} tag.
+
+Consider example:
+```html
+<h3>{msg meaning="I18N.VEHICLE.Further_Technical_Data" desc=""}Further Technical Data{/msg}</h3>
+```
+
+Note that at the moment this library requires that you precompile all files that contain {msg} tags into so called xliff format, which is
+a standard format that describes internationalized messages.
+More information on: http://en.wikipedia.org/wiki/XLIFF
+
+You can extract xliff messages from your soy file using a tool provided by google:
+https://developers.google.com/closure/templates/docs/translation
+
+At the moment the library does not contain a maven-plugin that would extract i18n messages and create xliff file(s) for it, it also appears to be outside of it's core functionality.
+
+The library contains a class: __DefaultSoyMsgBundleResolver__, which reads a xliff messages from classpath and makes it accessible to spring-soy-view library.
 
 ### Runtime Global Parameters
 Google's Soy Templates support a notion of globally injected parameters, which are available under a special namespace: ${ij}, contrary to other spring's view resolver library this library makes use of this and that way this allows us to keep SoyVIew implementation clean. By default an implementation delegates to a __DefaultGlobalModelResolver__, which in turn contains a list of RuntimeResolvers Out of the box the library provides a resolution for the following runtime information:
