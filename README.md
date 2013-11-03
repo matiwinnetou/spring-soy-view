@@ -423,10 +423,10 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
 
 ### Templates location
 
-By default a DefaultTemplatesFileResolver will look for *.soy templates stored inside /WEB-INF/templates folder, it will recursively resolve them, the location of files, an extension can be configured. At any given point in time it is also possible provide own implementation of TemplatesFileResolver if a default one doesn't meet our needs.
+By default a DefaultTemplatesFileResolver will look for __*.soy__ templates stored inside __/WEB-INF/templates__ folder, it will recursively resolve them, the location of files, an extension can be configured. At any given point in time it is also possible provide own implementation of TemplatesFileResolver if a default one doesn't meet our needs.
 
 ### Usage from Spring's Controller
-To render templates, one has to use by default (can be customized) a special prefix, i.e. "soy:" followed by a __logical__ template name.
+To render templates, one has to use by default (can be customized) a special prefix, i.e. __"soy:"__ followed by a __logical__ template name.
 
 This can be best illustrated by an example:
 
@@ -438,6 +438,26 @@ This can be best illustrated by an example:
 ```
 
 As indicated in the above example, this will yield rendering of a template defined in soy.example.serverTime, mind you that it is a logical template name and it doesn't matter in which file it is stored as long as the file is resolveable by a TemplatesFileResolver. In the mentioned example a string with a template name is returned, as it is normal in spring mvc world that when a method returns a string, it indicates a path to a template.
+
+### Spring's Template resolvers chaining
+
+In Spring MVC, templates resolvers can be chained in a sense of __Chain of Responsibility__ pattern (GoF), this is the reason a "soy:" prefix was introduced, when __SoyTemplateViewResolver__ cannot sees the template name does not have this prefix, it is passing to next handlers in the chain (ie. other template view resolvers).
+
+### Runtime Global Parameters
+Google's Soy Templates support a notion of globally injected parameters, which are available under a special namespace: ${ij}, contrary to other spring's view resolver library this library makes use of this and that way this allows us to keep SoyVIew implementation clean. By default an implementation delegates to a __DefaultGlobalModelResolver__, which in turn contains a list of RuntimeResolvers Out of the box the library provides a resolution for the following runtime information:
+
+* __Servlet's servletContext__ via ServletContextResolver class and by default data is bound to: __{$ij._servlet.context}__
+* __Spring's WebApplicationContext__ via WebApplicationContextResolver class and by default data is bound to: __{$ij._web.app.context}__
+* __Http cookies__ via CookieResolver and by default data is bound to: __{$ij._request.cookie}__ 
+* __Http session__ data via HttpSessionResolver and by default data is bound to: __{$ij._http.session}__. Please note this runtime resolver does not resolve objects only primitives, it is therefore needed that you extend from this runtime resolver 
+* __Spring's RequestContext__ via RequestContextResolver and data bound to: __{$ij._request.context}__
+* __Request parameters__ via RequestParametersResolver and data bound to: __{$ij._request.parameter}__
+* __Request headers__ via RequestHeadersResolver and data bound to: __{$ij._request.header}__
+
+Note that since by design a Soy __does not__ allow any code from the templates to be executes in java (without writing a plugin for it), all of those implementation support only getting data without input parameters.
+
+It is expected that if you need your own domain specific runtime data resolver, you simply write a new class and implement the interface __pl.matisoft.soy.global.runtime.resolvers.RuntimeResolver__, once done wire this via configuration of __DefaultGlobalModelResolver__
+
 
 ### Ajax JavaScript compilation
 
@@ -498,9 +518,10 @@ An example from an html document:
 ##### __/soy/compileJs__
 with the following parameters:
 
-* hash (optional) - indicates a release hash or a hash sum of the file
-* file (mandatory) - a list of one or multiple pathd pointing to soy files to be compiled to JavaScript
-* disableProcessors (optional) - a boolean, true or false, enabled by default, which controls whether this ajax controller should pass the result to configured output processors
+* __hash__ (optional) - indicates a release hash or a hash sum of the file, this is used for cache busting
+* __file__ (mandatory) - a list of one or multiple pathd pointing to soy files to be compiled to JavaScript
+* __locale__ (optional) - allows to override a default locale provided by __LocaleProvider_, .e.g locale=pl_PL
+* __disableProcessors__ (optional) - a boolean, true or false, enabled by default, which controls whether this ajax controller should pass the result to configured output processors
 
 ## ChangeLog
 
