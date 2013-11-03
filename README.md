@@ -166,6 +166,7 @@ To use spring-soy-view via XML in Spring it is recommended to take this template
 
 ### Java Bean Config
 <code>
+<pre>
 package pl.matisoft.soy.example;
 
 import com.google.common.collect.Lists;
@@ -372,6 +373,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
     }
 
 }
+</pre>
 </code>
 
 
