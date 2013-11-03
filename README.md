@@ -6,7 +6,7 @@ It is highly customizable via pluggable interfaces, for which a default implemen
 It distinguishes itself from other frameworks, which are often "black boxes" and do not allow easy customisation.
 It was created due to specific requirements, which no other framework at that time could provide.
 
-#### Supported
+#### Features
 * POJO rendering and flat structure rendering (ToSoyDataConverter interface)
 * I18N - SoyMsgBundle based on resolvable locale (SoyMsgBundleResolver interface)
 * Soy Global variables ($ij) supported with many out of the box runtime data resolvers (e.g. http session, request parameters, request headers, servlet context, etc) via (GlobalModelResolver interface)
@@ -20,7 +20,8 @@ It was created due to specific requirements, which no other framework at that ti
 
 #### Google Closure Soy
 
-Google Closure Soy is an implementation of logic-less templates by Google
+Google Closure Soy is an implementation of logic-less templates by Google. Templates can be used on the server side and
+on the client side using soy to JavaScript compiler.
 
 ##### Example:
 
@@ -223,6 +224,17 @@ with the following parameters:
 * __locale__ (optional) - allows to override a default locale provided by __LocaleProvider_, .e.g locale=pl_PL
 * __disableProcessors__ (optional) - a boolean, true or false, enabled by default, which controls whether this ajax controller should pass the result to configured output processors
 
+### Google groups forum
+
+If you find issues, cannot understand something, please post a question to a Google Groups forum, I will try to help
+you with the problem.
+
+[Google groups forum](https://groups.google.com/forum/#!forum/spring-soy-view "Google groups forum")
+
+### Git pull requests
+
+Git pull requests are welcome and I am happy to discuss and integrate them to the project
+
 ## ChangeLog
 
 ### 1.13.0
@@ -280,10 +292,10 @@ and now if it won't be able to match on soy template, it will delegate to other 
 
 Apache License Version 2.0
 
-#### Known issues:
+### Known issues:
 * SoyAjaxController may not work under windows server, i.e. it may only work with linux style file paths
 
-#### Example project:
+### Example project:
 * https://github.com/mati1979/spring-soy-view-example
 
 author: Mateusz Szczap<br>
