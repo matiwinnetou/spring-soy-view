@@ -21,10 +21,10 @@ It is highly customizable via pluggable interfaces, for which a default implemen
 In order to use spring-soy-view one has to wire beans. Since the library allows to adjust and plug an implementation for almost any internal function the configuration may seem to be verbose. It is recommended to keep spring-soy-view configuration in either separate XML file or Java Class, so that it does not obscure your internal application with it's wiring classes. Since most user's will want to adjust and possibly plug an own implementation of a certain function (seems to be the case for complex projects) the typical xml file is not part of jar distribution.
 
 ### Available modules
-- __spring-soy-view__ - this module is the core of the library, contains the main functionality including SoyTemplateFilesResolver 
-- __spring-soy-view-ajax-compiler__ - this module contains ajax compiler, it makes sense to use this modue only if you want to compile soy files to JavaScript
-- __spring-soy-view-min-google__ - this module allows minimification of soy to javascript code using google closure library. It makes sense to use this module only together with ajax-compiler module.
-- __spring-soy-view-min-yahoo__ - this module allows minimification of soy to javascript code using yahoo library. It makes sense to use this module only together with ajax-compiler module. Both google and yahoo libraries are mutually exclusive, it doesn't makse sense to use both at the same time
+* __spring-soy-view__ - this module is the core of the library, contains the main functionality including SoyTemplateFilesResolver 
+* __spring-soy-view-ajax-compiler__ - this module contains ajax compiler, it makes sense to use this modue only if you want to compile soy files to JavaScript
+* __spring-soy-view-min-google__ - this module allows minimification of soy to javascript code using google closure library. It makes sense to use this module only together with ajax-compiler module.
+* __spring-soy-view-min-yahoo__ - this module allows minimification of soy to javascript code using yahoo library. It makes sense to use this module only together with ajax-compiler module. Both google and yahoo libraries are mutually exclusive, it doesn't makse sense to use both at the same time
 
 ### Maven configuration
 
@@ -32,7 +32,7 @@ All artefacts have been pushed to maven central repository:
 
 ### pom.xml
 
-<code>
+```
 
         <dependency>
             <groupId>pl.matisoft</groupId>
@@ -58,19 +58,23 @@ All artefacts have been pushed to maven central repository:
             <version>1.20.0</version>
         </dependency>
 
-</code>
+```
 
 ### XML Configuration Example
 To use spring-soy-view via XML in Spring it is recommended to take this template as an example and adjust it accordingly. This example is taken from a real project and adjusted for the purpouses of this guide.
 
 ### spring-soy-view.xml
 
-<code>
+```
 
+    <!--
+    please replace ${myapp.dev.mode.on} pointing to your configuration variable indicating development mode
+    in which hot reloading is enabled and cache is disabled
+    -->
     <bean id="soyViewConfig" class="pl.matisoft.soy.config.SoyViewConfig">
         <property name="debugOn" value="${myapp.dev.mode.on}" />
     </bean>
-
+    
     <bean id="globalCompileVariablesProvider" class="pl.matisoft.soy.global.compile.DefaultCompileTimeGlobalModelResolver">
         <property name="data">
             <map>
@@ -205,11 +209,11 @@ To use spring-soy-view via XML in Spring it is recommended to take this template
         </property>
     </bean>
 
-</code>
-
-### Java Bean Config
 ```
 
+### Java Bean Config
+
+```java
 package pl.matisoft.soy.example;
 
 import com.google.common.collect.Lists;
@@ -415,8 +419,88 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
         return new ConfigurableAuthManager(Lists.newArrayList("templates/client-words.soy", "templates/server-time.soy"));
     }
 }
-
 ```
+
+### Templates location
+
+By default a DefaultTemplatesFileResolver will look for *.soy templates stored inside /WEB-INF/templates folder, it will recursively resolve them, the location of files, an extension can be configured. At any given point in time it is also possible provide own implementation of TemplatesFileResolver if a default one doesn't meet our needs.
+
+### Usage from Spring's Controller
+To render templates, one has to use by default (can be customized) a special prefix, i.e. "soy:" followed by a __logical__ template name.
+
+This can be best illustrated by an example:
+
+```java
+	@RequestMapping(value="/server-time")
+	public String getServerTime(final Model model) {
+		return "soy:soy.example.serverTime";
+	}
+```
+
+As indicated in the above example, this will yield rendering of a template defined in soy.example.serverTime, mind you that it is a logical template name and it doesn't matter in which file it is stored as long as the file is resolveable by a TemplatesFileResolver. In the mentioned example a string with a template name is returned, as it is normal in spring mvc world that when a method returns a string, it indicates a path to a template.
+
+### Ajax JavaScript compilation
+
+To use an ajax compiler it is necessary to wire or include SoyAjaxController in application's configuration files:
+
+```xml
+<bean id="ajaxSoyController" class="pl.matisoft.soy.ajax.SoyAjaxController">
+        <property name="localeProvider" ref="localeProvider" />
+        <property name="soyMsgBundleResolver" ref="soyMsgBundleResolver" />
+        <property name="templateFilesResolver" ref="templateFileResolver" />
+        <property name="tofuCompiler" ref="tofuCompiler" />
+        <property name="debugOn">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName" value="soyViewConfig" />
+                <property name="propertyPath" value="debugOn" />
+            </bean>
+        </property>
+        <property name="cacheControl" value="public, max-age=86400" /> <!-- one year -->
+        <property name="expiresHeaders" value="Mon, 16 May 2050 20:00:00 GMT" />
+        <property name="outputProcessors">
+            <list>
+                <bean class="pl.matisoft.soy.ajax.process.google.GoogleClosureOutputProcessor" />
+            </list>
+        </property>
+        <property name="authManager">
+            <bean class="pl.matisoft.soy.ajax.auth.ConfigurableAuthManager">
+                <property name="allowedTemplates">
+                    <list>
+                        <value>ajax_search_makes</value>
+                        <value>ajax_search_models</value>
+                        <value>ajax_check_distance</value>
+                        <value>ajax_adnav</value>
+                        <value>ajax_similar_ads</value>
+                        <value>ajax_google_ad_info</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+```
+
+* cacheControl - indicates how long the resource should not expire after it has been compiled. This parameter is only useful if debugOn is false
+* expireHeaders - similar to cache control but for HTML 1.0
+* outputProcessors - a list of processors that should be applied after js compilation takes place. Out of the box three implementations are provided: __GoogleClosureOutputProcessor__, __YahooOutputProcessor__ and __PrependAppendOutputProcessor__, which allows to append and prepend an arbitrary JavaScript code, which could be useful if one uses __requirejs__.
+* authManager - an implementation that allows to specify a list of allowedTemplates to be compiled, this is a security measure so that only certain templates are allowed to be compiled to JavaScript.
+
+An example from an html document:
+
+```html
+<script type="text/javascript" src="../bower_components/soyutils/soyutils.js"></script>
+<script type="text/javascript" src="soy/compileJs?file=templates/client-words.soy&amp;file=templates/server-time.soy"></script>
+```
+
+* I the first line it is necessary to note here that this example uses __required__ soyutils using bower package manager.
+* In second line, we can see a call to soy/compileJs?, which will compile both templates/client-words.soy and templates/server-time.soy using SoyAjaxController. Please note this code will also combine and potentially obfuscate (if OutputProcessor has been configured for this SoyAjaxController)
+
+#### SoyAjaxController supports the following endpoints:
+##### __/soy/compileJs__
+with the following parameters:
+
+* hash (optional) - indicates a release hash or a hash sum of the file
+* file (mandatory) - a list of one or multiple pathd pointing to soy files to be compiled to JavaScript
+* disableProcessors (optional) - a boolean, true or false, enabled by default, which controls whether this ajax controller should pass the result to configured output processors
 
 ## ChangeLog
 
