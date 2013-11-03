@@ -7,20 +7,21 @@ It is highly customizable via pluggable interfaces, for which a default implemen
 #### Supported
 * POJO rendering and flat structure rendering (ToSoyDataConverter interface)
 * I18N - SoyMsgBundle based on resolvable locale (SoyMsgBundleResolver interface)
-* JavaScript compilation via AJAX endpoint using a Spring Controller (SoyAjaxController)
-* JavaScript compilation which supports browser caching (hash url part)
-* JavaScript obfuscation (via either google closure or yahoo js obfuscator) and combination of generated urls via Ajax
 * Soy Global variables ($ij) supported with many out of the box runtime data resolvers (e.g. http session, request parameters, request headers, servlet context, etc) via (GlobalModelResolver interface)
 * Soy Compile time global variables supported (CompileTimeGlobalModelResolver interface)
 * Debug flag support, allows editing and changing soy files in dev mode with immediate reflection and recompilation of soy
 * Ability to provide own template file resolver (TemplateFilesResolver interface)
 * Model transformation available (ModelAdjuster interface) since spring wraps the real backing model in it's own map  
+* JavaScript compilation via AJAX endpoint using a Spring Controller (SoyAjaxController)
+* JavaScript compilation which supports browser caching (hash url part)
+* JavaScript obfuscation (via either google closure or yahoo js obfuscator) and combination of generated urls via Ajax
 
 # User's Guide
 
 In order to use spring-soy-view one has to wire beans. Since the library allows to adjust and plug an implementation for almost any internal function the configuration may seem to be verbose. It is recommended to keep spring-soy-view configuration in either separate XML file or Java Class, so that it does not obscure your internal application with it's wiring classes. Since most user's will want to adjust and possibly plug an own implementation of a certain function (seems to be the case for complex projects) the typical xml file is not part of jar distribution.
 
-### Available modules
+### Available maven modules
+
 * __spring-soy-view__ - this module is the core of the library, contains the main functionality including SoyTemplateFilesResolver 
 * __spring-soy-view-ajax-compiler__ - this module contains ajax compiler, it makes sense to use this modue only if you want to compile soy files to JavaScript
 * __spring-soy-view-min-google__ - this module allows minimification of soy to javascript code using google closure library. It makes sense to use this module only together with ajax-compiler module.
@@ -32,8 +33,7 @@ All artefacts have been pushed to maven central repository:
 
 ### pom.xml
 
-```
-
+```xml
         <dependency>
             <groupId>pl.matisoft</groupId>
             <artifactId>spring-soy-view</artifactId>
@@ -57,7 +57,6 @@ All artefacts have been pushed to maven central repository:
             <artifactId>spring-soy-view-min-yahoo</artifactId>
             <version>1.20.0</version>
         </dependency>
-
 ```
 
 ### XML Configuration Example
@@ -174,7 +173,7 @@ To use an ajax compiler it is necessary to wire or include SoyAjaxController in 
                 </property>
             </bean>
         </property>
-    </bean>
+</bean>
 ```
 
 * cacheControl - indicates how long the resource should not expire after it has been compiled. This parameter is only useful if debugOn is false
@@ -189,7 +188,7 @@ An example from a html document:
 <script type="text/javascript" src="soy/compileJs?file=templates/client-words.soy&amp;file=templates/server-time.soy"></script>
 ```
 
-* I the first line it is necessary to note here that this example uses __required__ soyutils using bower package manager.
+* I the first line it is necessary to note here that this example uses __required__ soyutils using bower package manager but obviously it can be linked in an _old fashioned_ way. soyutils is available in bower as "soyutils" package
 * In second line, we can see a call to soy/compileJs?, which will compile both templates/client-words.soy and templates/server-time.soy using SoyAjaxController. Please note this code will also combine and potentially obfuscate (if OutputProcessor has been configured for this SoyAjaxController)
 
 #### SoyAjaxController supports the following endpoints:
