@@ -1,8 +1,10 @@
 #Introduction
 
-Implementation of Spring's MVC View in Google Closure (soy)
+Implementation of Spring's MVC View Resolver using Google Closure (soy)
 
-It is highly customizable via pluggable interfaces, for which a default implementation is provided. It distinguishes itself from other frameworks, which are often "black boxes" and do not allow easy customisation. It was created due to specific requirements, which no other framework at that time could provide.
+It is highly customizable via pluggable interfaces, for which a default implementation is provided.
+It distinguishes itself from other frameworks, which are often "black boxes" and do not allow easy customisation.
+It was created due to specific requirements, which no other framework at that time could provide.
 
 #### Supported
 * POJO rendering and flat structure rendering (ToSoyDataConverter interface)
@@ -15,6 +17,27 @@ It is highly customizable via pluggable interfaces, for which a default implemen
 * JavaScript compilation via AJAX endpoint using a Spring Controller (SoyAjaxController)
 * JavaScript compilation which supports browser caching (hash url part)
 * JavaScript obfuscation (via either google closure or yahoo js obfuscator) and combination of generated urls via Ajax
+
+#### Google Closure Soy
+
+Google Closure Soy is an implementation of logic-less templates by Google
+
+##### Example:
+
+```
+{namespace soy.example}
+
+/**
+ * @param words The words to display
+ */
+{template .clientWords}
+  <ul>
+    {foreach $word in $words}
+      <li>{$word}</li>
+    {/foreach}
+  </ul>
+{/template}
+```
 
 # User's Guide
 
@@ -252,6 +275,10 @@ and now if it won't be able to match on soy template, it will delegate to other 
 * SoyTemplateViewResolver now extends from Spring's AbstractCachingViewResolver, which means we were able to get rid of two upper classes in inheritance hierarchy, in which some abstractions did not apply to us
 * SoyView now doesn't extend from Spring's abstract classes but needless to say implements Spring's view interface
 * Introduced a new concept of CompiledTemplatesHolder, this way we can prevent compilation of all templates to take place multiple times per site, i.e. as many as there are pages (SoyView instances)
+
+### License
+
+Apache License Version 2.0
 
 #### Known issues:
 * SoyAjaxController may not work under windows server, i.e. it may only work with linux style file paths
