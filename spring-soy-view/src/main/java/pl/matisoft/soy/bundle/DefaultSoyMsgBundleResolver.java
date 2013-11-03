@@ -36,14 +36,11 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultSoyMsgBundleResolver.class);
 
-    /** default filename, which should be visible in classpath which defines compiled soy message bundle file */
-    public final static String DEF_MESSAGES_PATH = "messages";
-
     /** a cache of soy msg bundles */
     /** friendly */ Map<Locale, SoyMsgBundle> msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
 
     /** a path to a bundle */
-    private String messagesPath = DEF_MESSAGES_PATH;
+    private String messagesPath = SoyViewConfig.DEF_MESSAGES_PATH;
 
     /** will cache msgBundles if a debugOn is off, if debug is on,
      *  will compile msg bundles each time it is invoked */

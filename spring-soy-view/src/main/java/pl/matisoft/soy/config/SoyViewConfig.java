@@ -35,6 +35,11 @@ public class SoyViewConfig {
      */
     public final static String DEFAULT_SOY_PREFIX = "soy:";
 
+    /**
+     * A default path to xliff messages
+     */
+    public final static String DEF_MESSAGES_PATH = "messages";
+
     private boolean debugOn = DEFAULT_DEBUG_ON;
 
     private String encoding = DEFAULT_ENCODING;

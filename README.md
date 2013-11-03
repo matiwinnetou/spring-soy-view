@@ -153,7 +153,17 @@ https://developers.google.com/closure/templates/docs/translation
 
 At the moment the library does not contain a maven-plugin that would extract i18n messages and create xliff file(s) for it, it also appears to be outside of it's core functionality.
 
-The library contains a class: __DefaultSoyMsgBundleResolver__, which reads a xliff messages from classpath and makes it accessible to spring-soy-view library.
+The library contains a class: __DefaultSoyMsgBundleResolver__, which reads a xliff messages from classpath and makes it accessible to spring-soy-view library. By default a class will read messages
+stores in the classpath under: __messages.xlf__ file, this can be configured to reflect project settings.
+
+The library needs to lookup a locale and for this it uses an interface LocaleProvider, which comes with number of implementations. What is suggested and recommended is to use SpringLocaleProvider, which
+using spring resolver will lookup a current locale and load locale's xliff messages to be displayed for a user.
+
+### Developer and Production mode
+
+In order to support hot-reloading of soy files a library supports a developer mode, which is controller via debugOn flag. A name of this property can be misleading but it is for historical reasons.
+Usually when this property is set to true on certain classes it means the caching will be disabled, note that you can set a debugOn property on some classes and always leave it set to true or false on others.
+This way you can control certain aspects of developer mode, some classes may continue to cache results others will constantly recompile or build pertinent objects.
 
 ### Runtime Global Parameters
 Google's Soy Templates support a notion of globally injected parameters, which are available under a special namespace: ${ij}, contrary to other spring's view resolver library this library makes use of this and that way this allows us to keep SoyVIew implementation clean. By default an implementation delegates to a __DefaultGlobalModelResolver__, which in turn contains a list of RuntimeResolvers Out of the box the library provides a resolution for the following runtime information:
@@ -178,7 +188,22 @@ public interface RuntimeResolver {
 }
 ```
 
+### Model adjuster (ModelAdjuster)
+
+This concept has been created because Spring MVC will often wrap your real domain object inside own model. Soy needs to
+access a path to your domain object compiled to soy compatible data structures, not internal spring model.
+To use it, just wire __SpringModelAdjuster__ and specify your model property (typically 'model').
+
+### POJO Data Conversion (ToSoyDataConverter)
+
+A library by default will convert your POJO domain objects to soy compatible data structures. A default implementation
+of ToSoyDataConverter that will recursively inspect a passed in model and build a nested structure of SoyMapData objects,
+which consist only of primitives supported by Soy and thus can be rendered.
+
 ### Ajax JavaScript compilation
+
+This is an optional module, in which compilation of soy files can be done via a Spring MVC controller. Typically, however,
+most project will use a maven plugin or grunt task that compiles soy files to javascript.
 
 To use an ajax compiler it is necessary to wire or include SoyAjaxController in application's configuration files:
 
