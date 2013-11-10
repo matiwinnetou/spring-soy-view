@@ -1,6 +1,5 @@
 package pl.matisoft.soy.global.runtime.resolvers;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.template.soy.data.SoyMapData;
 import org.junit.Assert;
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class RequestHeadersResolverTest {
 
-    private RequestHeadersResolver requestHeadersResolver = new RequestHeadersResolver();
+    private RequestHeadersDataResolver requestHeadersResolver = new RequestHeadersDataResolver();
 
     @Test
     public void testResolverHeaders() throws Exception {

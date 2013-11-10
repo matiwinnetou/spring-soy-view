@@ -1,14 +1,14 @@
-package pl.matisoft.soy.ajax.process;
+package pl.matisoft.soy.ajax.process.yahoo;
+
+import java.io.StringReader;
+import java.io.StringWriter;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Created with IntelliJ IDEA.

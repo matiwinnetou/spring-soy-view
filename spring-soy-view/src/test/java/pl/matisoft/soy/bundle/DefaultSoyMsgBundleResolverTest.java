@@ -23,7 +23,7 @@ public class DefaultSoyMsgBundleResolverTest {
 
     @Test
     public void defaultDebug() throws Exception {
-        Assert.assertFalse("debug should be off", defaultSoyMsgBundleResolver.isDebugOn());
+        Assert.assertFalse("debug should be off", defaultSoyMsgBundleResolver.isHotReloadMode());
     }
 
     @Test
@@ -33,8 +33,8 @@ public class DefaultSoyMsgBundleResolverTest {
 
     @Test
     public void settingDebug() throws Exception {
-        defaultSoyMsgBundleResolver.setDebugOn(true);
-        Assert.assertTrue("debug should be on", defaultSoyMsgBundleResolver.isDebugOn());
+        defaultSoyMsgBundleResolver.setHotReloadMode(true);
+        Assert.assertTrue("debug should be on", defaultSoyMsgBundleResolver.isHotReloadMode());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class DefaultSoyMsgBundleResolverTest {
 
     @Test
     public void cacheDoesntWorkInDebugMode() throws Exception {
-        defaultSoyMsgBundleResolver.setDebugOn(true);
+        defaultSoyMsgBundleResolver.setHotReloadMode(true);
         defaultSoyMsgBundleResolver.setMessagesPath("msg/messages");
         defaultSoyMsgBundleResolver.resolve(Optional.of(Locale.GERMAN));
         Assert.assertTrue("cache should be empty", defaultSoyMsgBundleResolver.msgBundles.isEmpty());
@@ -162,7 +162,7 @@ public class DefaultSoyMsgBundleResolverTest {
     @Test
     public void cacheDoesntWorkInDebugModeThowsNPEOnCacheAccess() throws Exception {
         try {
-            defaultSoyMsgBundleResolver.setDebugOn(true);
+            defaultSoyMsgBundleResolver.setHotReloadMode(true);
             defaultSoyMsgBundleResolver.setMessagesPath("msg/messages");
             defaultSoyMsgBundleResolver.resolve(Optional.of(Locale.GERMAN));
             defaultSoyMsgBundleResolver.msgBundles = null;

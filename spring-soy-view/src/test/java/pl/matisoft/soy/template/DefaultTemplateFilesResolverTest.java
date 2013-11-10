@@ -21,13 +21,13 @@ public class DefaultTemplateFilesResolverTest {
 
     @Test
     public void defaultDebugFlag() throws Exception {
-        Assert.assertFalse("debug flag should be off", defaultTemplateFilesResolver.isDebugOn());
+        Assert.assertFalse("debug flag should be off", defaultTemplateFilesResolver.isHotReloadMode());
     }
 
     @Test
     public void setDebugFlag() throws Exception {
-        defaultTemplateFilesResolver.setDebugOn(true);
-        Assert.assertTrue("debug flag should be on", defaultTemplateFilesResolver.isDebugOn());
+        defaultTemplateFilesResolver.setHotReloadMode(true);
+        Assert.assertTrue("debug flag should be on", defaultTemplateFilesResolver.isHotReloadMode());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class DefaultTemplateFilesResolverTest {
     @Test
     public void cacheDisabledWithDebugOn() throws Exception {
         defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        defaultTemplateFilesResolver.setDebugOn(true);
+        defaultTemplateFilesResolver.setHotReloadMode(true);
         defaultTemplateFilesResolver.resolve("template1");
         Assert.assertTrue("cache should be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
     }

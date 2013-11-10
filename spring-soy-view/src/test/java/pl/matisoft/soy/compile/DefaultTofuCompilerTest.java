@@ -44,13 +44,13 @@ public class DefaultTofuCompilerTest {
 
     @Test
     public void debugDefault() throws Exception {
-        Assert.assertFalse("debug should be off", defaultTofuCompiler.isDebugOn());
+        Assert.assertFalse("debug should be off", defaultTofuCompiler.isHotReloadMode());
     }
 
     @Test
     public void debugWorks() throws Exception {
-        defaultTofuCompiler.setDebugOn(true);
-        Assert.assertTrue("debug should be on", defaultTofuCompiler.isDebugOn());
+        defaultTofuCompiler.setHotReloadMode(true);
+        Assert.assertTrue("debug should be on", defaultTofuCompiler.isHotReloadMode());
     }
 
     @Test

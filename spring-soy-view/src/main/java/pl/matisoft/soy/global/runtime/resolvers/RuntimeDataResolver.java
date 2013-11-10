@@ -1,10 +1,10 @@
 package pl.matisoft.soy.global.runtime.resolvers;
 
-import com.google.template.soy.data.SoyMapData;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
+
+import com.google.template.soy.data.SoyMapData;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,7 +12,7 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 16:29
  */
-public interface RuntimeResolver {
+public interface RuntimeDataResolver {
 
     void resolveData(HttpServletRequest request, HttpServletResponse response, Map<String, ? extends Object> model, SoyMapData root);
 

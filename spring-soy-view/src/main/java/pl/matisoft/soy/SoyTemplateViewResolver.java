@@ -1,5 +1,7 @@
 package pl.matisoft.soy;
 
+import java.util.Locale;
+
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,19 +14,17 @@ import org.springframework.web.servlet.view.InternalResourceView;
 import org.springframework.web.servlet.view.RedirectView;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
-import pl.matisoft.soy.holder.CompiledTemplatesHolder;
-import pl.matisoft.soy.holder.EmptyCompiledTemplatesHolder;
-import pl.matisoft.soy.config.SoyViewConfig;
+import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
 import pl.matisoft.soy.data.adjust.ModelAdjuster;
 import pl.matisoft.soy.global.runtime.EmptyGlobalModelResolver;
 import pl.matisoft.soy.global.runtime.GlobalModelResolver;
+import pl.matisoft.soy.holder.CompiledTemplatesHolder;
+import pl.matisoft.soy.holder.EmptyCompiledTemplatesHolder;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.EmptyTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
-
-import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA.
@@ -71,7 +71,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
     private CompiledTemplatesHolder compiledTemplatesHolder = new EmptyCompiledTemplatesHolder();
 
     /** an encoding to use */
-    private String encoding = SoyViewConfig.DEFAULT_ENCODING;
+    private String encoding = SoyViewConfigDefaults.DEFAULT_ENCODING;
 
     /** a default view */
     private String indexView = "index";
@@ -82,7 +82,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
     private int order = Integer.MAX_VALUE;
 
-    private String prefix = SoyViewConfig.DEFAULT_SOY_PREFIX;
+    private String prefix = SoyViewConfigDefaults.DEFAULT_SOY_PREFIX;
 
     protected View loadView(final String viewName, final Locale locale) throws Exception {
         Preconditions.checkNotNull(viewName, "viewName cannot be null!");
@@ -244,8 +244,8 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
         this.encoding = encoding;
     }
 
-    public void setDebugOn(final boolean debugOn) {
-        setCache(!debugOn);
+    public void setHotReloadMode(final boolean hotReloadMode) {
+        setCache(!hotReloadMode);
     }
 
 }

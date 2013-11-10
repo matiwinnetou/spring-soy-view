@@ -1,5 +1,9 @@
 package pl.matisoft.soy.holder;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
@@ -8,13 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import pl.matisoft.soy.compile.EmptyTofuCompiler;
 import pl.matisoft.soy.compile.TofuCompiler;
-import pl.matisoft.soy.config.SoyViewConfig;
+import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,7 +26,7 @@ public class DefaultCompiledTemplatesHolder implements InitializingBean, Compile
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultCompiledTemplatesHolder.class);
 
-    private boolean debugOn = false;
+    private boolean hotReloadMode = false;
 
     private TofuCompiler tofuCompiler = new EmptyTofuCompiler();
 
@@ -34,10 +34,10 @@ public class DefaultCompiledTemplatesHolder implements InitializingBean, Compile
 
     private Optional<SoyTofu> compiledTemplates = Optional.absent();
 
-    private boolean preCompileTemplates = SoyViewConfig.DEFAULT_PRECOMPILE_TEMPLATES;
+    private boolean preCompileTemplates = SoyViewConfigDefaults.DEFAULT_PRECOMPILE_TEMPLATES;
 
     public Optional<SoyTofu> compiledTemplates() throws IOException {
-        if (isDebugOn() || !compiledTemplates.isPresent()) {
+        if (isHotReloadMode() || !compiledTemplates.isPresent()) {
             this.compiledTemplates = Optional.fromNullable(compileTemplates());
         }
 
@@ -66,16 +66,16 @@ public class DefaultCompiledTemplatesHolder implements InitializingBean, Compile
         throw new IOException("0 template files have been found, check your templateFilesResolver!");
     }
 
-    public void setDebugOn(final boolean debugOn) {
-        this.debugOn = debugOn;
+    public void setHotReloadMode(final boolean hotReloadMode) {
+        this.hotReloadMode = hotReloadMode;
     }
 
-    public boolean isDebugOn() {
-        return debugOn;
+    public boolean isHotReloadMode() {
+        return hotReloadMode;
     }
 
-    public boolean isDebugOff() {
-        return !debugOn;
+    public boolean isHotReloadModeOff() {
+        return !hotReloadMode;
     }
 
     public void setTofuCompiler(TofuCompiler tofuCompiler) {

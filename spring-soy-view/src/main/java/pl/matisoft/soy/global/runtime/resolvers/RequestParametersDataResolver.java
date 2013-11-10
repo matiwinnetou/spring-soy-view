@@ -13,7 +13,7 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 16:24
  */
-public class RequestParametersResolver implements RuntimeResolver {
+public class RequestParametersDataResolver implements RuntimeDataResolver {
 
     private String prefix = "_request.parameter.";
 

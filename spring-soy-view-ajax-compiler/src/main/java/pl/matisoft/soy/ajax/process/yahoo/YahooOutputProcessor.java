@@ -1,14 +1,15 @@
-package pl.matisoft.soy.ajax.process;
+package pl.matisoft.soy.ajax.process.yahoo;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import pl.matisoft.soy.ajax.process.OutputProcessor;
 
 /**
  * Created with IntelliJ IDEA.

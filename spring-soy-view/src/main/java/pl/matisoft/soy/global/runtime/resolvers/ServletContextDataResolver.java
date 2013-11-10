@@ -2,7 +2,6 @@ package pl.matisoft.soy.global.runtime.resolvers;
 
 import com.google.template.soy.data.SoyMapData;
 import org.springframework.web.context.ServletContextAware;
-import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +15,7 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 18:13
  */
-public class ServletContextResolver implements RuntimeResolver, ServletContextAware {
+public class ServletContextDataResolver implements RuntimeDataResolver, ServletContextAware {
 
     private ServletContext servletContext;
 

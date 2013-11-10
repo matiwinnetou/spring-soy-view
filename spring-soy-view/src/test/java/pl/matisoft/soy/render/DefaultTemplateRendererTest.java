@@ -43,13 +43,13 @@ public class DefaultTemplateRendererTest {
 
     @Test
     public void testDefaultDebug() throws Exception {
-        Assert.assertFalse("debug is off by default", defaultTemplateRenderer.isDebugOn());
+        Assert.assertFalse("debug is off by default", defaultTemplateRenderer.isHotReloadMode());
     }
 
     @Test
     public void testSetDebug() throws Exception {
-        defaultTemplateRenderer.setDebugOn(true);
-        Assert.assertTrue("setting debug flag works", defaultTemplateRenderer.isDebugOn());
+        defaultTemplateRenderer.setHotReloadMode(true);
+        Assert.assertTrue("setting debug flag works", defaultTemplateRenderer.isHotReloadMode());
     }
 
     @Test
@@ -110,7 +110,7 @@ public class DefaultTemplateRendererTest {
 
     @Test
     public void testRenderWithAllDataWithDebugOn() throws Exception {
-        defaultTemplateRenderer.setDebugOn(true);
+        defaultTemplateRenderer.setHotReloadMode(true);
         final Object domainMock = new Object();
         final RenderRequest renderRequest = mock(RenderRequest.class);
         final SoyTofu soyTofu = mock(SoyTofu.class);

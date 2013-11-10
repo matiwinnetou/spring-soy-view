@@ -11,7 +11,7 @@ import com.google.template.soy.tofu.SoyTofu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.matisoft.soy.SoyView;
-import pl.matisoft.soy.config.SoyViewConfig;
+import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.data.DefaultToSoyDataConverter;
 import pl.matisoft.soy.data.ToSoyDataConverter;
 
@@ -45,7 +45,7 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
     /**
      * whether debug is on, in case it is on - Soy's Renderer Don't Add To Cache will be turned on, which means
      * renderer caching will be disabled */
-    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
+    private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
     @Override
     public void render(final RenderRequest renderRequest) throws Exception {
@@ -75,13 +75,13 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
         final Optional<SoyMsgBundle> soyMsgBundleOptional = renderRequest.getSoyMsgBundle();
         if (soyMsgBundleOptional.isPresent()) {
             renderer.setMsgBundle(soyMsgBundleOptional.get());
-            if (!isDebugOn()) {
+            if (isHotReloadModeOff()) {
                 if (renderRequest.getCompiledTemplates().isPresent()) {
                     renderRequest.getCompiledTemplates().get().addToCache(soyMsgBundleOptional.get(), null);
                 }
             }
         }
-        if (isDebugOn()) {
+        if (isHotReloadMode()) {
             renderer.setDontAddToCache(true);
         }
     }
@@ -102,16 +102,16 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
         this.toSoyDataConverter = toSoyDataConverter;
     }
 
-    public void setDebugOn(boolean debugOn) {
-        this.debugOn = debugOn;
+    public void setHotReloadMode(boolean hotReloadMode) {
+        this.hotReloadMode = hotReloadMode;
     }
 
-    public boolean isDebugOn() {
-        return debugOn;
+    public boolean isHotReloadMode() {
+        return hotReloadMode;
     }
 
-    public boolean isDebugOff() {
-        return !debugOn;
+    public boolean isHotReloadModeOff() {
+        return !hotReloadMode;
     }
 
 }

@@ -1,14 +1,14 @@
 package pl.matisoft.soy.global.runtime.resolvers;
 
-import com.google.template.soy.data.SoyMapData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
+
+import com.google.template.soy.data.SoyMapData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,9 +16,9 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 16:37
  */
-public class CookieResolver implements RuntimeResolver {
+public class CookieDataResolver implements RuntimeDataResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(CookieResolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(CookieDataResolver.class);
 
     private String prefix = "_request.cookie.";
 

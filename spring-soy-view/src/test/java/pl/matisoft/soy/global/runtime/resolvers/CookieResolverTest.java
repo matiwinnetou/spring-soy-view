@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CookieResolverTest {
 
-    private CookieResolver cookieResolver = new CookieResolver();
+    private CookieDataResolver cookieResolver = new CookieDataResolver();
 
     @Test
     public void testBindCookies() throws Exception {

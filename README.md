@@ -213,10 +213,10 @@ To use an ajax compiler it is necessary to wire or include SoyAjaxController in 
         <property name="soyMsgBundleResolver" ref="soyMsgBundleResolver" />
         <property name="templateFilesResolver" ref="templateFileResolver" />
         <property name="tofuCompiler" ref="tofuCompiler" />
-        <property name="debugOn">
+        <property name="hotReloadMode">
             <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName" value="soyViewConfig" />
-                <property name="propertyPath" value="debugOn" />
+                <property name="propertyPath" value="hotReloadMode" />
             </bean>
         </property>
         <property name="cacheControl" value="public, max-age=86400" /> <!-- one year -->
@@ -243,7 +243,7 @@ To use an ajax compiler it is necessary to wire or include SoyAjaxController in 
 </bean>
 ```
 
-* cacheControl - indicates how long the resource should not expire after it has been compiled. This parameter is only useful if debugOn is false
+* cacheControl - indicates how long the resource should not expire after it has been compiled. This parameter is only useful if hotReloadMode is false
 * expireHeaders - similar to cache control but for HTML 1.0
 * outputProcessors - a list of processors that should be applied after js compilation takes place. Out of the box three implementations are provided: __GoogleClosureOutputProcessor__, __YahooOutputProcessor__ and __PrependAppendOutputProcessor__, which allows to append and prepend an arbitrary JavaScript code, which could be useful if one uses __requirejs__.
 * authManager - an implementation that allows to specify a list of allowedTemplates to be compiled, this is a security measure so that only certain templates are allowed to be compiled to JavaScript.

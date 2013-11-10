@@ -6,7 +6,7 @@ package pl.matisoft.soy.config;
  * Date: 23/06/2013
  * Time: 18:02
  */
-public class SoyViewConfig {
+public class SoyViewConfigDefaults {
 
     /**
      * Default directory for templates
@@ -18,7 +18,7 @@ public class SoyViewConfig {
      */
     public final static String DEFAULT_ENCODING = "utf-8";
 
-    public final static boolean DEFAULT_DEBUG_ON = false;
+    public final static boolean DEFAULT_HOT_RELOAD_MODE = false;
 
     /**
      * Default soy files extension
@@ -35,29 +35,6 @@ public class SoyViewConfig {
      */
     public final static String DEFAULT_SOY_PREFIX = "soy:";
 
-    /**
-     * A default path to xliff messages
-     */
-    public final static String DEF_MESSAGES_PATH = "messages";
-
-    private boolean debugOn = DEFAULT_DEBUG_ON;
-
-    private String encoding = DEFAULT_ENCODING;
-
-    public boolean isDebugOn() {
-        return debugOn;
-    }
-
-    public void setDebugOn(final boolean debugOn) {
-        this.debugOn = debugOn;
-    }
-
-    public String getEncoding() {
-        return encoding;
-    }
-
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
-    }
+    public static final String DEF_MESSAGES_PATH = "messages";
 
 }

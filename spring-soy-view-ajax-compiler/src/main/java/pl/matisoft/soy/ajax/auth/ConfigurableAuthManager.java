@@ -1,9 +1,8 @@
 package pl.matisoft.soy.ajax.auth;
 
-import com.google.common.collect.ImmutableList;
-import pl.matisoft.soy.config.SoyViewConfig;
-
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Created with IntelliJ IDEA.

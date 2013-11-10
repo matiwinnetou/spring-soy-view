@@ -13,7 +13,7 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 16:36
  */
-public class RequestHeadersResolver implements RuntimeResolver {
+public class RequestHeadersDataResolver implements RuntimeDataResolver {
 
     private String prefix = "_request.header.";
 

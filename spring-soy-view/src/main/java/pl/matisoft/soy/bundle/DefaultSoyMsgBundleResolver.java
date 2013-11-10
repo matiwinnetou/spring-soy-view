@@ -1,5 +1,10 @@
 package pl.matisoft.soy.bundle;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -10,12 +15,8 @@ import com.google.template.soy.msgs.restricted.SoyMsgBundleImpl;
 import com.google.template.soy.xliffmsgplugin.XliffMsgPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.matisoft.soy.config.SoyViewConfig;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Component;
+import pl.matisoft.soy.config.SoyViewConfigDefaults;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Assuming defaults and locale set to pl_PL, an implementation will look for a following file in a classpath:
  * messages_pl_PL.xlf
  */
+@Component("defaultEmptySoyMsgBundleResolver")
 public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultSoyMsgBundleResolver.class);
@@ -40,11 +42,11 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
     /** friendly */ Map<Locale, SoyMsgBundle> msgBundles = new ConcurrentHashMap<Locale, SoyMsgBundle>();
 
     /** a path to a bundle */
-    private String messagesPath = SoyViewConfig.DEF_MESSAGES_PATH;
+    private String messagesPath = SoyViewConfigDefaults.DEF_MESSAGES_PATH;
 
-    /** will cache msgBundles if a debugOn is off, if debug is on,
+    /** will cache msgBundles if a hotReloadMode is off, if debug is on,
      *  will compile msg bundles each time it is invoked */
-    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
+    private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
     /** in case translation is missing for a passed in locale,
      *  whether the implementation should fallback to English returning
@@ -68,7 +70,7 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
         synchronized (msgBundles) {
             SoyMsgBundle soyMsgBundle = null;
-            if (isDebugOff()) {
+            if (isHotReloadModeOff()) {
                 soyMsgBundle = msgBundles.get(locale.get());
             }
             if (soyMsgBundle == null) {
@@ -85,7 +87,7 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
                     return Optional.absent();
                 }
 
-                if (isDebugOff()) {
+                if (isHotReloadModeOff()) {
                     msgBundles.put(locale.get(), soyMsgBundle);
                 }
             }
@@ -148,8 +150,8 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
         this.messagesPath = messagesPath;
     }
 
-    public void setDebugOn(final boolean debugOn) {
-        this.debugOn = debugOn;
+    public void setHotReloadMode(final boolean hotReloadMode) {
+        this.hotReloadMode = hotReloadMode;
     }
 
     public void setFallbackToEnglish(boolean fallbackToEnglish) {
@@ -160,12 +162,12 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
         return messagesPath;
     }
 
-    public boolean isDebugOn() {
-        return debugOn;
+    public boolean isHotReloadMode() {
+        return hotReloadMode;
     }
 
-    private boolean isDebugOff() {
-        return !debugOn;
+    private boolean isHotReloadModeOff() {
+        return !hotReloadMode;
     }
 
     public boolean isFallbackToEnglish() {

@@ -1,5 +1,16 @@
 package pl.matisoft.soy.ajax;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
@@ -14,12 +25,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 import pl.matisoft.soy.ajax.auth.AuthManager;
 import pl.matisoft.soy.ajax.auth.PermissableAuthManager;
-import pl.matisoft.soy.ajax.hash.EmptyHashFileGenerator;
-import pl.matisoft.soy.ajax.hash.HashFileGenerator;
 import pl.matisoft.soy.ajax.process.OutputProcessor;
 import pl.matisoft.soy.ajax.utils.I18nUtils;
 import pl.matisoft.soy.ajax.utils.PathUtils;
@@ -27,25 +35,14 @@ import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.EmptyTofuCompiler;
 import pl.matisoft.soy.compile.TofuCompiler;
-import pl.matisoft.soy.config.SoyViewConfig;
+import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.concurrent.ThreadSafe;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Controller
 @ThreadSafe
@@ -102,12 +99,12 @@ public class SoyAjaxController {
      * CacheControl (Http 1.1) and Expires (Http 1.0) http headers
      * will be set to user configured values.
      */
-    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
+    private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
     /**
      * character encoding, by default utf-8
      */
-    private String encoding = SoyViewConfig.DEFAULT_ENCODING;
+    private String encoding = SoyViewConfigDefaults.DEFAULT_ENCODING;
 
     /**
      * List of output processors, output processors typically perform obfuscation
@@ -171,7 +168,7 @@ public class SoyAjaxController {
     ) throws IOException {
         Preconditions.checkNotNull(templateFilesResolver, "templateFilesResolver cannot be null");
 
-        if (isProdMode()) {
+        if (isHotReloadModeOff()) {
             final Optional<String> template = extractAndCombineAll(hash, templateFileNames);
             if (template.isPresent()) {
                 return prepareResponseFor(template.get(), disableProcessors);
@@ -184,7 +181,7 @@ public class SoyAjaxController {
             if (!allCompiledTemplates.isPresent()) {
                 throw notFound("Template file(s) could not be resolved.");
             }
-            if (isProdMode()) {
+            if (isHotReloadModeOff()) {
                 synchronized (cachedJsTemplates) {
                     Map<String, String> map = cachedJsTemplates.getIfPresent(hash);
                     if (map == null) {
@@ -260,7 +257,7 @@ public class SoyAjaxController {
     private ResponseEntity<String> prepareResponseFor(final String templateContent, final boolean disableProcessors) throws IOException {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/javascript; charset=" + encoding);
-        headers.add("Cache-Control", debugOn ? "no-cache" : cacheControl);
+        headers.add("Cache-Control", hotReloadMode ? "no-cache" : cacheControl);
         if (StringUtils.hasText(expiresHeaders)) {
             headers.add("Expires", expiresHeaders);
         }
@@ -304,8 +301,12 @@ public class SoyAjaxController {
         return compiledTemplate;
     }
 
-    private boolean isProdMode() {
-        return !debugOn;
+    private boolean isHotReloadMode() {
+        return hotReloadMode;
+    }
+
+    private boolean isHotReloadModeOff() {
+        return !hotReloadMode;
     }
 
     private HttpClientErrorException notFound(final String file) {
@@ -336,8 +337,8 @@ public class SoyAjaxController {
         this.localeProvider = localeProvider;
     }
 
-    public void setDebugOn(final boolean debugOn) {
-        this.debugOn = debugOn;
+    public void setHotReloadMode(final boolean hotReloadMode) {
+        this.hotReloadMode = hotReloadMode;
     }
 
     public void setEncoding(final String encoding) {

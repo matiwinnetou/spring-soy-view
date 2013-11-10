@@ -25,7 +25,7 @@ public class MD5HashFileGeneratorTest {
 
     @Test
     public void testDebugByDefault() throws Exception {
-        Assert.assertFalse("debug should be off by default", hashFileGenerator.isDebugOn());
+        Assert.assertFalse("debug should be off by default", hashFileGenerator.isHotReloadMode());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class MD5HashFileGeneratorTest {
 
     @Test
     public void testReturnedHashMatchesDebugOn() throws Exception {
-        hashFileGenerator.setDebugOn(true);
+        hashFileGenerator.setHotReloadMode(true);
         hashFileGenerator.afterPropertiesSet();
         final URL url = getClass().getClassLoader().getResource("templates/template1.soy");
         final Optional<String> hash =  hashFileGenerator.hash(Optional.of(url));
@@ -76,7 +76,7 @@ public class MD5HashFileGeneratorTest {
 
     @Test
     public void testReturnedHashMatchesDebugOnCacheSound() throws Exception {
-        hashFileGenerator.setDebugOn(true);
+        hashFileGenerator.setHotReloadMode(true);
         final URL url = getClass().getClassLoader().getResource("templates/template1.soy");
         hashFileGenerator.hash(Optional.of(url));
         Assert.assertEquals("debug true, caching should be empty", 0L, hashFileGenerator.cache.size());

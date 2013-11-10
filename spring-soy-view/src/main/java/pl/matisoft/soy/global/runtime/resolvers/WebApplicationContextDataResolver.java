@@ -3,7 +3,6 @@ package pl.matisoft.soy.global.runtime.resolvers;
 import com.google.template.soy.data.SoyMapData;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
-import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +16,7 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 18:36
  */
-public class WebApplicationContextResolver extends WebApplicationObjectSupport implements RuntimeResolver {
+public class WebApplicationContextDataResolver extends WebApplicationObjectSupport implements RuntimeDataResolver {
 
     private String prefix = "_web.app.context.";
 

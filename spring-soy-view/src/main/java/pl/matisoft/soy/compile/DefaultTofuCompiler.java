@@ -18,7 +18,8 @@ import com.google.template.soy.tofu.SoyTofu;
 import com.google.template.soy.tofu.SoyTofuOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.matisoft.soy.config.SoyViewConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
 
@@ -32,8 +33,9 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTofuCompiler.class);
 
-    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
+    private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
+    @Autowired
     private CompileTimeGlobalModelResolver compileTimeGlobalModelResolver = new EmptyCompileTimeGlobalModelResolver();
 
     private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();
@@ -82,7 +84,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
     private SoyTofuOptions createSoyTofuOptions() {
         final SoyTofuOptions soyTofuOptions = new SoyTofuOptions();
-        soyTofuOptions.setUseCaching(isDebugOff());
+        soyTofuOptions.setUseCaching(isHotReloadModeOff());
 
         return soyTofuOptions;
     }
@@ -131,8 +133,8 @@ public class DefaultTofuCompiler implements TofuCompiler {
         return builder.build();
     }
 
-    public void setDebugOn(final boolean debugOn) {
-        this.debugOn = debugOn;
+    public void setHotReloadMode(final boolean hotReloadMode) {
+        this.hotReloadMode = hotReloadMode;
     }
 
     public void setCompileTimeGlobalModelResolver(final CompileTimeGlobalModelResolver compileTimeGlobalModelResolver) {
@@ -143,12 +145,12 @@ public class DefaultTofuCompiler implements TofuCompiler {
         this.soyJsSrcOptions = soyJsSrcOptions;
     }
 
-    public boolean isDebugOn() {
-        return debugOn;
+    public boolean isHotReloadMode() {
+        return hotReloadMode;
     }
 
-    private boolean isDebugOff() {
-        return !debugOn;
+    public boolean isHotReloadModeOff() {
+        return !hotReloadMode;
     }
 
     public SoyJsSrcOptions getSoyJsSrcOptions() {

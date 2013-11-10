@@ -24,7 +24,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.support.ServletContextResource;
-import pl.matisoft.soy.config.SoyViewConfig;
+import pl.matisoft.soy.config.SoyViewConfigDefaults;
 
 /**
  * Created with IntelliJ IDEA.
@@ -46,16 +46,12 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
 
     private boolean recursive = true;
 
-    /**
-     * in case debugOn - the implementation will never cache resolved templates,
-     * otherwise for speed purposes the resolved templates will be cached.
-     */
-    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
+    private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
     /** a thread safe cache for resolved templates, no need to worry of ddos attack */
     /** friendly */ CopyOnWriteArrayList<URL> cachedFiles = new CopyOnWriteArrayList<URL>();
 
-    private String filesExtension = SoyViewConfig.DEFAULT_FILES_EXTENSION;
+    private String filesExtension = SoyViewConfigDefaults.DEFAULT_FILES_EXTENSION;
 
     private ServletContext servletContext;
 
@@ -65,7 +61,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
     @Override
     public void afterPropertiesSet() throws Exception {
         if (templatesLocation == null) {
-            templatesLocation = new ServletContextResource(servletContext, SoyViewConfig.DEFAULT_TEMPLATE_FILES_PATH);
+            templatesLocation = new ServletContextResource(servletContext, SoyViewConfigDefaults.DEFAULT_TEMPLATE_FILES_PATH);
         }
     }
 
@@ -73,7 +69,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
     public Collection<URL> resolve() throws IOException {
         Preconditions.checkNotNull(templatesLocation, "templatesLocation cannot be null!");
 
-        if (debugOn) {
+        if (hotReloadMode) {
             final List<URL> files = toFiles(templatesLocation);
             logger.debug("Debug on - resolved files:" + files.size());
 
@@ -108,7 +104,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
                 final String fileName = url.getFile();
                 final File file = new File(fileName);
 
-                return file.toPath().endsWith(normalizeTemplateName(templateFileName));
+                return file.toURI().toString().endsWith(normalizeTemplateName(templateFileName));
             }
 
         }, null);
@@ -116,7 +112,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
         return Optional.fromNullable(templateFile);
     }
 
-    private String normalizeTemplateName(String templateFileName) {
+    private String normalizeTemplateName(final String templateFileName) {
         String normalizedTemplateName = templateFileName;
         if (!templateFileName.endsWith(dotWithExtension())) {
             normalizedTemplateName = templateFileName + dotWithExtension();
@@ -177,8 +173,8 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
         this.recursive = recursive;
     }
 
-    public void setDebugOn(boolean debugOn) {
-        this.debugOn = debugOn;
+    public void setHotReloadMode(boolean hotReloadMode) {
+        this.hotReloadMode = hotReloadMode;
     }
 
     public Resource getTemplatesLocation() {
@@ -189,8 +185,8 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
         return recursive;
     }
 
-    public boolean isDebugOn() {
-        return debugOn;
+    public boolean isHotReloadMode() {
+        return hotReloadMode;
     }
 
     public String getFilesExtension() {

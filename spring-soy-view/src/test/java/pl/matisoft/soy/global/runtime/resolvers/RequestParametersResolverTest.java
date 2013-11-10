@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class RequestParametersResolverTest {
 
-    private RequestParametersResolver requestParametersResolver = new RequestParametersResolver();
+    private RequestParametersDataResolver requestParametersResolver = new RequestParametersDataResolver();
 
     @Test
     public void resolveRequestParameters() throws Exception {

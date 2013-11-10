@@ -11,18 +11,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.FluentIterable;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import pl.matisoft.soy.config.SoyViewConfig;
-
-import javax.annotation.Nullable;
+import pl.matisoft.soy.config.SoyViewConfigDefaults;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,14 +29,14 @@ import javax.annotation.Nullable;
  * An MD5 algorithm implementation of a hash file generator
  *
  * It is important to notice that this implementation supports a dev and prod modes
- * in dev (debugOn) mode the implementation will not cache md5 hash checksums, conversely
+ * in dev (hotReloadMode) mode the implementation will not cache md5 hash checksums, conversely
  * in prod mode it will cache it. The cache can be fine tuned via setters.
  */
 public class MD5HashFileGenerator implements HashFileGenerator, InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(MD5HashFileGenerator.class);
 
-    private boolean debugOn = SoyViewConfig.DEFAULT_DEBUG_ON;
+    private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
     private final static int DEF_CACHE_MAX_SIZE = 10000;
 
@@ -86,7 +82,7 @@ public class MD5HashFileGenerator implements HashFileGenerator, InitializingBean
             return Optional.absent();
         }
         logger.debug("Calculating md5 hash, url:{}", url);
-        if (isDebugOff()) {
+        if (isHotReloadModeOff()) {
             final String md5 = cache.getIfPresent(url.get());
 
             logger.debug("md5 hash:{}", md5);
@@ -99,7 +95,7 @@ public class MD5HashFileGenerator implements HashFileGenerator, InitializingBean
         final InputStream is = url.get().openStream();
         final String md5 = getMD5Checksum(is);
 
-        if (isDebugOff()) {
+        if (isHotReloadModeOff()) {
             logger.debug("caching url:{} with hash:{}", url, md5);
 
             cache.put(url.get(), md5);
@@ -168,12 +164,8 @@ public class MD5HashFileGenerator implements HashFileGenerator, InitializingBean
         return result;
     }
 
-    private boolean isDebugOff() {
-        return !debugOn;
-    }
-
-    public void setDebugOn(boolean debugOn) {
-        this.debugOn = debugOn;
+    public void setHotReloadMode(boolean hotReloadMode) {
+        this.hotReloadMode = hotReloadMode;
     }
 
     public void setCacheMaxSize(int cacheMaxSize) {
@@ -188,8 +180,12 @@ public class MD5HashFileGenerator implements HashFileGenerator, InitializingBean
         this.expireAfterWriteUnit = expireAfterWriteUnit;
     }
 
-    public boolean isDebugOn() {
-        return debugOn;
+    private boolean isHotReloadModeOff() {
+        return !hotReloadMode;
+    }
+
+    public boolean isHotReloadMode() {
+        return hotReloadMode;
     }
 
     public int getCacheMaxSize() {

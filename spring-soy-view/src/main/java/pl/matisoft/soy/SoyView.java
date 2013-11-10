@@ -9,7 +9,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.web.servlet.View;
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
-import pl.matisoft.soy.config.SoyViewConfig;
+import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
 import pl.matisoft.soy.data.adjust.ModelAdjuster;
 import pl.matisoft.soy.global.runtime.EmptyGlobalModelResolver;
@@ -51,7 +51,7 @@ public class SoyView implements View, BeanNameAware {
 
     protected SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
-    private String contentType = "text/html; charset=" + SoyViewConfig.DEFAULT_ENCODING;
+    private String contentType = "text/html; charset=" + SoyViewConfigDefaults.DEFAULT_ENCODING;
 
     private String beanName = "";
 

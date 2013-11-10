@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean autowire="byType" id="soyLocaleProvider" class="pl.matisoft.soy.locale.SpringLocaleProvider" />
+
+    <bean autowire="byType" id="soyTemplateFileResolver" class="pl.matisoft.soy.template.DefaultTemplateFilesResolver">
+        <property name="hotReloadMode" value="${soy.hot.reload.mode:false}" />
+        <property name="templatesLocation" value="${soy.templates.directory:/WEB-INF/templates}" />
+        <property name="recursive" value="${soy.templates.resolve.recursively:true}" />
+        <property name="filesExtension" value="${soy.templates.file.extension:soy}" />
+    </bean>
+
+    <bean autowire="byType" id="soyCompileTimeGlobalModelResolver" class="pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver" />
+
+    <bean autowire="byType" id="soyTofuCompiler" class="pl.matisoft.soy.compile.DefaultTofuCompiler">
+        <property name="hotReloadMode" value="${soy.hot.reload.mode:false}" />
+    </bean>
+
+    <bean autowire="byType" id="soyMsgBundleResolver" class="pl.matisoft.soy.bundle.DefaultSoyMsgBundleResolver">
+        <property name="messagesPath" value="${soy.i18n.xliff.path:xliffs/messages}" />
+        <property name="hotReloadMode" value="${soy.hot.reload.mode:false}" />
+        <property name="fallbackToEnglish" value="${soy.i18n.fallback.to.english:true}" />
+    </bean>
+
+    <bean autowire="byType" id="soyCompiledTemplatesHolder" class="pl.matisoft.soy.holder.DefaultCompiledTemplatesHolder">
+        <property name="hotReloadMode" value="${soy.hot.reload.mode:false}" />
+        <property name="preCompileTemplates" value="${soy.preCompile.templates:false}" />
+    </bean>
+
+    <bean autowire="byType" id="soyTemplateRenderer" class="pl.matisoft.soy.render.DefaultTemplateRenderer">
+        <property name="hotReloadMode" value="${soy.hot.reload.mode:false}" />
+    </bean>
+
+    <bean autowire="byType" id="soyModelAdjuster" class="pl.matisoft.soy.data.adjust.SpringModelAdjuster" />
+
+    <bean autowire="byType" id="soyGlobalRuntimeVariablesProvider" class="pl.matisoft.soy.global.runtime.DefaultGlobalModelResolver">
+        <property name="resolvers">
+            <list>
+                <bean class="pl.matisoft.soy.global.runtime.resolvers.RequestParametersDataResolver" />
+                <bean class="pl.matisoft.soy.global.runtime.resolvers.RequestHeadersDataResolver" />
+                <bean class="pl.matisoft.soy.global.runtime.resolvers.CookieDataResolver" />
+                <bean class="pl.matisoft.soy.global.runtime.resolvers.WebApplicationContextDataResolver" />
+                <bean class="pl.matisoft.soy.global.runtime.resolvers.ServletContextDataResolver" />
+                <bean class="pl.matisoft.soy.global.runtime.resolvers.RequestContextDataResolver" />
+                <bean class="pl.matisoft.soy.global.runtime.resolvers.HttpSessionDataResolver" />
+            </list>
+        </property>
+    </bean>
+
+    <bean autowire="byType" id="soyViewResolver" class="pl.matisoft.soy.SoyTemplateViewResolver">
+        <property name="hotReloadMode" value="${soy.hot.reload.mode:false}" />
+        <property name="encoding" value="${soy.encoding:utf-8}" />
+        <property name="indexView" value="${soy.indexView:index}" />
+        <property name="cacheLimit" value="${soy.templates.cache.limit:1024}" />
+        <property name="prefix" value="${soy.logical.prefix:soy:}" />
+        <property name="redirectContextRelative" value="${soy.redirect.context.relative:true}" />
+        <property name="redirectHttp10Compatible" value="${soy.redirect.http.10.compatible:true}" />
+    </bean>
+
+</beans>

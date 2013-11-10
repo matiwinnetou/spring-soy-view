@@ -1,16 +1,16 @@
 package pl.matisoft.soy.global.runtime;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.template.soy.data.SoyMapData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.matisoft.soy.global.runtime.resolvers.RuntimeResolver;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Map;
+import pl.matisoft.soy.global.runtime.resolvers.RuntimeDataResolver;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,25 +25,25 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultGlobalModelResolver.class);
 
-    private List<RuntimeResolver> resolvers = Lists.newArrayList();
+    private List<RuntimeDataResolver> resolvers = Lists.newArrayList();
 
     @Override
     public Optional<SoyMapData> resolveData(final HttpServletRequest request, final HttpServletResponse response, final Map<String, ? extends Object> model) {
         final SoyMapData root = new SoyMapData();
 
-        for (final RuntimeResolver runtimeResolver : resolvers) {
-            logger.debug("resolving:{}", runtimeResolver);
-            runtimeResolver.resolveData(request, response, model, root);
+        for (final RuntimeDataResolver runtimeDataResolver : resolvers) {
+            logger.debug("resolving:{}", runtimeDataResolver);
+            runtimeDataResolver.resolveData(request, response, model, root);
         }
 
         return Optional.of(root);
     }
 
-    public void setResolvers(List<RuntimeResolver> resolvers) {
+    public void setResolvers(List<RuntimeDataResolver> resolvers) {
         this.resolvers = resolvers;
     }
 
-    public List<RuntimeResolver> getResolvers() {
+    public List<RuntimeDataResolver> getResolvers() {
         return resolvers;
     }
 
