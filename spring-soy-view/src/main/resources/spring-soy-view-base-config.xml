@@ -57,7 +57,6 @@
         <property name="hotReloadMode" value="${soy.hot.reload.mode:false}" />
         <property name="encoding" value="${soy.encoding:utf-8}" />
         <property name="indexView" value="${soy.indexView:index}" />
-        <property name="cacheLimit" value="${soy.templates.cache.limit:1024}" />
         <property name="prefix" value="${soy.logical.prefix:soy:}" />
         <property name="redirectContextRelative" value="${soy.redirect.context.relative:true}" />
         <property name="redirectHttp10Compatible" value="${soy.redirect.http.10.compatible:true}" />

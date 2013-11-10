@@ -26,7 +26,7 @@ public class DefaultCompiledTemplatesHolder implements InitializingBean, Compile
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultCompiledTemplatesHolder.class);
 
-    private boolean hotReloadMode = false;
+    private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
     private TofuCompiler tofuCompiler = new EmptyTofuCompiler();
 
