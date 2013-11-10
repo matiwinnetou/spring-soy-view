@@ -20,6 +20,8 @@
         <property name="hotReloadMode" value="${soy.hot.reload.mode:false}" />
     </bean>
 
+    <bean autowire="byType" id="soyToSoyDataConverter" class="pl.matisoft.soy.data.DefaultToSoyDataConverter" />
+
     <bean autowire="byType" id="soyMsgBundleResolver" class="pl.matisoft.soy.bundle.DefaultSoyMsgBundleResolver">
         <property name="messagesPath" value="${soy.i18n.xliff.path:xliffs/messages}" />
         <property name="hotReloadMode" value="${soy.hot.reload.mode:false}" />
