@@ -39,7 +39,7 @@
 
     <bean autowire="byType" id="soyModelAdjuster" class="pl.matisoft.soy.data.adjust.SpringModelAdjuster" />
 
-    <bean autowire="byType" id="soyGlobalRuntimeVariablesProvider" class="pl.matisoft.soy.global.runtime.DefaultGlobalModelResolver">
+    <bean autowire="byType" id="soyGlobalRuntimeDataModelResolver" class="pl.matisoft.soy.global.runtime.DefaultGlobalModelResolver">
         <property name="resolvers">
             <list>
                 <bean class="pl.matisoft.soy.global.runtime.resolvers.RequestParametersDataResolver" />

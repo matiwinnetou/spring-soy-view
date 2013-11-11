@@ -27,12 +27,31 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
 
     private List<RuntimeDataResolver> resolvers = Lists.newArrayList();
 
+    private List<RuntimeDataResolver> userResolvers = Lists.newArrayList();
+
+    public DefaultGlobalModelResolver(List<RuntimeDataResolver> resolvers) {
+        this.resolvers = resolvers;
+    }
+
+    public DefaultGlobalModelResolver(List<RuntimeDataResolver> resolvers, List<RuntimeDataResolver> userResolvers) {
+        this.resolvers = resolvers;
+        this.userResolvers = userResolvers;
+    }
+
+    public DefaultGlobalModelResolver() {
+    }
+
     @Override
     public Optional<SoyMapData> resolveData(final HttpServletRequest request, final HttpServletResponse response, final Map<String, ? extends Object> model) {
         final SoyMapData root = new SoyMapData();
 
         for (final RuntimeDataResolver runtimeDataResolver : resolvers) {
             logger.debug("resolving:{}", runtimeDataResolver);
+            runtimeDataResolver.resolveData(request, response, model, root);
+        }
+
+        for (final RuntimeDataResolver runtimeDataResolver : userResolvers) {
+            logger.debug("user data resolving:{}", runtimeDataResolver);
             runtimeDataResolver.resolveData(request, response, model, root);
         }
 
@@ -45,6 +64,14 @@ public class DefaultGlobalModelResolver implements GlobalModelResolver {
 
     public List<RuntimeDataResolver> getResolvers() {
         return resolvers;
+    }
+
+    public List<RuntimeDataResolver> getUserResolvers() {
+        return userResolvers;
+    }
+
+    public void setUserResolvers(List<RuntimeDataResolver> userResolvers) {
+        this.userResolvers = userResolvers;
     }
 
 }
