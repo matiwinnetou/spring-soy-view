@@ -2,6 +2,7 @@ package pl.matisoft.soy.ajax;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringReader;
@@ -83,12 +84,16 @@ public class SoyAjaxController {
             .concurrencyLevel(1) //look up a constant class, 1 is not very clear
             .build();
 
+    @Inject
     private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
+    @Inject
     private TofuCompiler tofuCompiler = new EmptyTofuCompiler();
 
+    @Inject
     private SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
+    @Inject
     private LocaleProvider localeProvider = new EmptyLocaleProvider();
 
     /**
@@ -117,6 +122,7 @@ public class SoyAjaxController {
      * This can pose security risk and therefore it is possible to change this and inject
      * an AuthManager implementation that will only allow to compile those templates that a developer agreed to.
      */
+    @Inject
     private AuthManager authManager = new PermissableAuthManager();
 
     public SoyAjaxController() {

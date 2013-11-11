@@ -1,5 +1,6 @@
 package pl.matisoft.soy.render;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,6 +41,7 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateRenderer.class);
 
+    @Inject
     protected ToSoyDataConverter toSoyDataConverter = new DefaultToSoyDataConverter();
 
     /**

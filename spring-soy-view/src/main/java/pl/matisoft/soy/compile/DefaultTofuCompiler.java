@@ -1,6 +1,7 @@
 package pl.matisoft.soy.compile;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
@@ -35,7 +36,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
     private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
-    @Autowired
+    @Inject
     private CompileTimeGlobalModelResolver compileTimeGlobalModelResolver = new EmptyCompileTimeGlobalModelResolver();
 
     private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();

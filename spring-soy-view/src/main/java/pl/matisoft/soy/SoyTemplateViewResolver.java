@@ -26,6 +26,8 @@ import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.EmptyTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
 
+import javax.inject.Inject;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mati
@@ -58,16 +60,22 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
     private static final Logger logger = LoggerFactory.getLogger(SoyTemplateViewResolver.class);
 
+    @Inject
     protected TemplateRenderer templateRenderer = new EmptyTemplateRenderer();
 
+    @Inject
     protected ModelAdjuster modelAdjuster = new EmptyModelAdjuster();
 
+    @Inject
     protected GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
 
+    @Inject
     protected LocaleProvider localeProvider = new EmptyLocaleProvider();
 
+    @Inject
     protected SoyMsgBundleResolver soyMsgBundleResolver = new EmptySoyMsgBundleResolver();
 
+    @Inject
     private CompiledTemplatesHolder compiledTemplatesHolder = new EmptyCompiledTemplatesHolder();
 
     /** an encoding to use */

@@ -7,6 +7,7 @@ import pl.matisoft.soy.ajax.hash.HashFileGenerator;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URL;
@@ -22,8 +23,10 @@ import java.util.List;
  */
 public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
 
+    @Inject
     private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
+    @Inject
     private HashFileGenerator hashFileGenerator = new EmptyHashFileGenerator();
 
     private String siteUrl = "";

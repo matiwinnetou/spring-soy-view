@@ -3,6 +3,7 @@ package pl.matisoft.soy.template;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +54,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
 
     private String filesExtension = SoyViewConfigDefaults.DEFAULT_FILES_EXTENSION;
 
+    @Inject
     private ServletContext servletContext;
 
     public DefaultTemplateFilesResolver() {

@@ -48,8 +48,6 @@ import com.google.template.soy.data.SoyMapData;
  */
 public class DefaultToSoyDataConverter implements ToSoyDataConverter {
 
-    private long futureTimeOutInSeconds = 2 * 60; // 2 minutes
-
     @Override
     public Optional<SoyMapData> toSoyMap(final Object model) throws Exception {
         if (model == null) {
@@ -95,12 +93,6 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
                 list.add(toSoyCompatibleObjects(subValue));
             }
             return list;
-        }
-
-        if (obj instanceof Future<?>) {
-            final Future future = (Future) obj;
-
-            return toSoyCompatibleObjects(future.get(futureTimeOutInSeconds, TimeUnit.SECONDS));
         }
 
         if (obj instanceof Callable) {
@@ -153,10 +145,6 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
             return (SoyMapData) obj;
         }
         return new SoyMapData(toSoyCompatibleMap(obj));
-    }
-
-    public void setFutureTimeOutInSeconds(long futureTimeOutInSeconds) {
-        this.futureTimeOutInSeconds = futureTimeOutInSeconds;
     }
 
 }
