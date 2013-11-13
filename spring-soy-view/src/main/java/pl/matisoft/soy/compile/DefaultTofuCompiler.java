@@ -36,7 +36,7 @@ public class DefaultTofuCompiler implements TofuCompiler {
 
     private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
-    @Inject
+
     private CompileTimeGlobalModelResolver compileTimeGlobalModelResolver = new EmptyCompileTimeGlobalModelResolver();
 
     private SoyJsSrcOptions soyJsSrcOptions = new SoyJsSrcOptions();

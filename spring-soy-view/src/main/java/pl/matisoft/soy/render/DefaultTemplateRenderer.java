@@ -41,7 +41,7 @@ public class DefaultTemplateRenderer implements TemplateRenderer {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateRenderer.class);
 
-    @Inject
+
     protected ToSoyDataConverter toSoyDataConverter = new DefaultToSoyDataConverter();
 
     /**

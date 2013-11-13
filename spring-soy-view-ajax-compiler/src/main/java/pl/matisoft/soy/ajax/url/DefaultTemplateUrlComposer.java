@@ -23,10 +23,10 @@ import java.util.List;
  */
 public class DefaultTemplateUrlComposer implements TemplateUrlComposer {
 
-    @Inject
+
     private TemplateFilesResolver templateFilesResolver = new EmptyTemplateFilesResolver();
 
-    @Inject
+
     private HashFileGenerator hashFileGenerator = new EmptyHashFileGenerator();
 
     private String siteUrl = "";

@@ -30,10 +30,10 @@ public class DefaultCompiledTemplatesHolder implements InitializingBean, Compile
 
     private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
-    @Inject
+
     private TofuCompiler tofuCompiler = new EmptyTofuCompiler();
 
-    @Inject
+
     private TemplateFilesResolver templatesFileResolver = new EmptyTemplateFilesResolver();
 
     private Optional<SoyTofu> compiledTemplates = Optional.absent();

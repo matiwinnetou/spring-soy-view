@@ -14,6 +14,8 @@ import pl.matisoft.soy.ajax.process.OutputProcessor;
 import pl.matisoft.soy.ajax.process.google.GoogleClosureOutputProcessor;
 import pl.matisoft.soy.ajax.url.DefaultTemplateUrlComposer;
 import pl.matisoft.soy.ajax.url.TemplateUrlComposer;
+import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
+import pl.matisoft.soy.compile.TofuCompiler;
 import pl.matisoft.soy.config.SpringSoyViewBaseConfig;
 import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.template.TemplateFilesResolver;
@@ -59,7 +61,11 @@ public class SpringSoyViewAjaxConfig {
     }
 
     @Bean
-    public SoyAjaxController soyAjaxController(final AuthManager authManager, final LocaleProvider localeProvider) {
+    public SoyAjaxController soyAjaxController(final AuthManager authManager,
+                                               final LocaleProvider localeProvider,
+                                               final TemplateFilesResolver templateFilesResolver,
+                                               final TofuCompiler tofuCompiler,
+                                               final SoyMsgBundleResolver soyMsgBundleResolver) {
         final GoogleClosureOutputProcessor googleClosureOutputProcessor = new GoogleClosureOutputProcessor();
         googleClosureOutputProcessor.setEncoding(encoding);
 
@@ -70,6 +76,9 @@ public class SpringSoyViewAjaxConfig {
         soyAjaxController.setLocaleProvider(localeProvider);
         soyAjaxController.setOutputProcessors(Lists.<OutputProcessor>newArrayList(googleClosureOutputProcessor));
         soyAjaxController.setCacheControl(cacheControl);
+        soyAjaxController.setTemplateFilesResolver(templateFilesResolver);
+        soyAjaxController.setTofuCompiler(tofuCompiler);
+        soyAjaxController.setSoyMsgBundleResolver(soyMsgBundleResolver);
 
         return soyAjaxController;
     }

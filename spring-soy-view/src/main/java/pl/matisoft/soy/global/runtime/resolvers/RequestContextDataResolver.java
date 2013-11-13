@@ -4,6 +4,7 @@ import com.google.template.soy.data.SoyMapData;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.support.RequestContext;
 
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ public class RequestContextDataResolver implements RuntimeDataResolver, ServletC
 
     private String prefix = "_request.context.";
 
+    @Inject
     private ServletContext servletContext;
 
     @Override
