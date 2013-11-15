@@ -21,24 +21,24 @@ import pl.matisoft.soy.global.runtime.resolvers.RuntimeDataResolver;
  * A default implementation of GlobalModelResolver contains a list of resolvers,
  * each resolver can decide what data should be injected.
  */
-public class DefaultGlobalModelResolver implements GlobalModelResolver {
+public class DefaultGlobalRuntimeModelResolver implements GlobalRuntimeModelResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultGlobalModelResolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultGlobalRuntimeModelResolver.class);
 
     private List<RuntimeDataResolver> resolvers = Lists.newArrayList();
 
     private List<RuntimeDataResolver> userResolvers = Lists.newArrayList();
 
-    public DefaultGlobalModelResolver(List<RuntimeDataResolver> resolvers) {
+    public DefaultGlobalRuntimeModelResolver(List<RuntimeDataResolver> resolvers) {
         this.resolvers = resolvers;
     }
 
-    public DefaultGlobalModelResolver(List<RuntimeDataResolver> resolvers, List<RuntimeDataResolver> userResolvers) {
+    public DefaultGlobalRuntimeModelResolver(List<RuntimeDataResolver> resolvers, List<RuntimeDataResolver> userResolvers) {
         this.resolvers = resolvers;
         this.userResolvers = userResolvers;
     }
 
-    public DefaultGlobalModelResolver() {
+    public DefaultGlobalRuntimeModelResolver() {
     }
 
     @Override

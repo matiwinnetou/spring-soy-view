@@ -12,8 +12,8 @@ import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
 import pl.matisoft.soy.data.adjust.ModelAdjuster;
-import pl.matisoft.soy.global.runtime.EmptyGlobalModelResolver;
-import pl.matisoft.soy.global.runtime.GlobalModelResolver;
+import pl.matisoft.soy.global.runtime.EmptyGlobalRuntimeModelResolver;
+import pl.matisoft.soy.global.runtime.GlobalRuntimeModelResolver;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.DefaultTemplateRenderer;
@@ -45,7 +45,7 @@ public class SoyView implements View, BeanNameAware {
 
     protected ModelAdjuster modelAdjuster = new EmptyModelAdjuster();
 
-    protected GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
+    protected GlobalRuntimeModelResolver globalRuntimeModelResolver = new EmptyGlobalRuntimeModelResolver();
 
     protected LocaleProvider localeProvider = new EmptyLocaleProvider();
 
@@ -63,7 +63,7 @@ public class SoyView implements View, BeanNameAware {
         Preconditions.checkNotNull(templateName, "templateName cannot be null");
         Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null");
         Preconditions.checkNotNull(modelAdjuster, "modelAdjuster cannot be null");
-        Preconditions.checkNotNull(globalModelResolver, "globalModelResolver cannot be null");
+        Preconditions.checkNotNull(globalRuntimeModelResolver, "globalModelResolver cannot be null");
         Preconditions.checkNotNull(localeProvider, "localeProvider cannot be null");
         Preconditions.checkNotNull(soyMsgBundleResolver, "soyMsgBundleResolver cannot be null");
 
@@ -81,7 +81,7 @@ public class SoyView implements View, BeanNameAware {
                 .model(adjustedModel)
                 .request(request)
                 .response(response)
-                .globalRuntimeModel(globalModelResolver.resolveData(request, response, model))
+                .globalRuntimeModel(globalRuntimeModelResolver.resolveData(request, response, model))
                 .soyMsgBundle(soyMsgBundleResolver.resolve(localeProvider.resolveLocale(request)))
                 .soyView(this)
                 .build();
@@ -123,8 +123,8 @@ public class SoyView implements View, BeanNameAware {
         this.modelAdjuster = modelAdjuster;
     }
 
-    public void setGlobalModelResolver(GlobalModelResolver globalModelResolver) {
-        this.globalModelResolver = globalModelResolver;
+    public void setGlobalRuntimeModelResolver(GlobalRuntimeModelResolver globalRuntimeModelResolver) {
+        this.globalRuntimeModelResolver = globalRuntimeModelResolver;
     }
 
     public void setLocaleProvider(LocaleProvider localeProvider) {

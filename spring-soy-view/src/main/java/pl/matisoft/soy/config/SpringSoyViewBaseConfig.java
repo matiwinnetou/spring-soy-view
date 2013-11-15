@@ -19,8 +19,8 @@ import pl.matisoft.soy.data.adjust.ModelAdjuster;
 import pl.matisoft.soy.data.adjust.SpringModelAdjuster;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
-import pl.matisoft.soy.global.runtime.DefaultGlobalModelResolver;
-import pl.matisoft.soy.global.runtime.GlobalModelResolver;
+import pl.matisoft.soy.global.runtime.DefaultGlobalRuntimeModelResolver;
+import pl.matisoft.soy.global.runtime.GlobalRuntimeModelResolver;
 import pl.matisoft.soy.global.runtime.resolvers.*;
 import pl.matisoft.soy.holder.CompiledTemplatesHolder;
 import pl.matisoft.soy.holder.DefaultCompiledTemplatesHolder;
@@ -180,8 +180,8 @@ public class SpringSoyViewBaseConfig {
     }
 
     @Bean
-    public GlobalModelResolver soyGlobalModelResolver() {
-        final DefaultGlobalModelResolver defaultGlobalModelResolver = new DefaultGlobalModelResolver();
+    public GlobalRuntimeModelResolver soyGlobalRuntimeModelResolver() {
+        final DefaultGlobalRuntimeModelResolver defaultGlobalModelResolver = new DefaultGlobalRuntimeModelResolver();
         defaultGlobalModelResolver.setResolvers(Lists.newArrayList(
                 new RequestParametersDataResolver(),
                 new RequestHeadersDataResolver(),
@@ -200,12 +200,12 @@ public class SpringSoyViewBaseConfig {
                                         final ModelAdjuster modelAdjuster,
                                         final TemplateRenderer templateRenderer,
                                         final LocaleProvider localeProvider,
-                                        final GlobalModelResolver globalModelResolver)
+                                        final GlobalRuntimeModelResolver globalRuntimeModelResolver)
                                      throws Exception {
         final SoyTemplateViewResolver soyTemplateViewResolver = new SoyTemplateViewResolver();
         soyTemplateViewResolver.setCompiledTemplatesHolder(compiledTemplatesHolder);
         soyTemplateViewResolver.setEncoding(encoding);
-        soyTemplateViewResolver.setGlobalModelResolver(globalModelResolver);
+        soyTemplateViewResolver.setGlobalRuntimeModelResolver(globalRuntimeModelResolver);
         soyTemplateViewResolver.setHotReloadMode(hotReloadMode);
         soyTemplateViewResolver.setIndexView(indexView);
         soyTemplateViewResolver.setLocaleProvider(localeProvider);

@@ -2,11 +2,10 @@ package pl.matisoft.soy.global.runtime;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
-
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,7 +19,7 @@ import java.util.Map;
  *
  * Injected data can be referenced using a predefined prefix $ij, {$ij.variable.name}, e.g. {$ij.user.name}
  */
-public interface GlobalModelResolver {
+public interface GlobalRuntimeModelResolver {
 
     Optional<SoyMapData> resolveData(HttpServletRequest request, HttpServletResponse response, Map<String, ? extends Object> model);
 

@@ -113,11 +113,4 @@
 
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>codedance on Github</id>
-            <url>https://github.com/codedance/maven-repository/raw/master</url>
-        </repository>
-    </repositories>
-
 </project>

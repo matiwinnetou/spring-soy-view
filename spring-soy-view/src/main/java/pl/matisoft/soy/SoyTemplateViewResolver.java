@@ -17,8 +17,8 @@ import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
 import pl.matisoft.soy.data.adjust.ModelAdjuster;
-import pl.matisoft.soy.global.runtime.EmptyGlobalModelResolver;
-import pl.matisoft.soy.global.runtime.GlobalModelResolver;
+import pl.matisoft.soy.global.runtime.EmptyGlobalRuntimeModelResolver;
+import pl.matisoft.soy.global.runtime.GlobalRuntimeModelResolver;
 import pl.matisoft.soy.holder.CompiledTemplatesHolder;
 import pl.matisoft.soy.holder.EmptyCompiledTemplatesHolder;
 import pl.matisoft.soy.locale.EmptyLocaleProvider;
@@ -62,7 +62,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
     protected ModelAdjuster modelAdjuster = new EmptyModelAdjuster();
 
-    protected GlobalModelResolver globalModelResolver = new EmptyGlobalModelResolver();
+    protected GlobalRuntimeModelResolver globalRuntimeModelResolver = new EmptyGlobalRuntimeModelResolver();
 
     protected LocaleProvider localeProvider = new EmptyLocaleProvider();
 
@@ -114,7 +114,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
         view.setContentType(contentType());
         view.setTemplateRenderer(templateRenderer);
         view.setModelAdjuster(modelAdjuster);
-        view.setGlobalModelResolver(globalModelResolver);
+        view.setGlobalRuntimeModelResolver(globalRuntimeModelResolver);
         view.setLocaleProvider(localeProvider);
         view.setSoyMsgBundleResolver(soyMsgBundleResolver);
         view.setCompiledTemplates(compiledTemplatesHolder.compiledTemplates());
@@ -179,8 +179,8 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
         this.modelAdjuster = modelAdjuster;
     }
 
-    public void setGlobalModelResolver(final GlobalModelResolver globalModelResolver) {
-        this.globalModelResolver = globalModelResolver;
+    public void setGlobalRuntimeModelResolver(final GlobalRuntimeModelResolver globalRuntimeModelResolver) {
+        this.globalRuntimeModelResolver = globalRuntimeModelResolver;
     }
 
     public void setLocaleProvider(final LocaleProvider localeProvider) {

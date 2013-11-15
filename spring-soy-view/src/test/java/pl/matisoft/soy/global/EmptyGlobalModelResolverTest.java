@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 import org.junit.Assert;
 import org.junit.Test;
-import pl.matisoft.soy.global.runtime.EmptyGlobalModelResolver;
+import pl.matisoft.soy.global.runtime.EmptyGlobalRuntimeModelResolver;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,7 +14,7 @@ import pl.matisoft.soy.global.runtime.EmptyGlobalModelResolver;
  */
 public class EmptyGlobalModelResolverTest {
 
-    private EmptyGlobalModelResolver emptyGlobalModelResolver = new EmptyGlobalModelResolver();
+    private EmptyGlobalRuntimeModelResolver emptyGlobalModelResolver = new EmptyGlobalRuntimeModelResolver();
 
     @Test
     public void returnsNotNullByDefault() throws Exception {
