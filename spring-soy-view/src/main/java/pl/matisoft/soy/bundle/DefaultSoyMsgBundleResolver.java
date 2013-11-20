@@ -15,7 +15,6 @@ import com.google.template.soy.msgs.restricted.SoyMsgBundleImpl;
 import com.google.template.soy.xliffmsgplugin.XliffMsgPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import pl.matisoft.soy.config.SoyViewConfigDefaults;
 
 /**
@@ -33,7 +32,6 @@ import pl.matisoft.soy.config.SoyViewConfigDefaults;
  * Assuming defaults and locale set to pl_PL, an implementation will look for a following file in a classpath:
  * messages_pl_PL.xlf
  */
-@Component("defaultEmptySoyMsgBundleResolver")
 public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultSoyMsgBundleResolver.class);

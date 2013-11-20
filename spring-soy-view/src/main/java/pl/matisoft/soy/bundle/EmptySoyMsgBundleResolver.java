@@ -5,7 +5,6 @@ import java.util.Locale;
 
 import com.google.common.base.Optional;
 import com.google.template.soy.msgs.SoyMsgBundle;
-import org.springframework.stereotype.Component;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
  * An empty implementation of SoyMsgBundleResolver that always returns empty SoyMsgBundle,
  * i.e. absent value
  */
-@Component(value = "emptyEmptySoyMsgBundleResolver")
 public class EmptySoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     @Override
