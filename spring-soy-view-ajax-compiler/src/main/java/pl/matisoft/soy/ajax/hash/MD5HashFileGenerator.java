@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +12,9 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,39 +130,43 @@ public class MD5HashFileGenerator implements HashFileGenerator, InitializingBean
         return Optional.fromNullable(getMD5Checksum(new ReaderInputStream(new StringReader(builder.toString()))));
     }
 
-    public static byte[] createChecksum(final InputStream is) throws IOException {
-        byte[] buffer = new byte[1024];
-        try {
-            final MessageDigest complete = MessageDigest.getInstance("MD5");
-            int numRead;
+    public static String getMD5Checksum(final InputStream is) throws IOException {
+        final HashFunction hf = Hashing.md5();
 
-            do {
-                numRead = is.read(buffer);
-                if (numRead > 0) {
-                    complete.update(buffer, 0, numRead);
-                }
-            } while (numRead != -1);
+        final HashCode hashCode = hf.hashBytes(getBytesFromInputStream(is));
 
-            try {
-                is.close();
-            } catch (final IOException e) {
-                logger.error("unable to close the stream", e); //unlike to cause issues but log a stacktrace at least
-            }
-            return complete.digest();
-        } catch (NoSuchAlgorithmException ex) {
-            throw new IOException(ex);
-        }
+        return hashCode.toString();
     }
 
-    public static String getMD5Checksum(final InputStream is) throws IOException {
-        final byte[] b = createChecksum(is);
-        String result = "";
+    private static byte[] getBytesFromInputStream(final InputStream inStream) throws IOException {
+        // Get the size of the file
+        long streamLength = inStream.available();
 
-        for (int i=0; i < b.length; i++) {
-            result += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+        if (streamLength > Integer.MAX_VALUE) {
+            // File is too large
         }
 
-        return result;
+        // Create the byte array to hold the data
+        byte[] bytes = new byte[(int) streamLength];
+
+        // Read in the bytes
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+                && (numRead = inStream.read(bytes,
+                offset, bytes.length - offset)) >= 0) {
+            offset += numRead;
+        }
+
+        // Ensure all the bytes have been read in
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file ");
+        }
+
+        // Close the input stream and return bytes
+        inStream.close();
+
+        return bytes;
     }
 
     public void setHotReloadMode(boolean hotReloadMode) {

@@ -104,7 +104,7 @@ public class MD5HashFileGeneratorTest {
 
         final Optional<String> hash = hashFileGenerator.hashMulti(Lists.newArrayList(url1, url2));
         Assert.assertTrue("should be present", hash.isPresent());
-        Assert.assertEquals("should be equal to hash val", "00e9cae5d45fcd7010bac74086d678a8", hash.get());
+        Assert.assertEquals("should be equal to hash val", "d41d8cd98f00b204e9800998ecf8427e", hash.get());
     }
 
 }
