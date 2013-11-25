@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
  * Time: 16:48
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CookieResolverTest {
+public class CookieDataResolverTest {
 
     private CookieDataResolver cookieResolver = new CookieDataResolver();
 

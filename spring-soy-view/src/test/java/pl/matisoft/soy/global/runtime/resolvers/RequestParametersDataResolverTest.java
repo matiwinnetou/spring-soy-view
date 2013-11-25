@@ -1,6 +1,5 @@
 package pl.matisoft.soy.global.runtime.resolvers;
 
-import com.google.common.collect.Maps;
 import com.google.template.soy.data.SoyMapData;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,15 +19,15 @@ import static org.mockito.Mockito.when;
  * Created with IntelliJ IDEA.
  * User: mati
  * Date: 01/11/2013
- * Time: 16:57
+ * Time: 16:53
  */
 @RunWith(MockitoJUnitRunner.class)
-public class RequestHeadersResolverTest {
+public class RequestParametersDataResolverTest {
 
-    private RequestHeadersDataResolver requestHeadersResolver = new RequestHeadersDataResolver();
+    private RequestParametersDataResolver requestParametersResolver = new RequestParametersDataResolver();
 
     @Test
-    public void testResolverHeaders() throws Exception {
+    public void resolveRequestParameters() throws Exception {
         final SoyMapData soyMapData = new SoyMapData();
 
         final Vector<String> names = new Vector<String>();
@@ -44,16 +43,16 @@ public class RequestHeadersResolverTest {
 
         final Enumeration e = mock(Enumeration.class);
         when(e.hasMoreElements()).thenReturn(false);
-        when(request.getParameterNames()).thenReturn(e);
-        when(request.getHeaderNames()).thenReturn(names.elements());
-        when(request.getHeader("name1")).thenReturn(values.get(0));
-        when(request.getHeader("name2")).thenReturn(values.get(1));
+        when(request.getParameterNames()).thenReturn(names.elements());
+        when(request.getHeaderNames()).thenReturn(e);
+        when(request.getParameter("name1")).thenReturn(values.get(0));
+        when(request.getParameter("name2")).thenReturn(values.get(1));
 
         when(request.getCookies()).thenReturn(new Cookie[]{});
-        requestHeadersResolver.resolveData(request, response, Maps.<String, Object>newHashMap(), soyMapData);
+        requestParametersResolver.resolveData(request, response, null, soyMapData);
 
-        Assert.assertEquals("should not be value1", "value1", soyMapData.get("_request.header.name1").stringValue());
-        Assert.assertEquals("should not be value2", "value2", soyMapData.get("_request.header.name2").stringValue());
+        Assert.assertEquals("should not be value1", "value1", soyMapData.get("_request.parameter.name1").stringValue());
+        Assert.assertEquals("should not be value2", "value2", soyMapData.get("_request.parameter.name2").stringValue());
     }
 
 }

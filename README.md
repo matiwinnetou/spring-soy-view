@@ -17,6 +17,7 @@ It was created due to specific requirements, which no other framework at that ti
 * JavaScript compilation via AJAX endpoint using a Spring Controller (SoyAjaxController)
 * JavaScript compilation which supports browser caching (hash url part)
 * JavaScript obfuscation (via either google closure or yahoo js obfuscator) and combination of generated urls via Ajax
+* It allows to work in a "black-box" (auto import beans) or "white-box" mode, fine tune a configuration and manually create and wire beans
 
 #### Google Closure Soy
 
@@ -42,59 +43,115 @@ on the client side using soy to JavaScript compiler.
 
 # User's Guide
 
-In order to use spring-soy-view one has to wire beans. Since the library allows to adjust and plug an implementation for almost any internal function the configuration may seem to be verbose. It is recommended to keep spring-soy-view configuration in either separate XML file or Java Class, so that it does not obscure your internal application with it's wiring classes. Since most user's will want to adjust and possibly plug an own implementation of a certain function (seems to be the case for complex projects) the typical xml file is not part of jar distribution.
+To use Spring-Soy View in "white-box" mode one has to manually wire beans. Conversely to use library in "back-box" mode all you have to do is to import pertinent @Configuration objects with bean definitions.
+
+First we will look at "black-box" configuration as it is easier to begin with.
+Available @Configuration in library itself:
+* pl.matisoft.soy.config.SpringSoyViewBaseConfig (core)
+* pl.matisoft.soy.ajax.config.SpringSoyViewAjaxConfig (ajax)
+
+It is important to notice that if you decide to import SpringSoyViewAjaxConfig then you will automatically import SpringSoyViewBaseConfig since there is a dependency on it.
+It makes sense to use SpringSoyViewAjaxConfig only if you are interested in ajax compiler, which is effectively a spring controller compiles soy templates to javascript at runtime.
+
+
+### Example import usage: (Black-Box Mode)
+
+```java
+@Configuration
+@Import(SpringSoyViewAjaxConfig.class)
+@PropertySource("classpath:spring-soy-view-example.properties")
+@EnableWebMvc
+@ComponentScan(basePackages = {"pl.matisoft.soy.example"})
+public class SoyConfiguration extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    @Primary
+    public ViewResolver contentNegotiatingViewResolver(final ViewResolver soyViewResolver) throws Exception {
+        final ContentNegotiatingViewResolver contentNegotiatingViewResolver = new ContentNegotiatingViewResolver();
+        contentNegotiatingViewResolver.setViewResolvers(Lists.newArrayList(soyViewResolver));
+        contentNegotiatingViewResolver.setDefaultViews(Lists.<View>newArrayList(new MappingJacksonJsonView()));
+
+        return contentNegotiatingViewResolver;
+    }
+
+}
+
+```
+
+### Configurable Parameters (White-Box Mode) - SpringSoyViewBaseConfig - core
+* ${soy.hot.reload.mode:false} - supports developer and recompiles soy templates on every page access (slow but no reason to restart application on soy file change)
+* ${soy.templates.resolve.recursively:true} - whether soy files should be recursively resolved based on configured: ${soy.templates.directory}
+* ${soy.templates.file.extension:soy} - a soy file extension
+* ${soy.templates.directory:/WEB-INF/templates} - directory to look for template files
+* ${soy.i18n.xliff.path:xliffs/messages} - path to xliff messages files (Spring's Resource abstraction)
+* ${soy.encoding:utf-8} - encoding of soy templates and output responses
+* ${soy.i18n.fallback.to.english:true} - whether it should fallback to english on missing keys for a current locale
+* ${soy.preCompile.templates:false} - whether a library should precompile soy templates on startup or lazily on first access
+* ${soy.indexView:index} - a default index view - this is used in only special cases (TODO: )
+* ${soy.logical.prefix:soy:} - a prefix that is used to uniquely identify a logical soy template name
+* ${soy.resolver.order:2147483647} - order of this ViewResolver
+
+### Configurable Parameters (White-Box Mode) - SpringSoyViewBaseConfig - ajax
+* ${soy.hot.reload.mode:false} - supports developer and recompiles soy templates to java script otherwise it caches them
+* ${soy.site.url:} - points to absolute site urls, used only for an optional TemplateComposer, which most likely will be deprecated in next release
+* ${soy.cache.busting.cache.control:public, max-age=86400} - one year cache control, which is only used in production mode (not hot reload mode)
+* ${soy.encoding:utf-8} - http response encoding
+
+As you can see, we are using @Bean @Primary annotation to override the implementation which is imported from the file. In case of negotiatingViewResolver, we need to do that
+because ViewResolver is already provided within a SpringSoyViewAjaxConfig inside a library. The ViewResolver which is passed as a function argument is in fact a soyViewResolver thanks
+to Spring dependency resolution.
+
+In white-box mode the configuration may seem to be verbose but the advantage is that a developer is in full control which beans get instiantiated and wired up together.
+It is recommended that beginner users start with black-box approach and progress to white-box approach if they wish to be in full control over instantiated beans.
 
 ### Available maven modules
 
 * __spring-soy-view__ - this module is the core of the library, contains the main functionality including SoyTemplateFilesResolver 
-* __spring-soy-view-ajax-compiler__ - this module contains ajax compiler, it makes sense to use this modue only if you want to compile soy files to JavaScript
-* __spring-soy-view-min-google__ - this module allows minimification of soy to javascript code using google closure library. It makes sense to use this module only together with ajax-compiler module.
-* __spring-soy-view-min-yahoo__ - this module allows minimification of soy to javascript code using yahoo library. It makes sense to use this module only together with ajax-compiler module. Both google and yahoo libraries are mutually exclusive, it doesn't makse sense to use both at the same time
+* __spring-soy-view-ajax-compiler__ - this module contains ajax compiler, it makes sense to use this modue only if you want to compile soy files to JavaScript. This modules includes Yahoo and Google Closure obfuscation support
 
 ### Maven configuration
 
 All artefacts have been pushed to maven central repository:
 
-### pom.xml
+### Maven's pom.xml
 
 ```xml
+
         <dependency>
             <groupId>pl.matisoft</groupId>
             <artifactId>spring-soy-view</artifactId>
-            <version>1.20.0</version>
+            <version>1.25.1</version>
         </dependency>
 
         <dependency>
             <groupId>pl.matisoft</groupId>
             <artifactId>spring-soy-view-ajax-compiler</artifactId>
-            <version>1.20.0</version>
+            <version>1.25.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>pl.matisoft</groupId>
-            <artifactId>spring-soy-view-min-google</artifactId>
-            <version>1.20.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>pl.matisoft</groupId>
-            <artifactId>spring-soy-view-min-yahoo</artifactId>
-            <version>1.20.0</version>
-        </dependency>
 ```
 
-### XML Configuration Example
+### XML Configuration Example (White-Box Mode)
 
-To use spring-soy-view via XML in Spring it is recommended to take this template as an example and adjust it accordingly. This example is taken from a real project and adjusted for the purpouses of this guide.
+To use spring-soy-view via XML in Spring it is recommended to take this template as an example and adjust it accordingly. This example is taken from a real project and adjusted for the purposes of this guide.
 
-Gist: [spring-soy-view.xml](https://gist.github.com/mati1979/74e4d2b1c479dbf4a8ec "spring-soy-view.xml")
+Gist: [spring-soy-view.xml](https://gist.github.com/mati1979/74e4d2b1c479dbf4a8ec "spring-soy-view.xml") (*updated for: version 1.25.1 *)
 
-### Java Bean Config Example
+### Java Bean Config Example (White-Box Mode)
 
 In the same way it is possible to use XML wiring a better and more modern way to include soy-spring-view library is to use __@Configuration__ annotations from spring.
 
-Gist: [SoyConfiguration.java](https://gist.github.com/mati1979/7291135 "SoyConfiguration.java")
-
+Gist: [SoyConfiguration.java](https://gist.github.com/mati1979/7291135 "SoyConfiguration.java") (*updated for: version 1.25.1 *)
 
 ### Templates location
 
@@ -116,10 +173,12 @@ As indicated in the above example, this will yield rendering of a template defin
 
 ### Spring's Template resolvers chaining
 
-In Spring MVC, templates resolvers can be chained in a sense of __Chain of Responsibility__ pattern (GoF), this is the reason a "soy:" prefix was introduced, when __SoyTemplateViewResolver__ cannot sees the template name does not have this prefix, it is passing to next handlers in the chain (ie. other template view resolvers).
+In Spring MVC, templates resolvers can be chained in a sense of __Chain of Responsibility__ pattern (GoF), this is the reason a "soy:" prefix for a template name was introduced,
+when __SoyTemplateViewResolver__ cannot see that a template name have this prefix, it is skipping to next handler in the handler chain inside spring (ie. other template view resolvers).
 
 ### Compile Time Global Parameters
-There are parameters that are static in nature and they can be only changed upon restarts of the application. An example of such parameters could be: project directory, dev mode, google analytics token, etc. Normally these values are available via Spring's application properties. What you may notice is that from time to time you would like to reference this globally available data from your soy files, those parameters then are available in soy files in the form:
+There are parameters that are static in nature and they can be only changed upon restarts of the application. An example of such parameters could be: project directory, dev mode, google analytics token, etc.
+Normally these values are available via Spring's application properties. What you may notice is that from time to time you would like to reference this globally available data from your soy files, those parameters then are available in soy files in the form:
 {parameter.name}, note lack of $ sign.
 
 e.g.
@@ -168,22 +227,22 @@ This way you can control certain aspects of developer mode, some classes may con
 ### Runtime Global Parameters
 Google's Soy Templates support a notion of globally injected parameters, which are available under a special namespace: ${ij}, contrary to other spring's view resolver library this library makes use of this and that way this allows us to keep SoyVIew implementation clean. By default an implementation delegates to a __DefaultGlobalModelResolver__, which in turn contains a list of RuntimeResolvers Out of the box the library provides a resolution for the following runtime information:
 
-* __Servlet's servletContext__ via ServletContextResolver class and by default data is bound to: __{$ij._servlet.context}__
-* __Spring's WebApplicationContext__ via WebApplicationContextResolver class and by default data is bound to: __{$ij._web.app.context}__
-* __Http cookies__ via CookieResolver and by default data is bound to: __{$ij._request.cookie}__ 
-* __Http session__ data via HttpSessionResolver and by default data is bound to: __{$ij._http.session}__. Please note this runtime resolver does not resolve objects only primitives, it is therefore needed that you extend from this runtime resolver 
-* __Spring's RequestContext__ via RequestContextResolver and data bound to: __{$ij._request.context}__
-* __Request parameters__ via RequestParametersResolver and data bound to: __{$ij._request.parameter}__
-* __Request headers__ via RequestHeadersResolver and data bound to: __{$ij._request.header}__
+* __Servlet's servletContext__ via ServletContextDataResolver class and by default data is bound to: __{$ij._servlet.context}__
+* __Spring's WebApplicationContext__ via WebApplicationContextDataResolver class and by default data is bound to: __{$ij._web.app.context}__
+* __Http cookies__ via CookieDataResolver and by default data is bound to: __{$ij._request.cookie}__
+* __Http session__ data via HttpSessionDataResolver and by default data is bound to: __{$ij._http.session}__. Please note this runtime resolver does not resolve objects only primitives, it is therefore needed that you extend from this runtime resolver
+* __Spring's RequestContext__ via RequestContextDataResolver and data bound to: __{$ij._request.context}__
+* __Request parameters__ via RequestParametersDataResolver and data bound to: __{$ij._request.parameter}__
+* __Request headers__ via RequestHeadersDataResolver and data bound to: __{$ij._request.header}__
 
 Note that since by design a Soy __does not__ allow any code from the templates to be executes in java (without writing a plugin for it), all of those implementation support only getting data without input parameters.
 
 It is expected that if you need your own domain specific runtime data resolver, you simply write a new class and implement the interface __pl.matisoft.soy.global.runtime.resolvers.RuntimeResolver__, once done wire this via configuration of __DefaultGlobalModelResolver__
 
 ```java
-public interface RuntimeResolver {
+public interface RuntimeDataResolver {
 
-    void resolveData(HttpServletRequest request, HttpServletResponse response, Map model, SoyMapData root);
+   void resolveData(HttpServletRequest request, HttpServletResponse response, Map<String, ? extends Object> model, SoyMapData root);
 
 }
 ```
@@ -200,10 +259,14 @@ A library by default will convert your POJO domain objects to soy compatible dat
 of ToSoyDataConverter that will recursively inspect a passed in model and build a nested structure of SoyMapData objects,
 which consist only of primitives supported by Soy and thus can be rendered.
 
+Warning: be careful when your domain objects perform an expensive calls, e.g. hibernate db load. ToSoyDataConverter
+will __recursively__ invoke getters and is (for booleans) methods automatically to build SoyMapData object structure.
+
 ### Ajax JavaScript compilation
 
 This is an optional module, in which compilation of soy files can be done via a Spring MVC controller. Typically, however,
-most project will use a maven plugin or grunt task that compiles soy files to javascript.
+some project may choose to use a maven plugin or grunt task that compiles soy files to javascript or even not
+compilation to JavaScript at all (not recommended - usage allows performance tweaks and lazy loading)
 
 To use an ajax compiler it is necessary to wire or include SoyAjaxController in application's configuration files:
 
@@ -255,7 +318,7 @@ An example from a html document:
 <script type="text/javascript" src="soy/compileJs?file=templates/client-words.soy&amp;file=templates/server-time.soy"></script>
 ```
 
-* I the first line it is necessary to note here that this example uses __required__ soyutils using bower package manager but obviously it can be linked in an _old fashioned_ way. soyutils is available in bower as "soyutils" package
+* In the first line it is necessary to note here that this example uses __required__ soyutils using bower package manager but obviously it can be linked in an _old fashioned_ way. soyutils is available in bower as "soyutils" package
 * In second line, we can see a call to soy/compileJs?, which will compile both templates/client-words.soy and templates/server-time.soy using SoyAjaxController. Please note this code will also combine and potentially obfuscate (if OutputProcessor has been configured for this SoyAjaxController)
 
 #### SoyAjaxController supports the following endpoints:
