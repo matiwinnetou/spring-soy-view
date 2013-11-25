@@ -402,10 +402,6 @@ and now if it won't be able to match on soy template, it will delegate to other 
 * Updated example project to reflect new changes
 * Injected Data should now be used to generate file hashes for ajax compiler module.
 
-### TODO
-* Update documentation on website to reflect 1.25.1 changes
-* Write an implementation of SoyPlugin that is able to bridge to MessageSource from spring
-
 ### License
 
 Apache License Version 2.0
