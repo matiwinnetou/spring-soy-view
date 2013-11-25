@@ -331,6 +331,18 @@ and now if it won't be able to match on soy template, it will delegate to other 
 * SoyView now doesn't extend from Spring's abstract classes but needless to say implements Spring's view interface
 * Introduced a new concept of CompiledTemplatesHolder, this way we can prevent compilation of all templates to take place multiple times per site, i.e. as many as there are pages (SoyView instances)
 
+### 1.25.1
+* debugOn is now called: hotReloadMode (it was badly named to begin with)
+* RuntimeResolver is now called RuntimeDataResolver (it reflects what it does)
+* @Configuration objects are available for spring-soy-view and ajax module, so they can be imported from a main xml or @Configuration file
+* google min and yahoo min have been merged into ajax-compiler module. There was a circular dependency problem otherwise.
+* Updated example project to reflect new changes
+* Injected Data should now be used to generate file hashes for ajax compiler module.
+
+### TODO
+* Update documentation on website to reflect 1.25.1 changes
+* Write an implementation of SoyPlugin that is able to bridge to MessageSource from spring
+
 ### License
 
 Apache License Version 2.0
