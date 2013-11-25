@@ -88,7 +88,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
 
 ```
 
-### Configurable Parameters (White-Box Mode) - SpringSoyViewBaseConfig - core
+### Configurable Parameters (Black-Box Mode) - SpringSoyViewBaseConfig - core
 * ${soy.hot.reload.mode:false} - supports developer and recompiles soy templates on every page access (slow but no reason to restart application on soy file change)
 * ${soy.templates.resolve.recursively:true} - whether soy files should be recursively resolved based on configured: ${soy.templates.directory}
 * ${soy.templates.file.extension:soy} - a soy file extension
@@ -101,7 +101,7 @@ public class SoyConfiguration extends WebMvcConfigurerAdapter {
 * ${soy.logical.prefix:soy:} - a prefix that is used to uniquely identify a logical soy template name
 * ${soy.resolver.order:2147483647} - order of this ViewResolver
 
-### Configurable Parameters (White-Box Mode) - SpringSoyViewBaseConfig - ajax
+### Configurable Parameters (Black-Box Mode) - SpringSoyViewBaseConfig - ajax
 * ${soy.hot.reload.mode:false} - supports developer and recompiles soy templates to java script otherwise it caches them
 * ${soy.site.url:} - points to absolute site urls, used only for an optional TemplateComposer, which most likely will be deprecated in next release
 * ${soy.cache.busting.cache.control:public, max-age=86400} - one year cache control, which is only used in production mode (not hot reload mode)
@@ -413,7 +413,7 @@ Apache License Version 2.0
 ### Known issues:
 * SoyAjaxController may not work under windows server, i.e. it may only work with linux style file paths
 
-### Example project:
+### Example project (shows Black-Box mode in action)
 * https://github.com/mati1979/spring-soy-view-example
 
 author: Mateusz Szczap<br>
