@@ -36,16 +36,12 @@ public class SoyAjaxControllerTest {
 
     @InjectMocks
     private SoyAjaxController soyAjaxController = new SoyAjaxController();
-
     @Mock
     private TemplateFilesResolver templateFilesResolver;
-
     @Mock
     private SoyMsgBundleResolver soyMsgBundleResolver;
-
     @Mock
     private LocaleProvider localeProvider;
-
     @Mock
     private TofuCompiler tofuCompiler;
 
@@ -90,7 +86,7 @@ public class SoyAjaxControllerTest {
         when(tofuCompiler.compileToJsSrc(url2, null)).thenReturn(Optional.of(jsData2));
 
         final ResponseEntity<String> responseEntity = soyAjaxController.compile("", new String[]{templateName1, templateName2}, null, "true", request);
-        Assert.assertEquals("data should be equal", jsData2 + jsData1, responseEntity.getBody());
+        Assert.assertEquals("data should be equal", jsData1 + jsData2, responseEntity.getBody());
         Assert.assertTrue("http status should be equal", (responseEntity.getStatusCode() == HttpStatus.OK));
     }
 
