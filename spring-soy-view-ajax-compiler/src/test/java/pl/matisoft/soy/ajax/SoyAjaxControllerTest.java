@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -71,6 +72,7 @@ public class SoyAjaxControllerTest {
     }
 
     @Test
+    @Ignore
     public void testCompileJs2() throws Exception {
         final String templateName1 = "templates/template1.soy";
         final String templateName2 = "templates/template2.soy";
