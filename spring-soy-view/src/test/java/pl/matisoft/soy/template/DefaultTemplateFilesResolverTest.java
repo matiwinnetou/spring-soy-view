@@ -1,11 +1,18 @@
 package pl.matisoft.soy.template;
 
+import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Optional;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -17,114 +24,137 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class DefaultTemplateFilesResolverTest {
 
-    private DefaultTemplateFilesResolver defaultTemplateFilesResolver = new DefaultTemplateFilesResolver();
+    private DefaultTemplateFilesResolver templateFilesResolver = new DefaultTemplateFilesResolver();
+
+    @Before
+    public void setUp() {
+        templateFilesResolver.setTemplatesLocation("classpath:templates");
+        templateFilesResolver.afterPropertiesSet();
+    }
 
     @Test
     public void defaultDebugFlag() throws Exception {
-        Assert.assertFalse("debug flag should be off", defaultTemplateFilesResolver.isHotReloadMode());
+        Assert.assertFalse("debug flag should be off", templateFilesResolver.isHotReloadMode());
     }
 
     @Test
     public void setDebugFlag() throws Exception {
-        defaultTemplateFilesResolver.setHotReloadMode(true);
-        Assert.assertTrue("debug flag should be on", defaultTemplateFilesResolver.isHotReloadMode());
+        templateFilesResolver.setHotReloadMode(true);
+        Assert.assertTrue("debug flag should be on", templateFilesResolver.isHotReloadMode());
     }
 
     @Test
     public void defaultRecursive() throws Exception {
-        Assert.assertTrue("recursive template file resolution should be on", defaultTemplateFilesResolver.isRecursive());
+        Assert.assertTrue("recursive template file resolution should be on", templateFilesResolver.isRecursive());
     }
 
     @Test
     public void setRecursive() throws Exception {
-        defaultTemplateFilesResolver.setRecursive(false);
-        Assert.assertFalse("recursive template file resolution should be off", defaultTemplateFilesResolver.isRecursive());
+        templateFilesResolver.setRecursive(false);
+        Assert.assertFalse("recursive template file resolution should be off", templateFilesResolver.isRecursive());
     }
 
     @Test
     public void cacheShouldBeEmpty() throws Exception {
-        Assert.assertTrue("cache should be empty from beginning", defaultTemplateFilesResolver.cachedFiles.isEmpty());
+        Assert.assertNull("cache should be null from beginning", templateFilesResolver.cachedFiles);
     }
 
     @Test
     public void defaultTemplateLocation() throws Exception {
-        Assert.assertNull("template file location should be null", defaultTemplateFilesResolver.getTemplatesLocation());
+        Assert.assertNull("template file location should be null",
+                new DefaultTemplateFilesResolver().getTemplatesLocation());
     }
 
     @Test
-    public void resolveDebugOff() throws Exception {
-        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        final Collection<URL> urls = defaultTemplateFilesResolver.resolve();
+    public void resolveDebugOffRecursiveOn() throws Exception {
+        final Collection<URL> urls = templateFilesResolver.resolve();
+        Assert.assertEquals("should resolve urls", 5, urls.size());
+
+        Set<String> names = nab_template_names(urls);
+
+        for (final String s : new String[] {"template1", "template2", "template3", "sub/template4", "sub/template5"}) {
+           Assert.assertTrue(s + " must be in the set of resolved templates.", names.contains("templates/" + s + ".soy"));
+        }
+    }
+
+    @Test
+    public void resolveDebugOffRecursiveOff() throws Exception {
+        templateFilesResolver.setRecursive(false);
+        final Collection<URL> urls = templateFilesResolver.resolve();
         Assert.assertEquals("should resolve urls", 3, urls.size());
-        final Iterator<URL> it = urls.iterator();
-        final URL template1Url = it.next();
-        final URL template2Url = it.next();
-        final URL template3Url = it.next();
-        Assert.assertTrue("template1Url file should end with template1.soy", template1Url.getFile().endsWith("template1.soy"));
-        Assert.assertTrue("template2Url file should end with template2.soy", template2Url.getFile().endsWith("template2.soy"));
-        Assert.assertTrue("template3Url file should end with template3.soy", template3Url.getFile().endsWith("template3.soy"));
+
+        Set<String> names = nab_template_names(urls);
+
+        for (final String s : new String[] {"template1", "template2", "template3"}) {
+            Assert.assertTrue(s + " must be in the set of resolved templates.", names.contains("templates/" + s + ".soy"));
+        }
     }
 
     @Test
     public void resolveWithFullTemplateNameDebugOff() throws Exception {
-        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        final Optional<URL> url = defaultTemplateFilesResolver.resolve("templates/template1");
+        final Optional<URL> url = templateFilesResolver.resolve("templates/template1");
         Assert.assertTrue("should be present", url.isPresent());
         Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
     }
 
     @Test
     public void resolveWithTemplateNameDebugOff() throws Exception {
-        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        final Optional<URL> url = defaultTemplateFilesResolver.resolve("template1");
+        final Optional<URL> url = templateFilesResolver.resolve("template1");
         Assert.assertTrue("should be present", url.isPresent());
         Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
     }
 
     @Test
     public void resolveWithFullTemplateNameExtDebugOff() throws Exception {
-        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        final Optional<URL> url = defaultTemplateFilesResolver.resolve("templates/template1.soy");
+        final Optional<URL> url = templateFilesResolver.resolve("templates/template1.soy");
         Assert.assertTrue("should be present", url.isPresent());
         Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
     }
 
     @Test
     public void resolveWithTemplateNameExtDebugOff() throws Exception {
-        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        final Optional<URL> url = defaultTemplateFilesResolver.resolve("template1.soy");
+        final Optional<URL> url = templateFilesResolver.resolve("template1.soy");
         Assert.assertTrue("should be present", url.isPresent());
         Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
     }
 
     @Test
     public void resolveWithFullTemplateNameExtDebugOffShouldNotWork() throws Exception {
-        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        final Optional<URL> url = defaultTemplateFilesResolver.resolve("tmpl/template1.soy");
+        final Optional<URL> url = templateFilesResolver.resolve("tmpl/template1.soy");
         Assert.assertFalse("should be absent", url.isPresent());
     }
 
     @Test
     public void cacheDisabledWithDebugOn() throws Exception {
-        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        defaultTemplateFilesResolver.setHotReloadMode(true);
-        defaultTemplateFilesResolver.resolve("template1");
-        Assert.assertTrue("cache should be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
+        templateFilesResolver.setHotReloadMode(true);
+        templateFilesResolver.resolve("template1");
+
+        Assert.assertNull("cache should be null", templateFilesResolver.cachedFiles);
     }
 
     @Test
     public void cacheDisabledByDefault() throws Exception {
-        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        defaultTemplateFilesResolver.resolve("template1");
-        Assert.assertFalse("cache should not be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
+        templateFilesResolver.resolve("template1");
+        Assert.assertFalse("cache should not be empty", templateFilesResolver.cachedFiles.isEmpty());
     }
 
     @Test
     public void cacheEnabledWithDebugOff() throws Exception {
-        defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
-        defaultTemplateFilesResolver.resolve("template1");
-        Assert.assertFalse("cache should not be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
-        Assert.assertEquals("cache should not equal 3", 3, defaultTemplateFilesResolver.cachedFiles.size());
+        templateFilesResolver.resolve("template1");
+        Assert.assertFalse("cache should not be empty", templateFilesResolver.cachedFiles.isEmpty());
+        Assert.assertEquals("number of items in cache should be equal", 5, templateFilesResolver.cachedFiles.size());
     }
 
+    private Set<String> nab_template_names(Collection<URL> templates) {
+        Set<String> names = new HashSet<String>();
+
+        for (final URL template : templates) {
+            final String file_path = template.getFile();
+            final String file = file_path.substring(file_path.indexOf("templates"));
+
+            names.add(file);
+        }
+
+        return names;
+    }
 }

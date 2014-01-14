@@ -16,8 +16,6 @@ import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
-import javax.inject.Inject;
-
 /**
  * Created with IntelliJ IDEA.
  * User: mati
@@ -41,7 +39,7 @@ public class DefaultCompiledTemplatesHolder implements InitializingBean, Compile
     private boolean preCompileTemplates = SoyViewConfigDefaults.DEFAULT_PRECOMPILE_TEMPLATES;
 
     public Optional<SoyTofu> compiledTemplates() throws IOException {
-        if (isHotReloadMode() || !compiledTemplates.isPresent()) {
+        if (shouldCompileTemplates()) {
             this.compiledTemplates = Optional.fromNullable(compileTemplates());
         }
 
@@ -54,6 +52,10 @@ public class DefaultCompiledTemplatesHolder implements InitializingBean, Compile
         if (preCompileTemplates) {
             this.compiledTemplates = Optional.fromNullable(compileTemplates());
         }
+    }
+
+    private boolean shouldCompileTemplates() {
+        return isHotReloadMode() || !compiledTemplates.isPresent();
     }
 
     private SoyTofu compileTemplates() throws IOException {
