@@ -30,9 +30,7 @@ public class DefaultCompiledTemplatesHolder implements InitializingBean, Compile
 
     private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
-
     private TofuCompiler tofuCompiler = new EmptyTofuCompiler();
-
 
     private TemplateFilesResolver templatesFileResolver = new EmptyTemplateFilesResolver();
 
@@ -41,11 +39,15 @@ public class DefaultCompiledTemplatesHolder implements InitializingBean, Compile
     private boolean preCompileTemplates = SoyViewConfigDefaults.DEFAULT_PRECOMPILE_TEMPLATES;
 
     public Optional<SoyTofu> compiledTemplates() throws IOException {
-        if (isHotReloadMode() || !compiledTemplates.isPresent()) {
+        if (shouldCompileTemplates()) {
             this.compiledTemplates = Optional.fromNullable(compileTemplates());
         }
 
         return compiledTemplates;
+    }
+
+    private boolean shouldCompileTemplates() {
+        return isHotReloadMode() || !compiledTemplates.isPresent();
     }
 
     @Override
