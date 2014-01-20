@@ -155,7 +155,7 @@ public class ClasspathTemplateFilesResolver implements TemplateFilesResolver, In
 
     private String templateSearchStrings(String resource) {
         if (recursive) {
-            return resource + "/**/" + dotWithExtension();
+            return resource + "/**/*" + dotWithExtension();
         }
 
         return resource + "/*" + dotWithExtension();
