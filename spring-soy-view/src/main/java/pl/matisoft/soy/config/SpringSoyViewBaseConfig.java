@@ -90,7 +90,7 @@ public class SpringSoyViewBaseConfig {
         defaultTemplateFilesResolver.setHotReloadMode(hotReloadMode);
         defaultTemplateFilesResolver.setRecursive(recursive);
         defaultTemplateFilesResolver.setFilesExtension(fileExtension);
-        defaultTemplateFilesResolver.setTemplatesLocation(new ServletContextResource(servletContext, templatesPath));
+        defaultTemplateFilesResolver.setTemplatesLocation(templatesPath);
 
         return defaultTemplateFilesResolver;
     }

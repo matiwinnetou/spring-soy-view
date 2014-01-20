@@ -3,92 +3,63 @@ package pl.matisoft.soy.template;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.web.context.ServletContextAware;
-import org.springframework.web.context.support.ServletContextResource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import pl.matisoft.soy.config.SoyViewConfigDefaults;
 
 /**
- * Created with IntelliJ IDEA.
- * User: mati
- * Date: 20/06/2013
- * Time: 19:58
- *
  * An implementation that will recursively search (and resolve)
  * for soy files based on provided templatesLocation path
  */
 @ParametersAreNonnullByDefault
 @ThreadSafe
-public class DefaultTemplateFilesResolver implements TemplateFilesResolver, ServletContextAware, InitializingBean {
+public class DefaultTemplateFilesResolver implements TemplateFilesResolver, InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);
 
-    /** spring resource that points to a root path, in which soy templates are located */
-    private Resource templatesLocation = null;
+    /** spring resource string that points to a root path, in which soy templates are located */
+    private String templatesLocation = null;
 
     private boolean recursive = true;
 
     private boolean hotReloadMode = SoyViewConfigDefaults.DEFAULT_HOT_RELOAD_MODE;
 
-    /** a thread safe cache for resolved templates, no need to worry of ddos attack */
-    /** friendly */ CopyOnWriteArrayList<URL> cachedFiles = new CopyOnWriteArrayList<URL>();
+    private PathMatchingResourcePatternResolver resolver;
+
+    private ResourceLoader resourceLoader = new DefaultResourceLoader(getClass().getClassLoader());
+
+    /** friendly */ Collection<URL> cachedFiles;
 
     private String filesExtension = SoyViewConfigDefaults.DEFAULT_FILES_EXTENSION;
 
-    @Inject
-    private ServletContext servletContext;
-
-    public DefaultTemplateFilesResolver() {
-    }
-
     @Override
-    public void afterPropertiesSet() throws Exception {
-        if (templatesLocation == null) {
-            templatesLocation = new ServletContextResource(servletContext, SoyViewConfigDefaults.DEFAULT_TEMPLATE_FILES_PATH);
-        }
+    public void afterPropertiesSet() {
+        Preconditions.checkArgument(resourceLoader != null, "A ResourceLoader is expected to have been provided.");
+        resolver = new PathMatchingResourcePatternResolver(resourceLoader);
     }
 
     @Override
     public Collection<URL> resolve() throws IOException {
         Preconditions.checkNotNull(templatesLocation, "templatesLocation cannot be null!");
 
-        if (hotReloadMode) {
-            final List<URL> files = toFiles(templatesLocation);
-            logger.debug("Debug on - resolved files:" + files.size());
-
-            return files;
-        }
-
-        //no debug
-        synchronized (cachedFiles) {
-            if (cachedFiles.isEmpty()) {
-                final List<URL> files = toFiles(templatesLocation);
-                logger.debug("templates location:" + templatesLocation);
-                logger.debug("Using cache resolve, debug off, urls:" + files.size());
-                cachedFiles.addAll(files);
-            }
-        }
-
-        return cachedFiles;
+        return Collections.unmodifiableCollection(handleResolution());
     }
 
     @Override
@@ -97,7 +68,8 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
             return Optional.absent();
         }
 
-        final Collection<URL> files = resolve();
+        final Collection<URL> files = handleResolution();
+        final String normalizedFileName = normalizeTemplateName(templateFileName);
 
         final URL templateFile = Iterables.find(files, new Predicate<URL>() {
 
@@ -106,12 +78,69 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
                 final String fileName = url.getFile();
                 final File file = new File(fileName);
 
-                return file.toURI().toString().endsWith(normalizeTemplateName(templateFileName));
+                return file.toURI().toString().endsWith(normalizedFileName);
             }
 
         }, null);
 
         return Optional.fromNullable(templateFile);
+    }
+
+    protected Collection<URL> handleResolution() throws IOException {
+        Preconditions.checkNotNull(templatesLocation, "templatesLocation cannot be null!");
+
+        if (hotReloadMode) {
+            final Collection<URL> files = resolveSoyResources(templatesLocation);
+            logger.debug("Debug on - resolved files: {}", files.size());
+
+            return Collections.unmodifiableCollection(files);
+        }
+
+        // no debug
+        // double check locking to ensure we don't block threads to test if cached files is null
+        if (cachedFiles == null) {
+            synchronized (this) {
+                if (cachedFiles == null) {
+                    final Collection<URL> files = resolveSoyResources(templatesLocation);
+                    logger.debug("templates location: {}", templatesLocation);
+                    logger.debug("Using cache resolve, debug off, urls: {}", files.size());
+
+                    cachedFiles = Collections.unmodifiableCollection(files);
+                }
+            }
+        }
+
+        return cachedFiles;
+    }
+
+    private Collection<URL> resolveSoyResources(final String templatesLocation) throws IOException {
+        List<URL> urls = new LinkedList<URL>();
+
+        final String root = normalizePathRoot(templatesLocation);
+        final String search = templateSearchStrings(root);
+        final Resource[] resources = resolver.getResources(search);
+
+        for (Resource r : resources) {
+            urls.add(r.getURL());
+        }
+
+        return urls;
+    }
+
+    /**
+     * Path roots must end with "//".  Not entirely sure why.
+     *
+     * @param root The root, ie: classpath:templates
+     * @return The root + "//", ie: classpath:templates//
+     */
+    private String normalizePathRoot(String root) {
+        if (".*//$".matches(root)) {
+            return root;
+        } else if (".*/".matches(root)) {
+            return root + "/";
+        }
+
+        return root + "//";
     }
 
     private String normalizeTemplateName(final String templateFileName) {
@@ -123,51 +152,19 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
         return normalizedTemplateName;
     }
 
-    private List<URL> toFiles(final Resource templatesLocation) {
-        final List<URL> templateFiles = Lists.newArrayList();
-        try {
-            File baseDirectory = templatesLocation.getFile();
-            if (baseDirectory.isDirectory()) {
-                templateFiles.addAll(findSoyFiles(baseDirectory, recursive));
-            } else {
-                throw new IllegalArgumentException("Soy template base directory:" + templatesLocation + "' is not a directory");
-            }
-        } catch (final IOException e) {
-            throw new IllegalArgumentException("Soy template base directory '" + templatesLocation + "' does not exist", e);
+    private String templateSearchStrings(String resource) {
+        if (recursive) {
+           return resource + "/**/*.soy";
         }
 
-        return templateFiles;
-    }
-
-    protected List<URL> findSoyFiles(final File baseDirectory, final boolean recursive) throws MalformedURLException {
-        final List<URL> soyFiles = new ArrayList<URL>();
-        findSoyFiles(soyFiles, baseDirectory, recursive);
-
-        return soyFiles;
-    }
-
-    protected void findSoyFiles(final List<URL> soyFiles, final File baseDirectory, final boolean recursive) throws MalformedURLException {
-        final File[] files = baseDirectory.listFiles();
-        if (files != null) {
-            for (final File file : files) {
-                if (file.isFile()) {
-                    if (file.getName().endsWith(dotWithExtension())) {
-                        soyFiles.add(file.toURI().toURL());
-                    }
-                } else if (file.isDirectory() && recursive) {
-                    findSoyFiles(soyFiles, file, recursive);
-                }
-            }
-        } else {
-            throw new IllegalArgumentException("Unable to retrieve contents of:" + baseDirectory);
-        }
+        return resource + "/*.soy";
     }
 
     private String dotWithExtension() {
         return "." + filesExtension;
     }
 
-    public void setTemplatesLocation(Resource templatesLocation) {
+    public void setTemplatesLocation(String templatesLocation) {
         this.templatesLocation = templatesLocation;
     }
 
@@ -179,7 +176,7 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
         this.hotReloadMode = hotReloadMode;
     }
 
-    public Resource getTemplatesLocation() {
+    public String getTemplatesLocation() {
         return templatesLocation;
     }
 
@@ -198,10 +195,4 @@ public class DefaultTemplateFilesResolver implements TemplateFilesResolver, Serv
     public void setFilesExtension(String filesExtension) {
         this.filesExtension = filesExtension;
     }
-
-    @Override
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
-
 }
