@@ -54,6 +54,7 @@ public class DefaultTemplateFilesResolverTest {
     @Test
     public void resolveDebugOff() throws Exception {
         defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
+        defaultTemplateFilesResolver.setRecursive(false);
         final Collection<URL> urls = defaultTemplateFilesResolver.resolve();
         Assert.assertEquals("should resolve urls", 3, urls.size());
         final Iterator<URL> it = urls.iterator();
@@ -70,7 +71,7 @@ public class DefaultTemplateFilesResolverTest {
         defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
         final Optional<URL> url = defaultTemplateFilesResolver.resolve("templates/template1");
         Assert.assertTrue("should be present", url.isPresent());
-        Assert.assertTrue("template1Url file should end with template1.soy", url.get().getFile().endsWith("template1.soy"));
+        Assert.assertTrue("template1Url file should end with template1.soy:" + url, url.get().getFile().endsWith("template1.soy"));
     }
 
     @Test
@@ -124,7 +125,7 @@ public class DefaultTemplateFilesResolverTest {
         defaultTemplateFilesResolver.setTemplatesLocation(new ClassPathResource("templates", getClass().getClassLoader()));
         defaultTemplateFilesResolver.resolve("template1");
         Assert.assertFalse("cache should not be empty", defaultTemplateFilesResolver.cachedFiles.isEmpty());
-        Assert.assertEquals("cache should not equal 3", 3, defaultTemplateFilesResolver.cachedFiles.size());
+        Assert.assertEquals("cache should not equal 5", 5, defaultTemplateFilesResolver.cachedFiles.size());
     }
 
 }
