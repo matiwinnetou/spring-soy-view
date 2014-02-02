@@ -33,7 +33,7 @@ import java.util.List;
 @ThreadSafe
 public class ClasspathTemplateFilesResolver implements TemplateFilesResolver, InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultTemplateFilesResolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClasspathTemplateFilesResolver.class);
 
     /** spring resource string that points to a root path, in which soy templates are located */
     private String templatesLocation = null;
