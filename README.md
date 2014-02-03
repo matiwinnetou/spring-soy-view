@@ -402,12 +402,17 @@ and now if it won't be able to match on soy template, it will delegate to other 
 * Updated example project to reflect new changes
 * Injected Data should now be used to generate file hashes for ajax compiler module.
 
+### 1.25.2
+* Backwards compatible changes
+* Introduced new class ClasspathTemplateResolver as per Pull Request
+* Minor improvements to pom.xml files as per Pull Request
+
 ### License
 
 Apache License Version 2.0
 
 ### Known issues:
-* SoyAjaxController may not work under windows server, i.e. it may only work with linux style file paths
+* SoyAjaxController may not work under windows, i.e. it may only work with linux style file paths
 
 ### Example project (shows Black-Box mode in action)
 * https://github.com/mati1979/spring-soy-view-example
