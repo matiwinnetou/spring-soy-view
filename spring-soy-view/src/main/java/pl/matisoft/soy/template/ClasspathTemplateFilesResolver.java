@@ -117,8 +117,7 @@ public class ClasspathTemplateFilesResolver implements TemplateFilesResolver, In
     private Collection<URL> resolveSoyResources(final String templatesLocation) throws IOException {
         List<URL> urls = new LinkedList<URL>();
 
-        final String root = normalizePathRoot(templatesLocation);
-        final String search = templateSearchStrings(root);
+        final String search = templateSearchStrings(templatesLocation);
         final Resource[] resources = resolver.getResources(search);
 
         for (Resource r : resources) {
@@ -126,22 +125,6 @@ public class ClasspathTemplateFilesResolver implements TemplateFilesResolver, In
         }
 
         return urls;
-    }
-
-    /**
-     * Path roots must end with "//".  Not entirely sure why.
-     *
-     * @param root The root, ie: classpath:templates
-     * @return The root + "//", ie: classpath:templates//
-     */
-    private String normalizePathRoot(String root) {
-        if (".*//$".matches(root)) {
-            return root;
-        } else if (".*/".matches(root)) {
-            return root + "/";
-        }
-
-        return root + "//";
     }
 
     private String normalizeTemplateName(final String templateFileName) {
