@@ -407,6 +407,9 @@ and now if it won't be able to match on soy template, it will delegate to other 
 * Introduced new class ClasspathTemplateResolver as per Pull Request
 * Minor improvements to pom.xml files as per Pull Request
 
+### 1.25.3
+* Bug fixes in ClasspathTemplateResolver
+
 ### License
 
 Apache License Version 2.0
