@@ -17,16 +17,17 @@ package pl.matisoft.soy.data;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Primitives;
+import com.google.inject.matcher.AbstractMatcher;
+import com.google.inject.matcher.Matcher;
 import com.google.template.soy.data.SoyMapData;
 
 /**
@@ -47,6 +48,15 @@ import com.google.template.soy.data.SoyMapData;
  * are requested to provider their own implementation.
  */
 public class DefaultToSoyDataConverter implements ToSoyDataConverter {
+	private Matcher<PropertyDescriptor> ignorablePropertiesMatcher;
+
+    public DefaultToSoyDataConverter() {
+        setIgnorablePropertiesMatcher(new DefaultIgnorablePropertiesMatcher());
+    }
+    
+    public void setIgnorablePropertiesMatcher(Matcher<PropertyDescriptor> ignorablePropertiesMatcher) {
+        this.ignorablePropertiesMatcher = ignorablePropertiesMatcher;
+    }
 
     @Override
     public Optional<SoyMapData> toSoyMap(final Object model) throws Exception {
@@ -57,7 +67,8 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return Optional.fromNullable(objectToSoyDataMap(model));
     }
 
-    private Map<String, ?> toSoyCompatibleMap(final Object obj) throws Exception {
+    @SuppressWarnings("unchecked")
+    protected Map<String, ?> toSoyCompatibleMap(final Object obj) throws Exception {
         Object ret = toSoyCompatibleObjects(obj);
         if (!(ret instanceof Map)) {
             throw new IllegalArgumentException("Input should be a Map or POJO.");
@@ -66,14 +77,12 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return (Map<String, ?>) ret;
     }
 
-    private Object toSoyCompatibleObjects(Object obj) throws Exception {
+    protected Object toSoyCompatibleObjects(Object obj) throws Exception {
         if (obj == null) {
             return obj;
         }
 
-        if (Primitives.isWrapperType(obj.getClass())
-                || obj.getClass().isPrimitive()
-                || obj instanceof String) {
+        if (Primitives.isWrapperType(obj.getClass()) || obj instanceof String) {
             return obj;
         }
 
@@ -96,7 +105,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         }
 
         if (obj instanceof Callable) {
-            final Callable callable = (Callable) obj;
+            final Callable<?> callable = (Callable<?>) obj;
 
             return toSoyCompatibleObjects(callable.call());
         }
@@ -117,7 +126,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         }
     }
 
-    private static Map<String, ?> pojoToMap(final Object pojo) {
+    protected Map<String, ?> pojoToMap(final Object pojo) {
         Map<String, Object> map = new HashMap<String, Object>();
 
         try {
@@ -125,7 +134,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
 
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
             for (PropertyDescriptor pd : propertyDescriptors) {
-                if (pd.getReadMethod() != null && !"class".equals(pd.getName())) {
+            	if (!isIgnorable(pd)) {
                     map.put(pd.getName(), pd.getReadMethod().invoke(pojo));
                 }
             }
@@ -137,7 +146,7 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
         return map;
     }
 
-    private SoyMapData objectToSoyDataMap(Object obj) throws Exception {
+    protected SoyMapData objectToSoyDataMap(Object obj) throws Exception {
         if (obj == null) {
             return new SoyMapData();
         }
@@ -145,6 +154,20 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
             return (SoyMapData) obj;
         }
         return new SoyMapData(toSoyCompatibleMap(obj));
+    }
+    
+    protected boolean isIgnorable(PropertyDescriptor pd) {
+        return ignorablePropertiesMatcher.matches(pd);
+    }
+
+    private static class DefaultIgnorablePropertiesMatcher extends AbstractMatcher<PropertyDescriptor>
+            implements Serializable {
+        private static final long serialVersionUID = 0;
+
+        @Override
+        public boolean matches(PropertyDescriptor pd) {
+            return pd.getReadMethod() == null || Lists.newArrayList("class", "metaClass").contains(pd.getName());
+        }
     }
 
 }
