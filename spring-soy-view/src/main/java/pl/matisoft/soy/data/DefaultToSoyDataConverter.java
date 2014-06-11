@@ -14,137 +14,165 @@
 
 package pl.matisoft.soy.data;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.unmodifiableList;
+
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Primitives;
+import com.google.inject.matcher.AbstractMatcher;
+import com.google.inject.matcher.Matcher;
 import com.google.template.soy.data.SoyMapData;
 
 /**
- * An implementation of ToSoyDataConverter that will recursively inspect
- * a passed in model and build a nested structure of SoyMapData objects,
- * which consist only of primitives supported by Soy and thus can be
- * rendered.
- *
- * An implementation supports passing a model object, which is wrapped in Callable or
- * a Future.
- *
- * In case a model wrapped in Callable is passed, the implementation will
- * get a wrapped model object during invocation of this method.
- *
- * In case a model wrapped in Future is passed, the implementation will *synchronously*
- * get a wrapped model object during invocation of this method, assuming a 2 minutes
- * timeout by default. If such a behaviour should be altered, developers
- * are requested to provider their own implementation.
+ * An implementation of ToSoyDataConverter that will recursively inspect a
+ * passed in model and build a nested structure of SoyMapData objects, which
+ * consist only of primitives supported by Soy and thus can be rendered.
+ * 
+ * An implementation supports passing a model object, which is wrapped in
+ * Callable or a Future.
+ * 
+ * In case a model wrapped in Callable is passed, the implementation will get a
+ * wrapped model object during invocation of this method.
+ * 
+ * In case a model wrapped in Future is passed, the implementation will
+ * *synchronously* get a wrapped model object during invocation of this method,
+ * assuming a 2 minutes timeout by default. If such a behaviour should be
+ * altered, developers are requested to provider their own implementation.
  */
 public class DefaultToSoyDataConverter implements ToSoyDataConverter {
+	private Matcher<PropertyDescriptor> ignorablePropertiesMatcher;
 
-    @Override
-    public Optional<SoyMapData> toSoyMap(final Object model) throws Exception {
-        if (model == null) {
-            return Optional.absent();
-        }
+	public DefaultToSoyDataConverter() {
+		setIgnorablePropertiesMatcher(new DefaultIgnorablePropertiesMatcher());
+	}
 
-        return Optional.fromNullable(objectToSoyDataMap(model));
-    }
+	public void setIgnorablePropertiesMatcher(
+			Matcher<PropertyDescriptor> ignorablePropertiesMatcher) {
+		this.ignorablePropertiesMatcher = ignorablePropertiesMatcher;
+	}
 
-    private Map<String, ?> toSoyCompatibleMap(final Object obj) throws Exception {
-        Object ret = toSoyCompatibleObjects(obj);
-        if (!(ret instanceof Map)) {
-            throw new IllegalArgumentException("Input should be a Map or POJO.");
-        }
+	@Override
+	public Optional<SoyMapData> toSoyMap(final Object model) throws Exception {
+		if (model == null) {
+			return Optional.absent();
+		}
 
-        return (Map<String, ?>) ret;
-    }
+		return Optional.fromNullable(objectToSoyDataMap(model));
+	}
 
-    private Object toSoyCompatibleObjects(Object obj) throws Exception {
-        if (obj == null) {
-            return obj;
-        }
+	@SuppressWarnings("unchecked")
+	protected Map<String, ?> toSoyCompatibleMap(final Object obj)
+			throws Exception {
+		Object ret = toSoyCompatibleObjects(obj);
+		if (!(ret instanceof Map)) {
+			throw new IllegalArgumentException("Input should be a Map or POJO.");
+		}
 
-        if (Primitives.isWrapperType(obj.getClass())
-                || obj.getClass().isPrimitive()
-                || obj instanceof String) {
-            return obj;
-        }
+		return (Map<String, ?>) ret;
+	}
 
-        if (obj instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) obj;
-            Map<String, Object> newMap = new HashMap<String, Object>(map.size());
-            for (String key : map.keySet()) {
-                newMap.put(key, toSoyCompatibleObjects(map.get(key)));
-            }
-            return newMap;
-        }
+	protected Object toSoyCompatibleObjects(Object obj) throws Exception {
+		if (obj == null) {
+			return obj;
+		}
 
-        if (obj instanceof Iterable<?>) {
-            List<Object> list = Lists.newArrayList();
-            for (Object subValue : ((Iterable<?>) obj)) {
-                list.add(toSoyCompatibleObjects(subValue));
-            }
-            return list;
-        }
+		if (Primitives.isWrapperType(obj.getClass()) || obj instanceof String) {
+			return obj;
+		}
 
-        if (obj instanceof Callable) {
-            final Callable callable = (Callable) obj;
+		if (obj instanceof Map) {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = (Map<String, Object>) obj;
+			Map<String, Object> newMap = new HashMap<String, Object>(map.size());
+			for (String key : map.keySet()) {
+				newMap.put(key, toSoyCompatibleObjects(map.get(key)));
+			}
+			return newMap;
+		}
 
-            return toSoyCompatibleObjects(callable.call());
-        }
+		if (obj instanceof Iterable<?>) {
+			List<Object> list = Lists.newArrayList();
+			for (Object subValue : ((Iterable<?>) obj)) {
+				list.add(toSoyCompatibleObjects(subValue));
+			}
+			return list;
+		}
 
-        if (obj.getClass().isArray()) {
-            return obj;
-        }
+		if (obj instanceof Callable) {
+			final Callable<?> callable = (Callable<?>) obj;
 
-        {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> pojoMap = (Map<String, Object>) pojoToMap(obj);
-            Map<String, Object> newMap = new HashMap<String, Object>(pojoMap.size());
-            for (String key : pojoMap.keySet()) {
-                newMap.put(key, toSoyCompatibleObjects(pojoMap.get(key)));
-            }
+			return toSoyCompatibleObjects(callable.call());
+		}
 
-            return newMap;
-        }
-    }
+		if (obj.getClass().isArray()) {
+			return obj;
+		}
 
-    private static Map<String, ?> pojoToMap(final Object pojo) {
-        Map<String, Object> map = new HashMap<String, Object>();
+		@SuppressWarnings("unchecked")
+		Map<String, Object> pojoMap = (Map<String, Object>) pojoToMap(obj);
+		Map<String, Object> newMap = new HashMap<String, Object>(pojoMap.size());
+		for (String key : pojoMap.keySet()) {
+			newMap.put(key, toSoyCompatibleObjects(pojoMap.get(key)));
+		}
 
-        try {
-            final BeanInfo beanInfo = Introspector.getBeanInfo(pojo.getClass());
+		return newMap;
+	}
 
-            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-            for (PropertyDescriptor pd : propertyDescriptors) {
-                if (pd.getReadMethod() != null && !"class".equals(pd.getName())) {
-                    map.put(pd.getName(), pd.getReadMethod().invoke(pojo));
-                }
-            }
+	protected Map<String, ?> pojoToMap(final Object pojo) {
+		Map<String, Object> map = new HashMap<String, Object>();
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+		try {
+			final BeanInfo beanInfo = Introspector.getBeanInfo(pojo.getClass());
 
-        return map;
-    }
+			PropertyDescriptor[] propertyDescriptors = beanInfo
+					.getPropertyDescriptors();
+			for (PropertyDescriptor pd : propertyDescriptors) {
+				if (!isIgnorable(pd)) {
+					map.put(pd.getName(), pd.getReadMethod().invoke(pojo));
+				}
+			}
 
-    private SoyMapData objectToSoyDataMap(Object obj) throws Exception {
-        if (obj == null) {
-            return new SoyMapData();
-        }
-        if (obj instanceof SoyMapData) {
-            return (SoyMapData) obj;
-        }
-        return new SoyMapData(toSoyCompatibleMap(obj));
-    }
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
+		return map;
+	}
+
+	protected SoyMapData objectToSoyDataMap(Object obj) throws Exception {
+		if (obj == null) {
+			return new SoyMapData();
+		}
+		if (obj instanceof SoyMapData) {
+			return (SoyMapData) obj;
+		}
+		return new SoyMapData(toSoyCompatibleMap(obj));
+	}
+
+	protected boolean isIgnorable(PropertyDescriptor pd) {
+		return ignorablePropertiesMatcher.matches(pd);
+	}
+
+	private static class DefaultIgnorablePropertiesMatcher extends
+			AbstractMatcher<PropertyDescriptor> implements Serializable {
+		private static final long serialVersionUID = 0;
+		private static final List<String> ignorableProperties = unmodifiableList(newArrayList(
+				"class", "metaClass"));
+
+		@Override
+		public boolean matches(PropertyDescriptor pd) {
+			return pd.getReadMethod() == null
+					|| ignorableProperties.contains(pd.getName());
+		}
+	}
 }
