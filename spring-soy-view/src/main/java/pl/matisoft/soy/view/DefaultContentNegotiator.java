@@ -1,7 +1,6 @@
 package pl.matisoft.soy.view;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.list;
 import static org.springframework.util.Assert.isInstanceOf;
 import static org.springframework.util.CollectionUtils.containsAny;
@@ -19,13 +18,15 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * This class is responsible for determining whether or not it can support the requested content types.
+ * This class is responsible for determining whether or not it can support the
+ * requested content types.
  * 
  * @author Abhijit Sarkar
- *
+ * 
  */
 public class DefaultContentNegotiator implements ContentNegotiator {
-	private static final Logger logger = LoggerFactory.getLogger(DefaultContentNegotiator.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(DefaultContentNegotiator.class);
 
 	public static String DEFAULT_FAVORED_PARAMETER_NAME = "format";
 	public static String DEFAULT_SUPPORTED_CONTENT_TYPE = "text/html";
@@ -47,7 +48,8 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		return supportedContentTypes;
 	}
 
-	public void setSupportedContentTypes(final List<String> supportedContentTypes) {
+	public void setSupportedContentTypes(
+			final List<String> supportedContentTypes) {
 		this.supportedContentTypes = supportedContentTypes;
 	}
 
@@ -55,7 +57,8 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		return favorParameterOverAcceptHeader;
 	}
 
-	public void setFavorParameterOverAcceptHeader(final boolean favorParameterOverAcceptHeader) {
+	public void setFavorParameterOverAcceptHeader(
+			final boolean favorParameterOverAcceptHeader) {
 		this.favorParameterOverAcceptHeader = favorParameterOverAcceptHeader;
 	}
 
@@ -71,36 +74,44 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		return contentTypeComparator;
 	}
 
-	public void setContentTypeComparator(final Comparator<List<String>> contentTypeComparator) {
+	public void setContentTypeComparator(
+			final Comparator<List<String>> contentTypeComparator) {
 		this.contentTypeComparator = contentTypeComparator;
 	}
 
 	/**
-	 * Returns true is able to support the requested content types; false otherwise.
+	 * Returns true is able to support the requested content types; false
+	 * otherwise.
 	 * 
-	 * @return True is able to support the requested content types; false otherwise.
+	 * @return True is able to support the requested content types; false
+	 *         otherwise.
 	 */
 	@Override
 	public boolean isSupportedContentTypes() {
 		final List<String> contentTypes = contentTypes();
 
-		return contentTypeComparator.compare(supportedContentTypes, contentTypes) == 0;
+		return contentTypeComparator.compare(supportedContentTypes,
+				contentTypes) == 0;
 	}
 
 	/**
-	 * Returns requested content types or an empty list if none found.
+	 * Returns requested content types or default content type if none found.
 	 * 
-	 * @return Requested content types or an empty list if none found.
+	 * @return Requested content types or default content type if none found.
 	 */
 	@Override
 	public List<String> contentTypes() {
-		List<String> contentTypes = emptyList();
+		List<String> contentTypes = null;
 		final HttpServletRequest request = getHttpRequest();
 
 		if (favorParameterOverAcceptHeader) {
 			contentTypes = asList(getFavoredParameterValue(request));
 		} else {
 			contentTypes = getAcceptHeaderValues(request);
+		}
+
+		if (isEmpty(contentTypes)) {
+			contentTypes = asList(DEFAULT_SUPPORTED_CONTENT_TYPE);
 		}
 
 		return contentTypes;
@@ -114,7 +125,8 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 	}
 
 	private String getFavoredParameterValue(HttpServletRequest request) {
-		logger.debug("Retrieving content type from favored parameter: {}.", favoredParameterName);
+		logger.debug("Retrieving content type from favored parameter: {}.",
+				favoredParameterName);
 
 		return request.getParameter(favoredParameterName);
 	}
@@ -126,13 +138,16 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		return list(request.getHeaders(ACCEPT_HEADER));
 	}
 
-	private static class DefaultContentTypeComparator implements Comparator<List<String>> {
+	private static final class DefaultContentTypeComparator implements
+			Comparator<List<String>> {
 		private static final int NOT_EQUAL = 1;
 		private static final int EQUAL = 0;
 
 		@Override
-		public int compare(List<String> supportedContentTypes, List<String> contentTypes) {
-			logger.debug("Comparing supported content types with request content types: {}, {}.",
+		public int compare(List<String> supportedContentTypes,
+				List<String> contentTypes) {
+			logger.debug(
+					"Comparing supported content types with request content types: {}, {}.",
 					supportedContentTypes, contentTypes);
 
 			if (isEmpty(contentTypes)) {

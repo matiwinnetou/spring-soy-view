@@ -91,4 +91,11 @@ public class DefaultContentNegotiatorTest {
 
 		assertEquals(asList("text/html", "text/plain"), contentNegotiator.contentTypes());
 	}
+	
+	@Test
+	public void testContentTypesWhenEmpty() {
+		when(req.getHeaders(ACCEPT_HEADER)).thenReturn(enumeration(emptyList()));
+		
+		assertEquals(asList("text/html"), contentNegotiator.contentTypes());
+	}
 }
