@@ -110,7 +110,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
 		final SoyView view = new SoyView();
 		view.setTemplateName(stripPrefix(newViewName));
-		view.setContentType(contentNegotiator.contentTypes().get(0));
+		view.setContentType(contentType());
 		view.setTemplateRenderer(templateRenderer);
 		view.setModelAdjuster(modelAdjuster);
 		view.setGlobalRuntimeModelResolver(globalRuntimeModelResolver);
@@ -168,6 +168,10 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 	private View applyLifecycleMethods(String viewName, AbstractView view) {
 		return (View) getApplicationContext().getAutowireCapableBeanFactory().initializeBean(view, viewName);
 	}
+	
+	protected String contentType() {
+        return contentNegotiator.contentTypes().get(0) + "; charset=" + encoding;
+    }
 
 	public void setTemplateRenderer(final TemplateRenderer templateRenderer) {
 		this.templateRenderer = templateRenderer;
