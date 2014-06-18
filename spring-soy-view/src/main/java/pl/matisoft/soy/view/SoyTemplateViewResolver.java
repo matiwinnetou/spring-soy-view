@@ -1,5 +1,6 @@
 package pl.matisoft.soy.view;
 
+import java.util.List;
 import java.util.Locale;
 
 import org.slf4j.Logger;
@@ -101,8 +102,10 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 		}
 
 		final String newViewName = orIndexView(normalize(viewName));
+		
+		final List<String> contentTypes = contentNegotiator.contentTypes();
 
-		if (!canHandle(newViewName) || !contentNegotiator.isSupportedContentTypes()) {
+		if (!canHandle(newViewName) || !contentNegotiator.isSupportedContentTypes(contentTypes)) {
 			logger.debug("Unable to handle view: {}.", newViewName);
 
 			return null;
@@ -110,7 +113,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
 		final SoyView view = new SoyView();
 		view.setTemplateName(stripPrefix(newViewName));
-		view.setContentType(contentType());
+		view.setContentType(resolveContentType(contentTypes));
 		view.setTemplateRenderer(templateRenderer);
 		view.setModelAdjuster(modelAdjuster);
 		view.setGlobalRuntimeModelResolver(globalRuntimeModelResolver);
@@ -169,8 +172,9 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 		return (View) getApplicationContext().getAutowireCapableBeanFactory().initializeBean(view, viewName);
 	}
 	
-	protected String contentType() {
-        return contentNegotiator.contentTypes().get(0) + "; charset=" + encoding;
+	protected String resolveContentType(final List<String> contentTypes) {
+        // TODO: This should be better handled.
+		return contentTypes.get(0) + "; charset=" + encoding;
     }
 
 	public void setTemplateRenderer(final TemplateRenderer templateRenderer) {

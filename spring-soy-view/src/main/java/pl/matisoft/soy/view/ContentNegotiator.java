@@ -10,7 +10,7 @@ import java.util.List;
  *
  */
 public interface ContentNegotiator {
-	boolean isSupportedContentTypes();
+	boolean isSupportedContentTypes(List<String> contentTypes);
 
 	List<String> contentTypes();
 }

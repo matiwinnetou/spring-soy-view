@@ -2,6 +2,7 @@ package pl.matisoft.soy.view;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.list;
+import static java.util.Collections.unmodifiableList;
 import static org.springframework.util.Assert.isInstanceOf;
 import static org.springframework.util.CollectionUtils.containsAny;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -28,9 +29,9 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 	private static final Logger logger = LoggerFactory
 			.getLogger(DefaultContentNegotiator.class);
 
-	public static String DEFAULT_FAVORED_PARAMETER_NAME = "format";
-	public static String DEFAULT_SUPPORTED_CONTENT_TYPE = "text/html";
-	public static String ACCEPT_HEADER = "Accept";
+	public static final String DEFAULT_FAVORED_PARAMETER_NAME = "format";
+	public static final List<String> DEFAULT_SUPPORTED_CONTENT_TYPES = unmodifiableList(asList("text/html"));
+	public static final String ACCEPT_HEADER = "Accept";
 
 	private List<String> supportedContentTypes;
 	private boolean favorParameterOverAcceptHeader;
@@ -38,7 +39,7 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 	private Comparator<List<String>> contentTypeComparator;
 
 	public DefaultContentNegotiator() {
-		supportedContentTypes = asList(DEFAULT_SUPPORTED_CONTENT_TYPE);
+		supportedContentTypes = DEFAULT_SUPPORTED_CONTENT_TYPES;
 		favorParameterOverAcceptHeader = false;
 		favoredParameterName = DEFAULT_FAVORED_PARAMETER_NAME;
 		contentTypeComparator = new DefaultContentTypeComparator();
@@ -80,16 +81,14 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 	}
 
 	/**
-	 * Returns true is able to support the requested content types; false
+	 * Returns true if able to support the requested content types; false
 	 * otherwise.
 	 * 
-	 * @return True is able to support the requested content types; false
+	 * @return True if able to support the requested content types; false
 	 *         otherwise.
 	 */
 	@Override
-	public boolean isSupportedContentTypes() {
-		final List<String> contentTypes = contentTypes();
-
+	public boolean isSupportedContentTypes(final List<String> contentTypes) {
 		return contentTypeComparator.compare(supportedContentTypes,
 				contentTypes) == 0;
 	}
@@ -111,10 +110,10 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		}
 
 		if (isEmpty(contentTypes)) {
-			contentTypes = asList(DEFAULT_SUPPORTED_CONTENT_TYPE);
+			contentTypes = DEFAULT_SUPPORTED_CONTENT_TYPES;
 		}
 
-		return contentTypes;
+		return unmodifiableList(contentTypes);
 	}
 
 	private HttpServletRequest getHttpRequest() {

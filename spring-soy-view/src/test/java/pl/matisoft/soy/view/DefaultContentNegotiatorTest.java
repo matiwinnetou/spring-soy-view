@@ -40,38 +40,30 @@ public class DefaultContentNegotiatorTest {
 
 	@Test
 	public void testIsSupportedContentTypesWhenOneMatch() {
-		when(req.getHeaders(ACCEPT_HEADER)).thenReturn(enumeration(asList("text/html", "text/plain")));
-
 		contentNegotiator.setSupportedContentTypes(asList("text/html", "application/xml"));
 
-		assertTrue(contentNegotiator.isSupportedContentTypes());
+		assertTrue(contentNegotiator.isSupportedContentTypes(asList("text/html", "text/plain")));
 	}
 
 	@Test
 	public void testIsSupportedContentTypesWhenMultipleMatch() {
-		when(req.getHeaders(ACCEPT_HEADER)).thenReturn(enumeration(asList("text/html", "application/xml")));
-
 		contentNegotiator.setSupportedContentTypes(asList("text/html", "application/xml"));
 
-		assertTrue(contentNegotiator.isSupportedContentTypes());
+		assertTrue(contentNegotiator.isSupportedContentTypes(asList("text/html", "application/xml")));
 	}
 
 	@Test
 	public void testIsSupportedContentTypesWhenNoMatch() {
-		when(req.getHeaders(ACCEPT_HEADER)).thenReturn(enumeration(asList("text/html")));
-
 		contentNegotiator.setSupportedContentTypes(asList("application/xml"));
 
-		assertFalse(contentNegotiator.isSupportedContentTypes());
+		assertFalse(contentNegotiator.isSupportedContentTypes(asList("text/html")));
 	}
 
 	@Test
 	public void testIsSupportedContentTypesWhenEmpty() {
-		when(req.getHeaders(ACCEPT_HEADER)).thenReturn(enumeration(emptyList()));
-
 		contentNegotiator.setSupportedContentTypes(asList("application/xml"));
 
-		assertFalse(contentNegotiator.isSupportedContentTypes());
+		assertFalse(contentNegotiator.isSupportedContentTypes(null));
 	}
 
 	@Test
