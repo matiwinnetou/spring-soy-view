@@ -9,6 +9,7 @@ import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,9 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import pl.matisoft.soy.SoyView;
-import pl.matisoft.soy.data.ToSoyDataConverter;
 
+import pl.matisoft.soy.data.ToSoyDataConverter;
+import pl.matisoft.soy.view.SoyView;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
