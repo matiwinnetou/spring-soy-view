@@ -19,15 +19,13 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * This class is responsible for determining whether or not it can support the
- * requested content types.
+ * This class is responsible for determining whether or not it can support the requested content types.
  * 
  * @author Abhijit Sarkar
  * 
  */
 public class DefaultContentNegotiator implements ContentNegotiator {
-	private static final Logger logger = LoggerFactory
-			.getLogger(DefaultContentNegotiator.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultContentNegotiator.class);
 
 	public static final String DEFAULT_FAVORED_PARAMETER_NAME = "format";
 	public static final List<String> DEFAULT_SUPPORTED_CONTENT_TYPES = unmodifiableList(asList("text/html"));
@@ -49,8 +47,7 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		return supportedContentTypes;
 	}
 
-	public void setSupportedContentTypes(
-			final List<String> supportedContentTypes) {
+	public void setSupportedContentTypes(final List<String> supportedContentTypes) {
 		this.supportedContentTypes = supportedContentTypes;
 	}
 
@@ -58,8 +55,7 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		return favorParameterOverAcceptHeader;
 	}
 
-	public void setFavorParameterOverAcceptHeader(
-			final boolean favorParameterOverAcceptHeader) {
+	public void setFavorParameterOverAcceptHeader(final boolean favorParameterOverAcceptHeader) {
 		this.favorParameterOverAcceptHeader = favorParameterOverAcceptHeader;
 	}
 
@@ -75,22 +71,18 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		return contentTypeComparator;
 	}
 
-	public void setContentTypeComparator(
-			final Comparator<List<String>> contentTypeComparator) {
+	public void setContentTypeComparator(final Comparator<List<String>> contentTypeComparator) {
 		this.contentTypeComparator = contentTypeComparator;
 	}
 
 	/**
-	 * Returns true if able to support the requested content types; false
-	 * otherwise.
+	 * Returns true if able to support the requested content types; false otherwise.
 	 * 
-	 * @return True if able to support the requested content types; false
-	 *         otherwise.
+	 * @return True if able to support the requested content types; false otherwise.
 	 */
 	@Override
 	public boolean isSupportedContentTypes(final List<String> contentTypes) {
-		return contentTypeComparator.compare(supportedContentTypes,
-				contentTypes) == 0;
+		return contentTypeComparator.compare(supportedContentTypes, contentTypes) == 0;
 	}
 
 	/**
@@ -104,7 +96,7 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		final HttpServletRequest request = getHttpRequest();
 
 		if (favorParameterOverAcceptHeader) {
-			contentTypes = asList(getFavoredParameterValue(request));
+			contentTypes = getFavoredParameterValueAsList(request);
 		} else {
 			contentTypes = getAcceptHeaderValues(request);
 		}
@@ -123,11 +115,12 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		return ((ServletRequestAttributes) attrs).getRequest();
 	}
 
-	private String getFavoredParameterValue(HttpServletRequest request) {
-		logger.debug("Retrieving content type from favored parameter: {}.",
-				favoredParameterName);
+	private List<String> getFavoredParameterValueAsList(HttpServletRequest request) {
+		logger.debug("Retrieving content type from favored parameter: {}.", favoredParameterName);
 
-		return request.getParameter(favoredParameterName);
+		final String favoredParameterValue = request.getParameter(favoredParameterName);
+
+		return favoredParameterValue != null ? asList(favoredParameterValue) : null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -137,16 +130,13 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		return list(request.getHeaders(ACCEPT_HEADER));
 	}
 
-	private static final class DefaultContentTypeComparator implements
-			Comparator<List<String>> {
+	private static final class DefaultContentTypeComparator implements Comparator<List<String>> {
 		private static final int NOT_EQUAL = 1;
 		private static final int EQUAL = 0;
 
 		@Override
-		public int compare(List<String> supportedContentTypes,
-				List<String> contentTypes) {
-			logger.debug(
-					"Comparing supported content types with request content types: {}, {}.",
+		public int compare(List<String> supportedContentTypes, List<String> contentTypes) {
+			logger.debug("Comparing supported content types with request content types: {}, {}.",
 					supportedContentTypes, contentTypes);
 
 			if (isEmpty(contentTypes)) {

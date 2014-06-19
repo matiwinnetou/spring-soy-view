@@ -1,7 +1,6 @@
 package pl.matisoft.soy.view;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.enumeration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -83,11 +82,13 @@ public class DefaultContentNegotiatorTest {
 
 		assertEquals(asList("text/html", "text/plain"), contentNegotiator.contentTypes());
 	}
-	
+
 	@Test
-	public void testContentTypesWhenEmpty() {
-		when(req.getHeaders(ACCEPT_HEADER)).thenReturn(enumeration(emptyList()));
-		
+	public void testContentTypesWhenFavoredSetButNull() {
+		when(req.getParameter(DEFAULT_FAVORED_PARAMETER_NAME)).thenReturn(null);
+
+		contentNegotiator.setFavorParameterOverAcceptHeader(true);
+
 		assertEquals(asList("text/html"), contentNegotiator.contentTypes());
 	}
 }
