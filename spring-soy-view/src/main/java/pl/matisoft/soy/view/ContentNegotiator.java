@@ -7,10 +7,11 @@ import java.util.List;
  * content types.
  *  
  * @author Abhijit Sarkar
- *
  */
 public interface ContentNegotiator {
+
 	boolean isSupportedContentTypes(List<String> contentTypes);
 
 	List<String> contentTypes();
+
 }

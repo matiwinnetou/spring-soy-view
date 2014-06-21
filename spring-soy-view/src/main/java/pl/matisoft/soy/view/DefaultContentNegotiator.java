@@ -22,10 +22,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * This class is responsible for determining whether or not it can support the requested content types.
  * 
  * @author Abhijit Sarkar
- * 
  */
 public class DefaultContentNegotiator implements ContentNegotiator {
-	private static final Logger logger = LoggerFactory.getLogger(DefaultContentNegotiator.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultContentNegotiator.class);
 
 	public static final String DEFAULT_FAVORED_PARAMETER_NAME = "format";
 	public static final List<String> DEFAULT_SUPPORTED_CONTENT_TYPES = unmodifiableList(asList("text/html"));
