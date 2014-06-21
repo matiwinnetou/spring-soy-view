@@ -1,4 +1,4 @@
-package pl.matisoft.soy.view;
+package pl.matisoft.soy;
 
 import java.util.List;
 import java.util.Locale;

@@ -1,4 +1,4 @@
-package pl.matisoft.soy.view;
+package pl.matisoft.soy;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.enumeration;
@@ -8,8 +8,8 @@ import static org.junit.Assert.assertTrue;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
-import static pl.matisoft.soy.view.DefaultContentNegotiator.ACCEPT_HEADER;
-import static pl.matisoft.soy.view.DefaultContentNegotiator.DEFAULT_FAVORED_PARAMETER_NAME;
+import static pl.matisoft.soy.DefaultContentNegotiator.ACCEPT_HEADER;
+import static pl.matisoft.soy.DefaultContentNegotiator.DEFAULT_FAVORED_PARAMETER_NAME;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +20,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import pl.matisoft.soy.DefaultContentNegotiator;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ServletRequestAttributes.class, HttpServletRequest.class, RequestContextHolder.class })
@@ -90,5 +92,14 @@ public class DefaultContentNegotiatorTest {
 		contentNegotiator.setFavorParameterOverAcceptHeader(true);
 
 		assertEquals(asList("text/html"), contentNegotiator.contentTypes());
+	}
+
+	@Test
+	public void testContentTypesWhenNeedsSplit() {
+		when(req.getHeaders(ACCEPT_HEADER)).thenReturn(
+				enumeration(asList("text/html,application/xhtml+xml,application/xml;q=0.9")));
+
+		assertEquals(asList("text/html", "application/xhtml+xml", "application/xml;q=0.9"),
+				contentNegotiator.contentTypes());
 	}
 }

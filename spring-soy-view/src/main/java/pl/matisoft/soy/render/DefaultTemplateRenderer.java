@@ -14,10 +14,10 @@ import com.google.template.soy.tofu.SoyTofu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pl.matisoft.soy.SoyView;
 import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.data.DefaultToSoyDataConverter;
 import pl.matisoft.soy.data.ToSoyDataConverter;
-import pl.matisoft.soy.view.SoyView;
 
 /**
  * Created with IntelliJ IDEA.

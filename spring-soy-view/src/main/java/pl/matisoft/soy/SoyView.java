@@ -1,4 +1,4 @@
-package pl.matisoft.soy.view;
+package pl.matisoft.soy;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;

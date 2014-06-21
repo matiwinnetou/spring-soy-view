@@ -17,13 +17,16 @@
   <url>https://github.com/mati1979/spring-soy-view</url>
 
   <properties>
+    <project.build.sourceLevel>1.6</project.build.sourceLevel>
+    <project.build.targetLevel>1.6</project.build.targetLevel>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
     <servlet.api.version>2.5</servlet.api.version>
     <spring.version>3.2.3.RELEASE</spring.version>
     <yahoo.yui.compressor.version>2.4.7</yahoo.yui.compressor.version>
     <commons.io.version>2.4</commons.io.version>
     <jackson.mapper.version>1.8.4</jackson.mapper.version>
-    <slf4j.version>1.6.6</slf4j.version>
+    <slf4j.version>1.7.7</slf4j.version>
     <closure.compiler.version>v20130411</closure.compiler.version>
     <soy.version>2012-12-21</soy.version>
 
@@ -81,27 +84,55 @@
       <id>mati</id>
       <name>Mateusz Szczap</name>
       <email>mateusz.szczap@gmail.com</email>
+      <url>https://github.com/mati1979</url>
       <timezone>GMT+1</timezone>
       <roles>
         <role>Project Lead</role>
         <role>CM</role>
       </roles>
     </developer>
+    <developer>
+      <id>abhijitsarkar</id>
+      <name>Abhijit Sarkar</name>
+      <url>https://github.com/abhijitsarkar</url>
+      <roles>
+        <role>Contributor</role>
+      </roles>
+    </developer>
   </developers>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <encoding>utf8</encoding>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+          <configuration>
+            <compilerVersion>${project.build.sourceLevel}</compilerVersion>
+            <source>${project.build.sourceLevel}</source>
+            <target>${project.build.targetLevel}</target>
+            <encoding>${project.build.sourceEncoding}</encoding>
+            <showDeprecation>true</showDeprecation>
+            <showWarnings>true</showWarnings>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.14.1</version>
+          <configuration>
+            <parallel>methods</parallel>
+            <threadCount>10</threadCount>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>cobertura-maven-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <dependencyManagement>
@@ -125,18 +156,13 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-         <groupId>com.google.javascript</groupId>
-         <artifactId>closure-compiler</artifactId>
-         <version>${closure.compiler.version}</version>
-       </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
+        <groupId>com.google.javascript</groupId>
+        <artifactId>closure-compiler</artifactId>
+        <version>${closure.compiler.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
+        <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
       <dependency>
@@ -145,9 +171,9 @@
         <version>${soy.version}</version>
       </dependency>
       <dependency>
-         <groupId>com.yahoo.platform.yui</groupId>
-         <artifactId>yuicompressor</artifactId>
-         <version>${yahoo.yui.compressor.version}</version>
+        <groupId>com.yahoo.platform.yui</groupId>
+        <artifactId>yuicompressor</artifactId>
+        <version>${yahoo.yui.compressor.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -159,7 +185,7 @@
         <artifactId>jackson-mapper-asl</artifactId>
         <version>${jackson.mapper.version}</version>
         <scope>runtime</scope>
-       </dependency>
+      </dependency>
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>

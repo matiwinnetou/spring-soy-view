@@ -1,4 +1,4 @@
-package pl.matisoft.soy.view;
+package pl.matisoft.soy;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.list;
@@ -8,6 +8,7 @@ import static org.springframework.util.CollectionUtils.containsAny;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.web.context.request.RequestContextHolder.getRequestAttributes;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -25,11 +26,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public class DefaultContentNegotiator implements ContentNegotiator {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultContentNegotiator.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultContentNegotiator.class);
 
 	public static final String DEFAULT_FAVORED_PARAMETER_NAME = "format";
 	public static final List<String> DEFAULT_SUPPORTED_CONTENT_TYPES = unmodifiableList(asList("text/html"));
 	public static final String ACCEPT_HEADER = "Accept";
+
+	private static final String CONTENT_TYPE_DELIMITER = ",";
 
 	private List<String> supportedContentTypes;
 	private boolean favorParameterOverAcceptHeader;
@@ -102,6 +105,8 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		}
 
 		if (isEmpty(contentTypes)) {
+			logger.debug("Setting content types to default: {}.", DEFAULT_SUPPORTED_CONTENT_TYPES);
+
 			contentTypes = DEFAULT_SUPPORTED_CONTENT_TYPES;
 		}
 
@@ -120,14 +125,26 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 
 		final String favoredParameterValue = request.getParameter(favoredParameterName);
 
-		return favoredParameterValue != null ? asList(favoredParameterValue) : null;
+		return favoredParameterValue != null ? splitContentTypes(asList(favoredParameterValue)) : null;
 	}
 
 	@SuppressWarnings("unchecked")
 	private List<String> getAcceptHeaderValues(HttpServletRequest request) {
 		logger.debug("Retrieving content type from header: {}.", ACCEPT_HEADER);
 
-		return list(request.getHeaders(ACCEPT_HEADER));
+		return splitContentTypes(list(request.getHeaders(ACCEPT_HEADER)));
+	}
+
+	private List<String> splitContentTypes(final List<String> contentTypes) {
+		final List<String> splitContentTypes = new ArrayList<String>();
+
+		for (String aContentType : contentTypes) {
+			splitContentTypes.addAll(asList(aContentType.split(CONTENT_TYPE_DELIMITER)));
+		}
+
+		logger.debug("Split content types {} into {}.", contentTypes, splitContentTypes);
+
+		return splitContentTypes;
 	}
 
 	private static final class DefaultContentTypeComparator implements Comparator<List<String>> {

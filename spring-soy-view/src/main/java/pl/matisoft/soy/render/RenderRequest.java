@@ -8,7 +8,7 @@ import com.google.template.soy.data.SoyMapData;
 import com.google.template.soy.msgs.SoyMsgBundle;
 import com.google.template.soy.tofu.SoyTofu;
 
-import pl.matisoft.soy.view.SoyView;
+import pl.matisoft.soy.SoyView;
 
 /**
  * Created with IntelliJ IDEA.

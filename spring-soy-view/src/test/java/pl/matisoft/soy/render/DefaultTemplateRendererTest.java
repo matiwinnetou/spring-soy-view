@@ -18,8 +18,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import pl.matisoft.soy.SoyView;
 import pl.matisoft.soy.data.ToSoyDataConverter;
-import pl.matisoft.soy.view.SoyView;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 

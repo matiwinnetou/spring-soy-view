@@ -2,11 +2,16 @@ package pl.matisoft.soy.config;
 
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import com.google.template.soy.tofu.SoyTofuOptions;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.servlet.ViewResolver;
+
+import pl.matisoft.soy.ContentNegotiator;
+import pl.matisoft.soy.DefaultContentNegotiator;
+import pl.matisoft.soy.SoyTemplateViewResolver;
 import pl.matisoft.soy.bundle.DefaultSoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.DefaultTofuCompiler;
@@ -27,9 +32,6 @@ import pl.matisoft.soy.render.DefaultTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
-import pl.matisoft.soy.view.ContentNegotiator;
-import pl.matisoft.soy.view.DefaultContentNegotiator;
-import pl.matisoft.soy.view.SoyTemplateViewResolver;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
