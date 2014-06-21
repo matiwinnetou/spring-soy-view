@@ -19,9 +19,6 @@ import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.runtime.EmptyGlobalRuntimeModelResolver;
 import pl.matisoft.soy.global.runtime.GlobalRuntimeModelResolver;
-import pl.matisoft.soy.global.runtime.resolvers.RequestContextDataResolver;
-import pl.matisoft.soy.global.runtime.resolvers.ServletContextDataResolver;
-import pl.matisoft.soy.global.runtime.resolvers.WebApplicationContextDataResolver;
 import pl.matisoft.soy.holder.CompiledTemplatesHolder;
 import pl.matisoft.soy.holder.DefaultCompiledTemplatesHolder;
 import pl.matisoft.soy.locale.LocaleProvider;
@@ -165,21 +162,6 @@ public class SpringSoyViewBaseConfig {
     @Bean
     public ModelAdjuster soySpringModelAdjuster() {
         return new SpringModelAdjuster();
-    }
-
-    @Bean
-    public RequestContextDataResolver soyRequestContextDataResolver() {
-        return new RequestContextDataResolver();
-    }
-
-    @Bean
-    public WebApplicationContextDataResolver soyWebApplicationContextResolver() {
-        return new WebApplicationContextDataResolver();
-    }
-
-    @Bean
-    public ServletContextDataResolver soyServletContextResolver() {
-        return new ServletContextDataResolver();
     }
 
     @Bean
