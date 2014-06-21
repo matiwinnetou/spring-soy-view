@@ -158,11 +158,9 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 
 			if (isEmpty(contentTypes)) {
 				return NOT_EQUAL;
-			} else if (containsAny(supportedContentTypes, contentTypes)) {
-				return EQUAL;
 			}
 
-			return NOT_EQUAL;
+			return containsAny(supportedContentTypes, contentTypes) ? EQUAL : NOT_EQUAL;
 		}
 	}
 }
