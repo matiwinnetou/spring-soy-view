@@ -1,15 +1,12 @@
 package pl.matisoft.soy.config;
 
-import com.google.common.collect.Lists;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import com.google.template.soy.tofu.SoyTofuOptions;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.servlet.ViewResolver;
-
 import pl.matisoft.soy.bundle.DefaultSoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.compile.DefaultTofuCompiler;
@@ -20,9 +17,11 @@ import pl.matisoft.soy.data.adjust.ModelAdjuster;
 import pl.matisoft.soy.data.adjust.SpringModelAdjuster;
 import pl.matisoft.soy.global.compile.CompileTimeGlobalModelResolver;
 import pl.matisoft.soy.global.compile.EmptyCompileTimeGlobalModelResolver;
-import pl.matisoft.soy.global.runtime.DefaultGlobalRuntimeModelResolver;
+import pl.matisoft.soy.global.runtime.EmptyGlobalRuntimeModelResolver;
 import pl.matisoft.soy.global.runtime.GlobalRuntimeModelResolver;
-import pl.matisoft.soy.global.runtime.resolvers.*;
+import pl.matisoft.soy.global.runtime.resolvers.RequestContextDataResolver;
+import pl.matisoft.soy.global.runtime.resolvers.ServletContextDataResolver;
+import pl.matisoft.soy.global.runtime.resolvers.WebApplicationContextDataResolver;
 import pl.matisoft.soy.holder.CompiledTemplatesHolder;
 import pl.matisoft.soy.holder.DefaultCompiledTemplatesHolder;
 import pl.matisoft.soy.locale.LocaleProvider;
@@ -31,6 +30,8 @@ import pl.matisoft.soy.render.DefaultTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
 import pl.matisoft.soy.template.DefaultTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
+import pl.matisoft.soy.view.ContentNegotiator;
+import pl.matisoft.soy.view.DefaultContentNegotiator;
 import pl.matisoft.soy.view.SoyTemplateViewResolver;
 
 import javax.inject.Inject;
@@ -183,18 +184,12 @@ public class SpringSoyViewBaseConfig {
 
     @Bean
     public GlobalRuntimeModelResolver soyGlobalRuntimeModelResolver() {
-        final DefaultGlobalRuntimeModelResolver defaultGlobalModelResolver = new DefaultGlobalRuntimeModelResolver();
-        defaultGlobalModelResolver.setResolvers(Lists.newArrayList(
-                new RequestParametersDataResolver(),
-                new RequestHeadersDataResolver(),
-                new CookieDataResolver(),
-                soyRequestContextDataResolver(),
-                new HttpSessionDataResolver(),
-                soyWebApplicationContextResolver(),
-                soyServletContextResolver()
-        ));
+        return new EmptyGlobalRuntimeModelResolver();
+    }
 
-        return defaultGlobalModelResolver;
+    @Bean
+    public ContentNegotiator contentNegotiator() {
+        return new DefaultContentNegotiator();
     }
 
     @Bean
@@ -202,7 +197,8 @@ public class SpringSoyViewBaseConfig {
                                         final ModelAdjuster modelAdjuster,
                                         final TemplateRenderer templateRenderer,
                                         final LocaleProvider localeProvider,
-                                        final GlobalRuntimeModelResolver globalRuntimeModelResolver)
+                                        final GlobalRuntimeModelResolver globalRuntimeModelResolver,
+                                        final ContentNegotiator contentNegotiator)
                                      throws Exception {
         final SoyTemplateViewResolver soyTemplateViewResolver = new SoyTemplateViewResolver();
         soyTemplateViewResolver.setCompiledTemplatesHolder(compiledTemplatesHolder);
@@ -217,6 +213,7 @@ public class SpringSoyViewBaseConfig {
         soyTemplateViewResolver.setOrder(order);
         soyTemplateViewResolver.setRedirectContextRelative(true);
         soyTemplateViewResolver.setRedirectHttp10Compatible(true);
+        soyTemplateViewResolver.setContentNegotiator(contentNegotiator);
 
         return soyTemplateViewResolver;
     }

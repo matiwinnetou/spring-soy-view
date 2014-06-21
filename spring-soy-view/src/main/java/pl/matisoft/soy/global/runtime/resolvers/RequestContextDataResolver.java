@@ -16,6 +16,7 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 17:08
  */
+@Deprecated
 public class RequestContextDataResolver implements RuntimeDataResolver, ServletContextAware {
 
     private String prefix = "_request.context.";

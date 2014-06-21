@@ -254,4 +254,8 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 		setCache(!hotReloadMode);
 	}
 
+    public void setContentNegotiator(ContentNegotiator contentNegotiator) {
+        this.contentNegotiator = contentNegotiator;
+    }
+
 }

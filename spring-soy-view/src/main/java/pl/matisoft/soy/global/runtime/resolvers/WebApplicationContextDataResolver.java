@@ -16,6 +16,7 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 18:36
  */
+@Deprecated
 public class WebApplicationContextDataResolver extends WebApplicationObjectSupport implements RuntimeDataResolver {
 
     private String prefix = "_web.app.context.";

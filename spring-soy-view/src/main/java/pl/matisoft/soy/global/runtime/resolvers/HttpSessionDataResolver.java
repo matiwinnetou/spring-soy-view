@@ -15,6 +15,7 @@ import com.google.template.soy.data.SoyMapData;
  * Date: 01/11/2013
  * Time: 18:21
  */
+@Deprecated
 public class HttpSessionDataResolver implements RuntimeDataResolver {
 
     private String prefix = "_http.session.";

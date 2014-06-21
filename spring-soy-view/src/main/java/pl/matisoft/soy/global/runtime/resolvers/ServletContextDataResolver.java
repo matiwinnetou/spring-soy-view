@@ -16,6 +16,7 @@ import java.util.Map;
  * Date: 01/11/2013
  * Time: 18:13
  */
+@Deprecated
 public class ServletContextDataResolver implements RuntimeDataResolver, ServletContextAware {
 
     @Inject

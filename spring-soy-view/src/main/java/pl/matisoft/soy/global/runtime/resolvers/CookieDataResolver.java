@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
  * Date: 01/11/2013
  * Time: 16:37
  */
+@Deprecated
 public class CookieDataResolver implements RuntimeDataResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(CookieDataResolver.class);
