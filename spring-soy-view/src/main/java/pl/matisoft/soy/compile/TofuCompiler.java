@@ -1,13 +1,13 @@
 package pl.matisoft.soy.compile;
 
+import com.google.common.base.Optional;
+import com.google.template.soy.msgs.SoyMsgBundle;
+import com.google.template.soy.tofu.SoyTofu;
+
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
-
-import com.google.common.base.Optional;
-import com.google.template.soy.msgs.SoyMsgBundle;
-import com.google.template.soy.tofu.SoyTofu;
 
 /**
  * The SoyTofu binary compiler that based on
@@ -22,27 +22,25 @@ public interface TofuCompiler {
 
     /**
      * Obtains a binary compiled version based on a set of input urls
-     *
-     *
-     * @param files
-     * @return
+     * @param files - urls
+     * @return soy tofu
+     * @throws java.io.IOException - i/o error
      */
     SoyTofu compile(Collection<URL> files) throws IOException;
 
     /**
      * Obtains a compiled template to JavaScript as a String based on a template url
-     * @param template
-     * @param soyMsgBundle
-     * @return - an optional with a compiled JavaScript or absent in case of an issue
+     * @param template - template
+     * @param soyMsgBundle - bundle
+     * @return js
      */
     Optional<String> compileToJsSrc(URL template, @Nullable SoyMsgBundle soyMsgBundle);
 
     /**
      * Obtains a compiled template to JavaScript as a String based on a collection of template urls
-
-     * @param templates - a collection of template urls
-     * @param soyMsgBundle
-     * @return - collection containing string with compiled templates.
+     * @param templates - templates
+     * @param soyMsgBundle - bundle
+     * @return js
      */
     Collection<String> compileToJsSrc(Collection<URL> templates, @Nullable SoyMsgBundle soyMsgBundle);
 

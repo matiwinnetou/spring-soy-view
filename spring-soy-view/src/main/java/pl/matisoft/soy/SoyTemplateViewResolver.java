@@ -1,8 +1,6 @@
 package pl.matisoft.soy;
 
-import java.util.List;
-import java.util.Locale;
-
+import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -12,7 +10,6 @@ import org.springframework.web.servlet.view.AbstractCachingViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 import org.springframework.web.servlet.view.InternalResourceView;
 import org.springframework.web.servlet.view.RedirectView;
-
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
 import pl.matisoft.soy.config.SoyViewConfigDefaults;
@@ -27,7 +24,8 @@ import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.EmptyTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
 
-import com.google.common.base.Preconditions;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA. User: mati Date: 20/06/2013 Time: 19:51

@@ -1,9 +1,9 @@
 package pl.matisoft.soy.data;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
+
+import javax.annotation.Nullable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,10 +18,9 @@ public interface ToSoyDataConverter {
 
     /**
      * Convert a view model object to SoyMapData structure
-     *
-     * @param model
-     * @return
-     * @throws Exception
+     * @param model - model
+     * @return maybe soy map data
+     * @throws Exception - error to convert
      */
     Optional<SoyMapData> toSoyMap(@Nullable final Object model) throws Exception;
 

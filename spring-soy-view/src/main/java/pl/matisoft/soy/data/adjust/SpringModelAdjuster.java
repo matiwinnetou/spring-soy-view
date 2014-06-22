@@ -1,9 +1,9 @@
 package pl.matisoft.soy.data.adjust;
 
+import org.springframework.ui.Model;
+
 import javax.annotation.Nullable;
 import java.util.Map;
-
-import org.springframework.ui.Model;
 
 /**
  * Created with IntelliJ IDEA.

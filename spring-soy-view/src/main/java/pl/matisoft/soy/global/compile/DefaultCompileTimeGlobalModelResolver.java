@@ -1,11 +1,11 @@
 package pl.matisoft.soy.global.compile;
 
+import com.google.common.base.Optional;
+import com.google.template.soy.data.SoyMapData;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import com.google.common.base.Optional;
-import com.google.template.soy.data.SoyMapData;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,19 +14,6 @@ import com.google.template.soy.data.SoyMapData;
  * Time: 23:06
  *
  * A default implementation, which delegates to a map
- *
- * Example usage (Java Config):
- * <code>
- * @Bean
- * public CompileTimeGlobalModelResolver compileTimeGlobalModelResolver() {
- *    final Map<String,String> data = new HashMap<String,String>();
- *    data.put("site.url", "http://www.bbc.co.uk");
- *    final DefaultCompileTimeGlobalModelResolver resolver = new DefaultCompileTimeGlobalModelResolver();
- *    resolver.setData(data);
- *
- *    return resolver;
- * }
- * </code>
  */
 public class DefaultCompileTimeGlobalModelResolver implements CompileTimeGlobalModelResolver {
 

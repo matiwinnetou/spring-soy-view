@@ -1,10 +1,5 @@
 package pl.matisoft.soy.bundle;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -16,6 +11,11 @@ import com.google.template.soy.xliffmsgplugin.XliffMsgPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.matisoft.soy.config.SoyViewConfigDefaults;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -56,10 +56,8 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
      *
      * If a passed in locale object is "Optional.absent()",
      * the implementation will return Optional.absent() as well
-     *
-     * @param locale
-     * @return
-     * @throws IOException in case there is an i/o error reading msg bundle
+     * @param locale - maybe locale
+     * @return maybe soy msg bundle
      */
     public Optional<SoyMsgBundle> resolve(final Optional<Locale> locale) throws IOException {
         if (!locale.isPresent()) {
@@ -99,9 +97,9 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
      * based on a messagePath and locale, e.g. messages_de_DE.xlf and returns a merged
      * SoyMsgBundle of SoyMsgBundle matching a a pattern it finds in a class path.
      *
-     * @param locale
-     * @return
-     * @throws IOException
+     * @param locale - locale
+     * @return SoyMsgBundle - bundle
+     * @throws java.io.IOException - io error
      */
     protected SoyMsgBundle createSoyMsgBundle(final Locale locale) throws IOException {
         Preconditions.checkNotNull(messagesPath, "messagesPath cannot be null!");
@@ -124,10 +122,6 @@ public class DefaultSoyMsgBundleResolver implements SoyMsgBundleResolver {
 
     /**
      * Merge msg bundles together, creating new MsgBundle with merges msg bundles passed in as a method argument
-     *
-     * @param locale
-     * @param soyMsgBundles
-     * @return
      */
     private Optional<? extends SoyMsgBundle> mergeMsgBundles(final Locale locale, final List<SoyMsgBundle> soyMsgBundles) {
         if (soyMsgBundles.isEmpty()) {

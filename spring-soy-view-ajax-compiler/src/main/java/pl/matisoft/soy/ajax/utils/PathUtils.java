@@ -1,7 +1,6 @@
 package pl.matisoft.soy.ajax.utils;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,15 +16,16 @@ public class PathUtils {
 
     /**
      * Converts a String array to a String with coma separator
-     * example: String["a.soy", "b.soy"] -> output: a.soy,b.soy
+     * example: String["a.soy", "b.soy"] - output: a.soy,b.soy
+     * @param array - array
+     * @return comma separated list
      */
    public static String arrayToPath(final String[] array) {
         if (array == null) {
             return "";
         }
-        final Joiner joiner = Joiner.on(",").skipNulls();
 
-        return joiner.join(array);
+        return Joiner.on(",").skipNulls().join(array);
     }
 
 }

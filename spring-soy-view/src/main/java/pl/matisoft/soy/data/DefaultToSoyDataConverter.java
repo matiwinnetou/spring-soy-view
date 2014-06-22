@@ -14,8 +14,12 @@
 
 package pl.matisoft.soy.data;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.unmodifiableList;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Primitives;
+import com.google.inject.matcher.AbstractMatcher;
+import com.google.inject.matcher.Matcher;
+import com.google.template.soy.data.SoyMapData;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -26,12 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Primitives;
-import com.google.inject.matcher.AbstractMatcher;
-import com.google.inject.matcher.Matcher;
-import com.google.template.soy.data.SoyMapData;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.unmodifiableList;
 
 /**
  * An implementation of ToSoyDataConverter that will recursively inspect a

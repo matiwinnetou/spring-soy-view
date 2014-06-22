@@ -1,17 +1,5 @@
 package pl.matisoft.soy.ajax;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.concurrent.ThreadSafe;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
@@ -42,8 +30,19 @@ import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 @ThreadSafe
@@ -142,16 +141,17 @@ public class SoyAjaxController {
      * getting of new compiles JavaScript resource.
      *
      * Invocation of this url may throw two types of http exceptions:
-     * 1. notFound -> usually when a TemplateResolver cannot find a template with an associated name
-     * 2. error -> usually when there is a permission error and a user is not allowed to compile a template into a JavaScript
+     * 1. notFound - usually when a TemplateResolver cannot find a template with an associated name
+     * 2. error - usually when there is a permission error and a user is not allowed to compile a template into a JavaScript
      *
-     * @param hash = some unique number that should be used when we are caching this resource in a browser and we use http cache headers
+     * @param hash - some unique number that should be used when we are caching this resource in a browser and we use http cache headers
      * @param templateFileNames - an array of template names, e.g. client-words,server-time, which may or may not contain extension
-     *                          currently three modes are supported -> soy extension, js extension and no extension, which is preferred
+     *                          currently three modes are supported - soy extension, js extension and no extension, which is preferred
      * @param disableProcessors - whether the controller should run registered outputProcessors after the compilation is complete.
      * @param request - HttpServletRequest
+     * @param locale - locale
      * @return response entity, which wraps a compiled soy to JavaScript files.
-     * @throws IOException
+     * @throws IOException - io error
      */
     @RequestMapping(value="/soy/compileJs", method=GET)
     public ResponseEntity<String> compile(@RequestParam(required = false, value="hash", defaultValue = "") final String hash,

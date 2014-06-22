@@ -1,10 +1,10 @@
 package pl.matisoft.soy.data;
 
-import javax.annotation.Nullable;
-import java.util.Map;
-
 import com.google.common.base.Optional;
 import com.google.template.soy.data.SoyMapData;
+
+import javax.annotation.Nullable;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,10 +24,6 @@ public class NoConvertSoyDataConverter implements ToSoyDataConverter {
      *
      * An implementation will also check if a passed in object is a Map and return
      * a SoyMapData wrapping that map
-     *
-     * @param model
-     * @return SoyMapData if model is of this type and an empty SoyMapData in case model is *not* a SoyMapData
-     * @throws Exception
      */
     @Override
     public Optional<SoyMapData> toSoyMap(@Nullable final Object model) throws Exception {

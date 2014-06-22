@@ -1,10 +1,10 @@
 package pl.matisoft.soy.template;
 
+import com.google.common.base.Optional;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
-
-import com.google.common.base.Optional;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,15 +18,16 @@ public interface TemplateFilesResolver {
 
     /**
      * Iterate over all files and provide urls of files pointing to soy template files
-     * @return
-     * @throws IOException
+     * @return urls
+     * @throws java.io.IOException - i/o error
      */
     Collection<URL> resolve() throws IOException;
 
     /**
      * Iterate over all files and provide a matching url for a template passed in as a parameter
-     * @return
-     * @throws IOException
+     * @param templateName - name of template
+     * @return urls
+     * @throws java.io.IOException - i/o error
      */
     Optional<URL> resolve(String templateName) throws IOException;
 

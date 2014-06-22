@@ -1,9 +1,5 @@
 package pl.matisoft.soy.holder;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collection;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.template.soy.tofu.SoyTofu;
@@ -16,7 +12,9 @@ import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.template.EmptyTemplateFilesResolver;
 import pl.matisoft.soy.template.TemplateFilesResolver;
 
-import javax.inject.Inject;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.

@@ -1,9 +1,9 @@
 package pl.matisoft.soy.locale;
 
+import com.google.common.base.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
-
-import com.google.common.base.Optional;
 
 /**
  * Created with IntelliJ IDEA.

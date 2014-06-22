@@ -1,22 +1,21 @@
 package pl.matisoft.soy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.list;
 import static java.util.Collections.unmodifiableList;
 import static org.springframework.util.Assert.isInstanceOf;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.web.context.request.RequestContextHolder.getRequestAttributes;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * This class is responsible for determining whether or not it can support the requested content types.
