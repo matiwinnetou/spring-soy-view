@@ -173,7 +173,12 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 	}
 	
 	protected String resolveContentType(final List<String> contentTypes) {
-        // TODO: This should be better handled.
+        // TODO: This should be better handled.		
+		if (contentTypes.size() > 1) {
+			logger.warn("More than one content type is not currently supported; "
+					+ "only first one ({}) will be used.", contentTypes.get(0));
+		}
+		
 		return contentTypes.get(0) + "; charset=" + encoding;
     }
 
