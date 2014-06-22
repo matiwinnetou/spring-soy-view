@@ -92,6 +92,15 @@
       </roles>
     </developer>
     <developer>
+      <id>phasebash</id>
+      <name>Brandon Zeeb</name>
+      <email>phasebash@gmail.com</email>
+      <url>https://github.com/phasebash</url>
+      <roles>
+        <role>Contributor</role>
+      </roles>
+    </developer>
+    <developer>
       <id>abhijitsarkar</id>
       <name>Abhijit Sarkar</name>
       <url>https://github.com/abhijitsarkar</url>
