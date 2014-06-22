@@ -410,6 +410,12 @@ and now if it won't be able to match on soy template, it will delegate to other 
 ### 1.25.3
 * Bug fixes in ClasspathTemplateResolver
 
+### 1.25.4 - 22.06.2014
+* ContentNegotiator interface with default implementation
+* deprecated default implementation of runtime resolvers - some of them are buggy and try to be too clever, it is recommended that you write own specific for your use cases
+* Allow client to control ignorable properties in DefaultToSoyDataConverter
+*
+
 ### License
 
 Apache License Version 2.0
