@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.list;
 import static java.util.Collections.unmodifiableList;
 import static org.springframework.util.Assert.isInstanceOf;
-import static org.springframework.util.CollectionUtils.containsAny;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.web.context.request.RequestContextHolder.getRequestAttributes;
 
@@ -150,6 +149,8 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 	private static final class DefaultContentTypeComparator implements Comparator<List<String>> {
 		private static final int NOT_EQUAL = 1;
 		private static final int EQUAL = 0;
+		private static final String ASTERISK = "*";
+		private static final String PERIOD = ".";
 
 		@Override
 		public int compare(List<String> supportedContentTypes, List<String> contentTypes) {
@@ -160,7 +161,29 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 				return NOT_EQUAL;
 			}
 
-			return containsAny(supportedContentTypes, contentTypes) ? EQUAL : NOT_EQUAL;
+			for (String aContentType : contentTypes) {
+				for (String aSupportedContentType : supportedContentTypes) {
+					if (aSupportedContentType.matches(convertToRegex(aContentType))) {
+						return EQUAL;
+					}
+				}
+			}
+
+			return NOT_EQUAL;
+		}
+
+		private String convertToRegex(final String aContentType) {
+			final StringBuilder regex = new StringBuilder(aContentType);
+
+			int indexOfWildcard = regex.indexOf(ASTERISK);
+
+			for (; indexOfWildcard >= 0; indexOfWildcard = regex.indexOf(ASTERISK, indexOfWildcard + 2)) {
+				regex.insert(indexOfWildcard, PERIOD);
+			}
+
+			logger.debug("Converted content type {} to {}", aContentType, regex);
+
+			return regex.toString();
 		}
 	}
 }
