@@ -1,21 +1,23 @@
 package pl.matisoft.soy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import static java.util.Arrays.asList;
+import static java.util.Collections.list;
+import static java.util.Collections.unmodifiableList;
+import static java.util.regex.Pattern.quote;
+import static org.springframework.util.Assert.isInstanceOf;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static org.springframework.web.context.request.RequestContextHolder.getRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.list;
-import static java.util.Collections.unmodifiableList;
-import static org.springframework.util.Assert.isInstanceOf;
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static org.springframework.web.context.request.RequestContextHolder.getRequestAttributes;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * This class is responsible for determining whether or not it can support the requested content types.
@@ -149,7 +151,7 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		private static final int NOT_EQUAL = 1;
 		private static final int EQUAL = 0;
 		private static final String ASTERISK = "*";
-		private static final String PERIOD = ".";
+		private static final String PERIOD_PLUS_ASTERISK = ".*";
 
 		@Override
 		public int compare(List<String> supportedContentTypes, List<String> contentTypes) {
@@ -172,17 +174,7 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		}
 
 		private String convertToRegex(final String aContentType) {
-			final StringBuilder regex = new StringBuilder(aContentType);
-
-			int indexOfWildcard = regex.indexOf(ASTERISK);
-
-			for (; indexOfWildcard >= 0; indexOfWildcard = regex.indexOf(ASTERISK, indexOfWildcard + 2)) {
-				regex.insert(indexOfWildcard, PERIOD);
-			}
-
-			logger.debug("Converted content type {} to {}", aContentType, regex);
-
-			return regex.toString();
+			return aContentType.replaceAll(quote(ASTERISK), PERIOD_PLUS_ASTERISK);
 		}
 	}
 }
