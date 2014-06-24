@@ -1,18 +1,27 @@
 package pl.matisoft.soy;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.Integer.MAX_VALUE;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static org.springframework.util.StringUtils.isEmpty;
+import static pl.matisoft.soy.config.SoyViewConfigDefaults.DEFAULT_ENCODING;
+import static pl.matisoft.soy.config.SoyViewConfigDefaults.DEFAULT_SOY_PREFIX;
+
+import java.util.List;
+import java.util.Locale;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.AbstractCachingViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 import org.springframework.web.servlet.view.InternalResourceView;
 import org.springframework.web.servlet.view.RedirectView;
+
 import pl.matisoft.soy.bundle.EmptySoyMsgBundleResolver;
 import pl.matisoft.soy.bundle.SoyMsgBundleResolver;
-import pl.matisoft.soy.config.SoyViewConfigDefaults;
 import pl.matisoft.soy.data.adjust.EmptyModelAdjuster;
 import pl.matisoft.soy.data.adjust.ModelAdjuster;
 import pl.matisoft.soy.global.runtime.EmptyGlobalRuntimeModelResolver;
@@ -23,9 +32,6 @@ import pl.matisoft.soy.locale.EmptyLocaleProvider;
 import pl.matisoft.soy.locale.LocaleProvider;
 import pl.matisoft.soy.render.EmptyTemplateRenderer;
 import pl.matisoft.soy.render.TemplateRenderer;
-
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA. User: mati Date: 20/06/2013 Time: 19:51
@@ -51,7 +57,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 	 */
 	public static final String FORWARD_URL_PREFIX = "forward:";
 
-	private static final Logger logger = LoggerFactory.getLogger(SoyTemplateViewResolver.class);
+	private static final Logger logger = getLogger(SoyTemplateViewResolver.class);
 
 	protected TemplateRenderer templateRenderer = new EmptyTemplateRenderer();
 
@@ -68,7 +74,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 	private ContentNegotiator contentNegotiator = new DefaultContentNegotiator();
 
 	/** an encoding to use */
-	private String encoding = SoyViewConfigDefaults.DEFAULT_ENCODING;
+	private String encoding = DEFAULT_ENCODING;
 
 	/** a default view */
 	private String indexView = "index";
@@ -77,13 +83,13 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 
 	private boolean redirectHttp10Compatible = true;
 
-	private int order = Integer.MAX_VALUE;
+	private int order = MAX_VALUE;
 
-	private String prefix = SoyViewConfigDefaults.DEFAULT_SOY_PREFIX;
+	private String prefix = DEFAULT_SOY_PREFIX;
 
 	protected View loadView(final String viewName, final Locale locale) throws Exception {
-		Preconditions.checkNotNull(viewName, "viewName cannot be null!");
-		Preconditions.checkNotNull(templateRenderer, "templateRenderer cannot be null!");
+		checkNotNull(viewName, "viewName cannot be null!");
+		checkNotNull(templateRenderer, "templateRenderer cannot be null!");
 		logger.debug("loadView:{}, locale:{}", viewName, locale);
 
 		if (viewName.startsWith(REDIRECT_URL_PREFIX)) {
@@ -142,7 +148,7 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 	 * @return The defaulted view name.
 	 */
 	private String orIndexView(final String viewName) {
-		return StringUtils.isEmpty(viewName) ? indexView : viewName;
+		return isEmpty(viewName) ? indexView : viewName;
 	}
 
 	/**
@@ -171,6 +177,8 @@ public class SoyTemplateViewResolver extends AbstractCachingViewResolver impleme
 	}
 	
 	protected String resolveContentType(final List<String> contentTypes) {
+		checkArgument(!isEmpty(contentTypes), "Content types must not be null or empty.");
+		
         // TODO: This should be better handled.		
 		if (contentTypes.size() > 1) {
 			logger.warn("More than one content type is not currently supported; "
