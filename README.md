@@ -416,7 +416,7 @@ and now if it won't be able to match on soy template, it will delegate to other 
 * Allow client to control ignorable properties in DefaultToSoyDataConverter
 
 ### 1.25.5 - 24.09.2014
-* bug fix
+* trivial bug fix in SpringSoyViewBaseConfig
 
 ### License
 
