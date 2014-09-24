@@ -9,7 +9,7 @@
 
   <groupId>pl.matisoft</groupId>
   <artifactId>spring-soy-view-root</artifactId>
-  <version>1.25.5</version>
+  <version>1.25.6-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>spring-soy-view-root</name>
   <description>Implementation of Spring MVC View in Google-Closure library</description>
