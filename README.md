@@ -414,7 +414,9 @@ and now if it won't be able to match on soy template, it will delegate to other 
 * ContentNegotiator interface with default implementation
 * deprecated default implementation of runtime resolvers - some of them are buggy and try to be too clever, it is recommended that you write own specific for your use cases
 * Allow client to control ignorable properties in DefaultToSoyDataConverter
-*
+
+### 1.25.5 - 24.09.2014
+* bug fix
 
 ### License
 

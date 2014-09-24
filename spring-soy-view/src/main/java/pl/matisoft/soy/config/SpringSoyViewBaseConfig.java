@@ -180,9 +180,11 @@ public class SpringSoyViewBaseConfig {
                                         final TemplateRenderer templateRenderer,
                                         final LocaleProvider localeProvider,
                                         final GlobalRuntimeModelResolver globalRuntimeModelResolver,
-                                        final ContentNegotiator contentNegotiator)
+                                        final ContentNegotiator contentNegotiator,
+                                        final SoyMsgBundleResolver msgBundleResolver)
                                      throws Exception {
         final SoyTemplateViewResolver soyTemplateViewResolver = new SoyTemplateViewResolver();
+        soyTemplateViewResolver.setSoyMsgBundleResolver(msgBundleResolver);
         soyTemplateViewResolver.setCompiledTemplatesHolder(compiledTemplatesHolder);
         soyTemplateViewResolver.setEncoding(encoding);
         soyTemplateViewResolver.setGlobalRuntimeModelResolver(globalRuntimeModelResolver);
