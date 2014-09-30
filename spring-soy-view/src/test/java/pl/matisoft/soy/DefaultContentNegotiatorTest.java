@@ -21,8 +21,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import pl.matisoft.soy.DefaultContentNegotiator;
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ServletRequestAttributes.class, HttpServletRequest.class, RequestContextHolder.class })
 public class DefaultContentNegotiatorTest {
@@ -109,4 +107,13 @@ public class DefaultContentNegotiatorTest {
 		assertEquals(asList("text/html", "application/xhtml+xml", "application/xml;q=0.9"),
 				contentNegotiator.contentTypes());
 	}
+
+    @Test
+    public void testContentTypesWhenNeedsSplitWithWhitespace() {
+        when(req.getHeaders(ACCEPT_HEADER)).thenReturn(
+                enumeration(asList("text/html, application/xhtml+xml, application/xml;q=0.9")));
+
+        assertEquals(asList("text/html", "application/xhtml+xml", "application/xml;q=0.9"),
+                contentNegotiator.contentTypes());
+    }
 }
