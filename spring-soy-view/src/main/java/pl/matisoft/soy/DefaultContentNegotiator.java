@@ -32,7 +32,7 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 	public static final List<String> DEFAULT_SUPPORTED_CONTENT_TYPES = unmodifiableList(asList("text/html"));
 	public static final String ACCEPT_HEADER = "Accept";
 
-	private static final String CONTENT_TYPE_DELIMITER = ",";
+    private static final String CONTENT_TYPE_DELIMITER = ",\\s*";
 
 	private List<String> supportedContentTypes;
 	private boolean favorParameterOverAcceptHeader;
