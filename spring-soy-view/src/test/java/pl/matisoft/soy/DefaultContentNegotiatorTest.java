@@ -76,7 +76,7 @@ public class DefaultContentNegotiatorTest {
    	public void testIsSupportedContentTypesWhenWildcardWithLeadingSpace() {
         	contentNegotiator.setSupportedContentTypes(asList("text/html"));
 
-        	assertTrue(contentNegotiator.isSupportedContentTypes(Collections.unmodifiableList(asList(" */*"))));
+        	assertTrue(contentNegotiator.isSupportedContentTypes(asList(" */*")));
     	}
 
 	@Test
