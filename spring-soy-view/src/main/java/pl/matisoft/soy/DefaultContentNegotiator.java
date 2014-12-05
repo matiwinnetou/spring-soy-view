@@ -174,7 +174,7 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 		}
 
 		private String convertToRegex(final String aContentType) {
-			return aContentType.replaceAll(quote(ASTERISK), PERIOD_PLUS_ASTERISK);
+			return aContentType.trim().replaceAll(quote(ASTERISK), PERIOD_PLUS_ASTERISK);
 		}
 	}
 }
