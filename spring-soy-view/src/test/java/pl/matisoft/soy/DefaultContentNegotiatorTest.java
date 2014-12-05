@@ -72,6 +72,13 @@ public class DefaultContentNegotiatorTest {
 		assertTrue(contentNegotiator.isSupportedContentTypes(asList("*/*")));
 	}
 
+    	@Test
+   	public void testIsSupportedContentTypesWhenWildcardWithLeadingSpace() {
+        	contentNegotiator.setSupportedContentTypes(asList("text/html"));
+
+        	assertTrue(contentNegotiator.isSupportedContentTypes(asList(" */*")));
+    	}
+
 	@Test
 	public void testContentTypesWhenFavoredParameter() {
 		when(req.getParameter(DEFAULT_FAVORED_PARAMETER_NAME)).thenReturn("text/html");
