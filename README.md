@@ -418,6 +418,9 @@ and now if it won't be able to match on soy template, it will delegate to other 
 ### 1.25.5 - 24.09.2014
 * trivial bug fix in SpringSoyViewBaseConfig
 
+### 1.25.6 - 07.12.2014
+* bug fix with IE8
+
 ### License
 
 Apache License Version 2.0
