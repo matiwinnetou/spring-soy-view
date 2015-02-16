@@ -130,13 +130,13 @@ All artefacts have been pushed to maven central repository:
         <dependency>
             <groupId>pl.matisoft</groupId>
             <artifactId>spring-soy-view</artifactId>
-            <version>1.25.4</version>
+            <version>1.25.6</version>
         </dependency>
 
         <dependency>
             <groupId>pl.matisoft</groupId>
             <artifactId>spring-soy-view-ajax-compiler</artifactId>
-            <version>1.25.4</version>
+            <version>1.25.6</version>
         </dependency>
 
 ```
