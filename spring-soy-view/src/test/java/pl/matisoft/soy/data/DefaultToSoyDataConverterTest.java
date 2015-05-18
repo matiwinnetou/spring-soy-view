@@ -22,6 +22,10 @@ public class DefaultToSoyDataConverterTest {
 	private final String key = "key";
 	private final String keyValue = "keyValue";
 
+	private enum MyEnum {
+		A, B, C
+	}
+
 	@Test
 	public void testToSoyMapWhenNoModel() throws Exception {
 		Optional<SoyMapData> soyData = objectToSoyDataConverter.toSoyMap(null);
@@ -64,6 +68,15 @@ public class DefaultToSoyDataConverterTest {
 
 		assertEquals("test", testObject.toString());
 	}
+
+  @Test
+  public void testToSoyCompatibleObjectsWhenObjectIsEnum() throws Exception {
+    MyEnum testInput = MyEnum.A;
+    Object testObject = objectToSoyDataConverter
+      .toSoyCompatibleObjects(testInput);
+
+    assertEquals("A", testObject.toString());
+  }
 
 	@Test
 	public void testToSoyCompatibleObjectsWhenObjectIsWrapperType()
