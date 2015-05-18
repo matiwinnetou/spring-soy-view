@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -103,6 +104,14 @@
       <id>abhijitsarkar</id>
       <name>Abhijit Sarkar</name>
       <url>https://github.com/abhijitsarkar</url>
+      <roles>
+        <role>Contributor</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>solidjb</id>
+      <name>Jonathan Baker</name>
+      <url>https://github.com/solidjb</url>
       <roles>
         <role>Contributor</role>
       </roles>

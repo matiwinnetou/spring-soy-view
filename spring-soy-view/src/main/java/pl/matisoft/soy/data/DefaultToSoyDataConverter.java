@@ -90,6 +90,10 @@ public class DefaultToSoyDataConverter implements ToSoyDataConverter {
 			return obj;
 		}
 
+		if(obj.getClass().isEnum()) {
+			return ((Enum)obj).name();
+		}
+
 		if (obj instanceof Map) {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = (Map<String, Object>) obj;
