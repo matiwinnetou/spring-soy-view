@@ -421,6 +421,9 @@ and now if it won't be able to match on soy template, it will delegate to other 
 ### 1.25.6 - 07.12.2014
 * bug fix with IE8
 
+### 1.25.7 - 28.05.2015
+* added support for ENUMS (they will be automatically serialized from model to soy using DefaultToSoyModelConverter)
+
 ### License
 
 Apache License Version 2.0
@@ -431,5 +434,5 @@ Apache License Version 2.0
 ### Example project (shows Black-Box mode in action)
 * https://github.com/mati1979/spring-soy-view-example
 
-author: Mateusz Szczap<br>
-<mati@sz.home.pl>
+### author: Mateusz Szczap<br>
+- <mati@sz.home.pl>
