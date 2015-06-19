@@ -26,8 +26,8 @@
     <commons.io.version>2.4</commons.io.version>
     <jackson.mapper.version>1.8.4</jackson.mapper.version>
     <slf4j.version>1.7.7</slf4j.version>
-    <closure.compiler.version>v20130411</closure.compiler.version>
-    <soy.version>2012-12-21</soy.version>
+    <closure.compiler.version>v20150505</closure.compiler.version>
+    <soy.version>2015-04-10</soy.version>
 
     <junit.version>4.11</junit.version>
     <mockito.version>1.9.5</mockito.version>

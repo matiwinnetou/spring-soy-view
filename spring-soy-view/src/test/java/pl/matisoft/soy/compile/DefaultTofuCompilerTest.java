@@ -112,14 +112,22 @@ public class DefaultTofuCompilerTest {
                 "// This file was automatically generated from template3.soy.\n" +
                 "// Please don't edit this file by hand.\n" +
                 "\n" +
+                "/**\n" +
+                " * @fileoverview Templates in namespace soy.example.\n" +
+                " * @public\n" +
+                " */\n" +
+                "\n" +
                 "if (typeof soy == 'undefined') { var soy = {}; }\n" +
                 "if (typeof soy.example == 'undefined') { soy.example = {}; }\n" +
                 "\n" +
                 "\n" +
                 "soy.example.test = function(opt_data, opt_ignored) {\n" +
-                "  return 'notTranslated';\n" +
-                "};\n";
-        final SoyMsgPart soyMsgPart = new SoyMsgRawTextPart("translated");
+                "  return soydata.VERY_UNSAFE.ordainSanitizedHtml('notTranslated');\n" +
+                "};\n" +
+                "if (goog.DEBUG) {\n" +
+                "  soy.example.test.soyTemplateName = 'soy.example.test';\n" +
+                "}\n";
+        final SoyMsgPart soyMsgPart = SoyMsgRawTextPart.of("translated");
         final SoyMsg soyMsg = new SoyMsg(1, 1, "pl_PL", "test1", "desc", false, null, null, true, Lists.newArrayList(soyMsgPart));
         final SoyMsgBundle soyMsgBundle = new SoyMsgBundleImpl("pl_PL", Lists.<SoyMsg>newArrayList(soyMsg));
         when(compileTimeGlobalModelResolver.resolveData()).thenReturn(Optional.<SoyMapData>absent());
