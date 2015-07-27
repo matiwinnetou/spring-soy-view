@@ -424,6 +424,9 @@ and now if it won't be able to match on soy template, it will delegate to other 
 ### 1.25.7 - 28.05.2015
 * added support for ENUMS (they will be automatically serialized from model to soy using DefaultToSoyModelConverter)
 
+### 2.0.0 - 02.07.2015
+* upgrade to the latest released google closure templates library - 2015-04-10
+
 ### License
 
 Apache License Version 2.0
